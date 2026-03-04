@@ -14,7 +14,261 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      consultation_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medicine_votes: {
+        Row: {
+          created_at: string
+          feature_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medicines: {
+        Row: {
+          brand: string | null
+          category: string | null
+          contraindications: string | null
+          created_at: string
+          description: string | null
+          dosage_adult: string | null
+          dosage_child: string | null
+          id: string
+          name: string
+          pregnancy_safety: string | null
+          price: number | null
+          side_effects: string | null
+          storage: string | null
+          strength: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          contraindications?: string | null
+          created_at?: string
+          description?: string | null
+          dosage_adult?: string | null
+          dosage_child?: string | null
+          id?: string
+          name: string
+          pregnancy_safety?: string | null
+          price?: number | null
+          side_effects?: string | null
+          storage?: string | null
+          strength?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          contraindications?: string | null
+          created_at?: string
+          description?: string | null
+          dosage_adult?: string | null
+          dosage_child?: string | null
+          id?: string
+          name?: string
+          pregnancy_safety?: string | null
+          price?: number | null
+          side_effects?: string | null
+          storage?: string | null
+          strength?: string | null
+        }
+        Relationships: []
+      }
+      prescriptions: {
+        Row: {
+          clinic_name: string | null
+          created_at: string
+          date: string | null
+          diagnosis: string | null
+          hash: string | null
+          id: string
+          image_url: string | null
+          medicines: Json | null
+          prescribed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          clinic_name?: string | null
+          created_at?: string
+          date?: string | null
+          diagnosis?: string | null
+          hash?: string | null
+          id?: string
+          image_url?: string | null
+          medicines?: Json | null
+          prescribed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          clinic_name?: string | null
+          created_at?: string
+          date?: string | null
+          diagnosis?: string | null
+          hash?: string | null
+          id?: string
+          image_url?: string | null
+          medicines?: Json | null
+          prescribed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          adherence_score: number | null
+          created_at: string
+          dosage: string
+          frequency: string
+          id: string
+          medicine_name: string
+          missed_count: number | null
+          notes: string | null
+          reminder_time: string
+          status: string
+          taken_count: number | null
+          user_id: string
+        }
+        Insert: {
+          adherence_score?: number | null
+          created_at?: string
+          dosage?: string
+          frequency?: string
+          id?: string
+          medicine_name: string
+          missed_count?: number | null
+          notes?: string | null
+          reminder_time?: string
+          status?: string
+          taken_count?: number | null
+          user_id: string
+        }
+        Update: {
+          adherence_score?: number | null
+          created_at?: string
+          dosage?: string
+          frequency?: string
+          id?: string
+          medicine_name?: string
+          missed_count?: number | null
+          notes?: string | null
+          reminder_time?: string
+          status?: string
+          taken_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      symptom_logs: {
+        Row: {
+          created_at: string
+          detected_symptoms: Json | null
+          id: string
+          possible_conditions: Json | null
+          recommended_actions: Json | null
+          risk_score: number | null
+          severity: string | null
+          symptoms: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detected_symptoms?: Json | null
+          id?: string
+          possible_conditions?: Json | null
+          recommended_actions?: Json | null
+          risk_score?: number | null
+          severity?: string | null
+          symptoms: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detected_symptoms?: Json | null
+          id?: string
+          possible_conditions?: Json | null
+          recommended_actions?: Json | null
+          risk_score?: number | null
+          severity?: string | null
+          symptoms?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +277,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "patient" | "pharmacist" | "doctor" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +404,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["patient", "pharmacist", "doctor", "admin"],
+    },
   },
 } as const
