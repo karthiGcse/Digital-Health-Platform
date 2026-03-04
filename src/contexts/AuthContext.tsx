@@ -10,7 +10,7 @@ export interface Profile {
   email: string;
   name: string;
   role: AppRole;
-  phone: string;
+  phone: string | null;
   created_at: string;
   updated_at: string;
 }
