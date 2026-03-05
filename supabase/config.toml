@@ -1,1 +1,10 @@
 project_id = "evmyknljivgdfyxfzdov"
+
+[functions.claude-symptom-analysis]
+verify_jwt = false
+
+[functions.claude-medicine-summary]
+verify_jwt = false
+
+[functions.claude-drug-interactions]
+verify_jwt = false
