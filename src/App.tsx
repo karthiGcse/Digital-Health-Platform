@@ -31,9 +31,9 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/symptoms" element={<PlaceholderPage title="Symptom Checker" description="AI-powered symptom analysis coming in Phase 2." />} />
-              <Route path="/medicines" element={<PlaceholderPage title="Medicine Lookup" description="Search and explore medicine database coming in Phase 2." />} />
-              <Route path="/interactions" element={<PlaceholderPage title="Drug Interactions" description="Check drug interactions coming in Phase 2." />} />
+              <Route path="/symptoms" element={<SymptomChecker />} />
+              <Route path="/medicines" element={<MedicineLookup />} />
+              <Route path="/interactions" element={<DrugInteractions />} />
               <Route path="/prescriptions" element={<PlaceholderPage title="Digital Prescriptions" description="OCR-powered prescription management coming in Phase 2." />} />
               <Route path="/reminders" element={<PlaceholderPage title="Smart Reminders" description="Medication reminders coming in Phase 2." />} />
               <Route path="/telemedicine" element={<PlaceholderPage title="Telemedicine" description="Video consultations coming in Phase 2." />} />
