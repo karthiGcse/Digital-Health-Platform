@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.claude-drug-interactions]
 verify_jwt = false
+
+[functions.prescription-ocr]
+verify_jwt = false
+
+[functions.nearby-services]
+verify_jwt = false
