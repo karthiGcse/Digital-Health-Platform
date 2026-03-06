@@ -38,10 +38,10 @@ const App = () => (
               <Route path="/symptoms" element={<SymptomChecker />} />
               <Route path="/medicines" element={<MedicineLookup />} />
               <Route path="/interactions" element={<DrugInteractions />} />
-              <Route path="/prescriptions" element={<PlaceholderPage title="Digital Prescriptions" description="OCR-powered prescription management coming in Phase 2." />} />
-              <Route path="/reminders" element={<PlaceholderPage title="Smart Reminders" description="Medication reminders coming in Phase 2." />} />
-              <Route path="/telemedicine" element={<PlaceholderPage title="Telemedicine" description="Video consultations coming in Phase 2." />} />
-              <Route path="/nearby" element={<PlaceholderPage title="Nearby Services" description="Find hospitals and pharmacies nearby coming in Phase 2." />} />
+              <Route path="/prescriptions" element={<Prescriptions />} />
+              <Route path="/reminders" element={<Reminders />} />
+              <Route path="/telemedicine" element={<Telemedicine />} />
+              <Route path="/nearby" element={<NearbyServices />} />
               <Route path="/consultation" element={<PlaceholderPage title="AI Consultation" description="Chat with AI assistant coming in Phase 2." />} />
               <Route path="/analytics" element={<PlaceholderPage title="Health Analytics" description="Health analytics dashboard coming in Phase 2." />} />
               <Route path="/reports" element={<PlaceholderPage title="AI Reports" description="AI-generated health reports coming in Phase 2." />} />
