@@ -134,7 +134,7 @@ const DrugInteractions = () => {
                 </Select>
               </div>
             </div>
-            <Button onClick={checkPair} disabled={loading} className="w-full">
+            <Button onClick={checkPair} disabled={loading} className="w-full gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
               {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Checking...</> : 'Check Interaction'}
             </Button>
           </CardContent>
