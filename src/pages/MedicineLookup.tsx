@@ -95,9 +95,9 @@ const MedicineLookup = () => {
   return (
     <div className="space-y-6">
       {/* UGC Banner */}
-      <div className="flex items-start gap-3 rounded-card bg-warning/10 border border-warning/30 p-4">
-        <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-        <p className="text-sm text-warning">
+      <div className="flex items-start gap-3 rounded-2xl bg-warning/10 border border-warning/30 p-4">
+        <div className="stat-icon-orange h-9 w-9 shrink-0"><AlertTriangle className="h-4 w-4" /></div>
+        <p className="text-sm text-warning pt-1.5">
           Medicine information is for reference only. Always consult your pharmacist or doctor.
         </p>
       </div>
