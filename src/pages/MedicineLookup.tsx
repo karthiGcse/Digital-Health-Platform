@@ -124,7 +124,7 @@ const MedicineLookup = () => {
           {filtered.map(m => (
             <Card
               key={m.id}
-              className={`rounded-card shadow-sm hover:shadow-md transition-shadow cursor-pointer ${selected?.id === m.id ? 'ring-2 ring-primary' : ''}`}
+              className={`card-hover cursor-pointer ${selected?.id === m.id ? 'ring-2 ring-primary shadow-glow' : ''}`}
               onClick={() => openDetail(m)}
             >
               <CardContent className="p-4">
