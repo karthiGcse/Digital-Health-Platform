@@ -105,8 +105,8 @@ const DrugInteractions = () => {
     <div className="space-y-6">
       {/* Mode Toggle */}
       <div className="flex gap-2">
-        <Button variant={mode === 'pair' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('pair'); setResult(null); }}>Pairwise Check</Button>
-        <Button variant={mode === 'regimen' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('regimen'); setResult(null); }}>Multi-Drug Regimen</Button>
+        <Button variant={mode === 'pair' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('pair'); setResult(null); }} className={mode === 'pair' ? 'gradient-health text-white border-0 rounded-full shadow-glow' : 'rounded-full'}>Pairwise Check</Button>
+        <Button variant={mode === 'regimen' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('regimen'); setResult(null); }} className={mode === 'regimen' ? 'gradient-health text-white border-0 rounded-full shadow-glow' : 'rounded-full'}>Multi-Drug Regimen</Button>
       </div>
 
       {mode === 'pair' ? (
