@@ -9,16 +9,8 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 interface Doctor {
-  id: string;
-  name: string;
-  specialty: string;
-  experience: string;
-  rating: number;
-  fee: number;
-  available: boolean;
-  languages: string[];
-  nextSlot: string;
-  avatar: string;
+  id: string; name: string; specialty: string; experience: string; rating: number;
+  fee: number; available: boolean; languages: string[]; nextSlot: string; avatar: string;
 }
 
 const doctors: Doctor[] = [
@@ -33,6 +25,8 @@ const doctors: Doctor[] = [
 ];
 
 const specialties = ['All', ...Array.from(new Set(doctors.map(d => d.specialty)))];
+
+const doctorGradients = ['gradient-cool', 'gradient-health', 'gradient-success', 'gradient-warm', 'gradient-health', 'gradient-cool', 'gradient-health', 'gradient-warm'];
 
 const Telemedicine = () => {
   const [search, setSearch] = useState('');
@@ -50,21 +44,15 @@ const Telemedicine = () => {
 
   const startCall = (doctor: Doctor, type: 'video' | 'audio') => {
     if (!doctor.available) { toast.error('Doctor is not available right now'); return; }
-    setCallDoctor(doctor);
-    setCallType(type);
-    setInCall(true);
-    setCallDuration(0);
+    setCallDoctor(doctor); setCallType(type); setInCall(true); setCallDuration(0);
     toast.success(`Connecting ${type} call with ${doctor.name}...`);
     const interval = setInterval(() => setCallDuration(prev => prev + 1), 1000);
-    // Store interval for cleanup
     (window as any).__callInterval = interval;
   };
 
   const endCall = () => {
     clearInterval((window as any).__callInterval);
-    setInCall(false);
-    setCallDoctor(null);
-    setCallDuration(0);
+    setInCall(false); setCallDoctor(null); setCallDuration(0);
     toast('Call ended');
   };
 
@@ -76,11 +64,12 @@ const Telemedicine = () => {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search doctors..." className="pl-10" value={search} onChange={e => setSearch(e.target.value)} />
+          <Input placeholder="Search doctors..." className="pl-10 rounded-xl" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-2 flex-wrap">
           {specialties.slice(0, 5).map(s => (
-            <Button key={s} variant={specialty === s ? 'default' : 'outline'} size="sm" onClick={() => setSpecialty(s)} className="text-xs">{s}</Button>
+            <Button key={s} variant={specialty === s ? 'default' : 'outline'} size="sm" onClick={() => setSpecialty(s)}
+              className={`text-xs rounded-full ${specialty === s ? 'gradient-health text-white border-0 shadow-glow' : ''}`}>{s}</Button>
           ))}
         </div>
       </div>
@@ -89,10 +78,10 @@ const Telemedicine = () => {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((d, i) => (
           <motion.div key={d.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className="rounded-card shadow-sm hover:shadow-md transition-shadow">
+            <Card className="card-hover">
               <CardContent className="p-5">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{d.avatar}</div>
+                  <div className={`h-12 w-12 rounded-xl ${doctorGradients[i % doctorGradients.length]} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>{d.avatar}</div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate">{d.name}</h3>
                     <p className="text-xs text-muted-foreground">{d.specialty}</p>
@@ -102,25 +91,25 @@ const Telemedicine = () => {
                       <span className="text-xs text-muted-foreground">• {d.experience}</span>
                     </div>
                   </div>
-                  <Badge variant={d.available ? 'default' : 'secondary'} className={`text-xs ${d.available ? 'bg-success text-success-foreground' : ''}`}>
-                    {d.available ? 'Online' : 'Offline'}
+                  <Badge variant={d.available ? 'default' : 'secondary'} className={`text-xs rounded-full ${d.available ? 'bg-success text-success-foreground' : ''}`}>
+                    {d.available ? '● Online' : 'Offline'}
                   </Badge>
                 </div>
 
                 <div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{d.nextSlot}</span>
-                  <span className="font-semibold text-foreground">₹{d.fee}</span>
+                  <span className="font-bold text-foreground text-sm">₹{d.fee}</span>
                 </div>
 
                 <div className="flex items-center gap-1.5 mb-3">
-                  {d.languages.map(l => <Badge key={l} variant="outline" className="text-[10px] px-1.5">{l}</Badge>)}
+                  {d.languages.map(l => <Badge key={l} variant="outline" className="text-[10px] px-1.5 rounded-full">{l}</Badge>)}
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => startCall(d, 'video')} disabled={!d.available}>
+                  <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30" onClick={() => startCall(d, 'video')} disabled={!d.available}>
                     <Video className="h-3.5 w-3.5 mr-1" /> Video
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => startCall(d, 'audio')} disabled={!d.available}>
+                  <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-success/10 hover:text-success hover:border-success/30" onClick={() => startCall(d, 'audio')} disabled={!d.available}>
                     <Phone className="h-3.5 w-3.5 mr-1" /> Audio
                   </Button>
                 </div>
@@ -136,8 +125,8 @@ const Telemedicine = () => {
           <DialogHeader><DialogTitle>{callType === 'video' ? 'Video' : 'Audio'} Call</DialogTitle></DialogHeader>
           {callDoctor && (
             <div className="text-center space-y-6 py-6">
-              <div className={`h-24 w-24 mx-auto rounded-full flex items-center justify-center text-2xl font-bold ${callType === 'video' ? 'bg-primary/10 text-primary' : 'bg-success/10 text-success'}`}>
-                {callType === 'video' ? <Video className="h-10 w-10" /> : <User className="h-10 w-10" />}
+              <div className={`h-24 w-24 mx-auto rounded-3xl flex items-center justify-center shadow-glow ${callType === 'video' ? 'gradient-health' : 'gradient-success'}`}>
+                {callType === 'video' ? <Video className="h-10 w-10 text-white" /> : <User className="h-10 w-10 text-white" />}
               </div>
               <div>
                 <h3 className="font-heading font-bold text-lg">{callDoctor.name}</h3>
@@ -145,7 +134,7 @@ const Telemedicine = () => {
               </div>
               <div className="text-3xl font-mono font-bold text-primary">{formatTime(callDuration)}</div>
               <p className="text-xs text-muted-foreground animate-pulse">Call in progress (simulated)</p>
-              <Button variant="destructive" size="lg" className="rounded-full px-8" onClick={endCall}>
+              <Button variant="destructive" size="lg" className="rounded-full px-8 gradient-danger text-white border-0 shadow-lg" onClick={endCall}>
                 <X className="h-5 w-5 mr-2" /> End Call
               </Button>
             </div>

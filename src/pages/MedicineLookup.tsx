@@ -95,9 +95,9 @@ const MedicineLookup = () => {
   return (
     <div className="space-y-6">
       {/* UGC Banner */}
-      <div className="flex items-start gap-3 rounded-card bg-warning/10 border border-warning/30 p-4">
-        <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-        <p className="text-sm text-warning">
+      <div className="flex items-start gap-3 rounded-2xl bg-warning/10 border border-warning/30 p-4">
+        <div className="stat-icon-orange h-9 w-9 shrink-0"><AlertTriangle className="h-4 w-4" /></div>
+        <p className="text-sm text-warning pt-1.5">
           Medicine information is for reference only. Always consult your pharmacist or doctor.
         </p>
       </div>
@@ -124,15 +124,15 @@ const MedicineLookup = () => {
           {filtered.map(m => (
             <Card
               key={m.id}
-              className={`rounded-card shadow-sm hover:shadow-md transition-shadow cursor-pointer ${selected?.id === m.id ? 'ring-2 ring-primary' : ''}`}
+              className={`card-hover cursor-pointer ${selected?.id === m.id ? 'ring-2 ring-primary shadow-glow' : ''}`}
               onClick={() => openDetail(m)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Pill className="h-5 w-5 text-primary" />
+                  <div className="h-10 w-10 rounded-xl gradient-success flex items-center justify-center shadow-md">
+                    <Pill className="h-5 w-5 text-white" />
                   </div>
-                  <Badge variant="secondary" className="text-xs">{m.category}</Badge>
+                  <Badge variant="secondary" className="text-xs rounded-full">{m.category}</Badge>
                 </div>
                 <h3 className="font-heading font-semibold">{m.name}</h3>
                 <p className="text-xs text-muted-foreground">{m.brand}</p>

@@ -13,18 +13,9 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Reminder {
-  id: string;
-  medicine_name: string;
-  dosage: string;
-  frequency: string;
-  reminder_time: string;
-  status: string;
-  taken_count: number | null;
-  missed_count: number | null;
-  adherence_score: number | null;
-  notes: string | null;
-  user_id: string;
-  created_at: string;
+  id: string; medicine_name: string; dosage: string; frequency: string; reminder_time: string;
+  status: string; taken_count: number | null; missed_count: number | null; adherence_score: number | null;
+  notes: string | null; user_id: string; created_at: string;
 }
 
 const frequencies = ['Once daily', 'Twice daily', 'Three times daily', 'Every 8 hours', 'Every 12 hours', 'Weekly', 'As needed'];
@@ -48,16 +39,8 @@ const Reminders = () => {
   const addReminder = async () => {
     if (!user || !form.medicine_name) { toast.error('Medicine name required'); return; }
     const { error } = await supabase.from('reminders').insert({
-      user_id: user.id,
-      medicine_name: form.medicine_name,
-      dosage: form.dosage,
-      frequency: form.frequency,
-      reminder_time: form.reminder_time,
-      notes: form.notes || null,
-      status: 'active',
-      taken_count: 0,
-      missed_count: 0,
-      adherence_score: 100,
+      user_id: user.id, medicine_name: form.medicine_name, dosage: form.dosage, frequency: form.frequency,
+      reminder_time: form.reminder_time, notes: form.notes || null, status: 'active', taken_count: 0, missed_count: 0, adherence_score: 100,
     });
     if (error) { toast.error('Failed to add'); return; }
     toast.success('Reminder added');
@@ -96,9 +79,7 @@ const Reminders = () => {
     setReminders(prev => prev.map(rem => rem.id === r.id ? { ...rem, status: newStatus } : rem));
   };
 
-  const overallAdherence = reminders.length > 0
-    ? Math.round(reminders.reduce((sum, r) => sum + (r.adherence_score || 0), 0) / reminders.length)
-    : 0;
+  const overallAdherence = reminders.length > 0 ? Math.round(reminders.reduce((sum, r) => sum + (r.adherence_score || 0), 0) / reminders.length) : 0;
 
   const adherenceColor = (score: number) => {
     if (score >= 80) return 'text-success';
@@ -112,30 +93,30 @@ const Reminders = () => {
     <div className="space-y-6">
       {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardContent className="p-4 text-center">
-            <Bell className="h-5 w-5 text-primary mx-auto mb-1" />
+            <div className="stat-icon-blue mx-auto mb-2"><Bell className="h-5 w-5" /></div>
             <p className="text-2xl font-bold">{reminders.filter(r => r.status === 'active').length}</p>
             <p className="text-xs text-muted-foreground">Active</p>
           </CardContent>
         </Card>
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardContent className="p-4 text-center">
-            <TrendingUp className={`h-5 w-5 mx-auto mb-1 ${adherenceColor(overallAdherence)}`} />
+            <div className={`stat-icon-${overallAdherence >= 80 ? 'green' : 'orange'} mx-auto mb-2`}><TrendingUp className="h-5 w-5" /></div>
             <p className="text-2xl font-bold">{overallAdherence}%</p>
             <p className="text-xs text-muted-foreground">Adherence</p>
           </CardContent>
         </Card>
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardContent className="p-4 text-center">
-            <Check className="h-5 w-5 text-success mx-auto mb-1" />
+            <div className="stat-icon-green mx-auto mb-2"><Check className="h-5 w-5" /></div>
             <p className="text-2xl font-bold">{reminders.reduce((s, r) => s + (r.taken_count || 0), 0)}</p>
             <p className="text-xs text-muted-foreground">Taken</p>
           </CardContent>
         </Card>
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardContent className="p-4 text-center">
-            <X className="h-5 w-5 text-destructive mx-auto mb-1" />
+            <div className="stat-icon-red mx-auto mb-2"><X className="h-5 w-5" /></div>
             <p className="text-2xl font-bold">{reminders.reduce((s, r) => s + (r.missed_count || 0), 0)}</p>
             <p className="text-xs text-muted-foreground">Missed</p>
           </CardContent>
@@ -146,37 +127,39 @@ const Reminders = () => {
       <div className="flex justify-end">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" /> Add Reminder</Button>
+            <Button className="gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
+              <Plus className="h-4 w-4 mr-2" /> Add Reminder
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>New Medication Reminder</DialogTitle></DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
                 <label className="text-sm font-medium mb-1 block">Medicine Name</label>
-                <Input placeholder="e.g. Metformin" value={form.medicine_name} onChange={e => setForm(p => ({ ...p, medicine_name: e.target.value }))} />
+                <Input placeholder="e.g. Metformin" value={form.medicine_name} onChange={e => setForm(p => ({ ...p, medicine_name: e.target.value }))} className="rounded-xl" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Dosage</label>
-                  <Input placeholder="e.g. 500mg" value={form.dosage} onChange={e => setForm(p => ({ ...p, dosage: e.target.value }))} />
+                  <Input placeholder="e.g. 500mg" value={form.dosage} onChange={e => setForm(p => ({ ...p, dosage: e.target.value }))} className="rounded-xl" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">Time</label>
-                  <Input type="time" value={form.reminder_time} onChange={e => setForm(p => ({ ...p, reminder_time: e.target.value }))} />
+                  <Input type="time" value={form.reminder_time} onChange={e => setForm(p => ({ ...p, reminder_time: e.target.value }))} className="rounded-xl" />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Frequency</label>
                 <Select value={form.frequency} onValueChange={v => setForm(p => ({ ...p, frequency: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>{frequencies.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Notes (optional)</label>
-                <Input placeholder="Take after food" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+                <Input placeholder="Take after food" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} className="rounded-xl" />
               </div>
-              <Button onClick={addReminder} className="w-full">Add Reminder</Button>
+              <Button onClick={addReminder} className="w-full gradient-health text-white border-0 rounded-xl">Add Reminder</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -184,9 +167,9 @@ const Reminders = () => {
 
       {/* Reminders List */}
       {reminders.length === 0 ? (
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardContent className="p-12 text-center">
-            <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <div className="stat-icon-blue mx-auto mb-4 h-16 w-16"><Bell className="h-8 w-8" /></div>
             <h3 className="font-heading font-semibold text-lg mb-2">No Reminders</h3>
             <p className="text-sm text-muted-foreground">Set up medication reminders to stay on track.</p>
           </CardContent>
@@ -196,40 +179,35 @@ const Reminders = () => {
           <AnimatePresence>
             {reminders.map(r => (
               <motion.div key={r.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <Card className={`rounded-card shadow-sm ${r.status === 'paused' ? 'opacity-50' : ''}`}>
+                <Card className={`card-hover ${r.status === 'paused' ? 'opacity-50' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold truncate">{r.medicine_name}</h3>
-                          <Badge variant={r.status === 'active' ? 'default' : 'secondary'} className="text-xs cursor-pointer" onClick={() => toggleStatus(r)}>
+                          <Badge variant={r.status === 'active' ? 'default' : 'secondary'} className="text-xs cursor-pointer rounded-full" onClick={() => toggleStatus(r)}>
                             {r.status}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <span>{r.dosage}</span>
-                          <span>•</span>
-                          <span>{r.frequency}</span>
-                          <span>•</span>
+                          <span>{r.dosage}</span><span>•</span><span>{r.frequency}</span><span>•</span>
                           <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{r.reminder_time}</span>
                         </div>
                         {r.notes && <p className="text-xs text-muted-foreground mt-1">📝 {r.notes}</p>}
                         <div className="flex items-center gap-3 mt-2">
-                          <div className="flex-1">
-                            <Progress value={r.adherence_score || 0} className="h-1.5" />
-                          </div>
-                          <span className={`text-xs font-medium ${adherenceColor(r.adherence_score || 0)}`}>{r.adherence_score || 0}%</span>
+                          <div className="flex-1"><Progress value={r.adherence_score || 0} className="h-2 rounded-full" /></div>
+                          <span className={`text-xs font-bold ${adherenceColor(r.adherence_score || 0)}`}>{r.adherence_score || 0}%</span>
                           <span className="text-xs text-muted-foreground">({r.taken_count || 0}✓ / {r.missed_count || 0}✗)</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <Button variant="outline" size="icon" className="h-9 w-9 text-success hover:bg-success/10" onClick={() => markTaken(r)}>
+                        <Button variant="outline" size="icon" className="h-9 w-9 text-success hover:bg-success/10 rounded-xl border-success/30" onClick={() => markTaken(r)}>
                           <Check className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10" onClick={() => markMissed(r)}>
+                        <Button variant="outline" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10 rounded-xl border-destructive/30" onClick={() => markMissed(r)}>
                           <X className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => deleteReminder(r.id)}>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => deleteReminder(r.id)}>
                           <Trash2 className="h-4 w-4 text-muted-foreground" />
                         </Button>
                       </div>

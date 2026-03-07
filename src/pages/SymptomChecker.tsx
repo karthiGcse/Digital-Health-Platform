@@ -114,9 +114,9 @@ const SymptomChecker = () => {
   return (
     <div className="space-y-6">
       {/* UGC Banner */}
-      <div className="flex items-start gap-3 rounded-card bg-warning/10 border border-warning/30 p-4">
-        <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-        <p className="text-sm text-warning">
+      <div className="flex items-start gap-3 rounded-2xl bg-warning/10 border border-warning/30 p-4">
+        <div className="stat-icon-orange h-9 w-9 shrink-0"><AlertTriangle className="h-4 w-4" /></div>
+        <p className="text-sm text-warning pt-1.5">
           This tool provides general information only. Consult a healthcare professional for medical advice.
         </p>
       </div>
@@ -124,8 +124,13 @@ const SymptomChecker = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Input Form */}
         <div className="lg:col-span-2 space-y-4">
-          <Card className="rounded-card shadow-sm">
-            <CardHeader><CardTitle className="text-lg">Describe Your Symptoms</CardTitle></CardHeader>
+          <Card className="card-hover">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <div className="stat-icon-blue h-8 w-8"><Activity className="h-4 w-4" /></div>
+                <CardTitle className="text-lg">Describe Your Symptoms</CardTitle>
+              </div>
+            </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
@@ -167,12 +172,12 @@ const SymptomChecker = () => {
                 <p className="text-xs text-muted-foreground mb-2">Common symptoms (click to add):</p>
                 <div className="flex flex-wrap gap-2">
                   {commonSymptoms.map(s => (
-                    <Button key={s} variant="outline" size="sm" className="text-xs rounded-full" onClick={() => addSymptom(s)}>{s}</Button>
+                    <Button key={s} variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all" onClick={() => addSymptom(s)}>{s}</Button>
                   ))}
                 </div>
               </div>
 
-              <Button onClick={analyze} disabled={loading} className="w-full">
+              <Button onClick={analyze} disabled={loading} className="w-full gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
                 {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing...</> : <><Activity className="h-4 w-4 mr-2" /> Analyze with AI</>}
               </Button>
             </CardContent>
@@ -280,7 +285,7 @@ const SymptomChecker = () => {
 
         {/* History Sidebar */}
         <div>
-          <Card className="rounded-card shadow-sm">
+          <Card className="card-hover">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Analysis History</CardTitle>
