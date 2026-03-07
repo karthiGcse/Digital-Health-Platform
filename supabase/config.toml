@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.nearby-services]
 verify_jwt = false
+
+[functions.ai-consultation]
+verify_jwt = false
+
+[functions.ai-health-report]
+verify_jwt = false

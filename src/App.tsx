@@ -17,7 +17,10 @@ import Reminders from "@/pages/Reminders";
 import Telemedicine from "@/pages/Telemedicine";
 import NearbyServices from "@/pages/NearbyServices";
 import ComingSoon from "@/pages/ComingSoon";
-import PlaceholderPage from "@/pages/PlaceholderPage";
+import AIConsultation from "@/pages/AIConsultation";
+import HealthAnalytics from "@/pages/HealthAnalytics";
+import AIReports from "@/pages/AIReports";
+import Emergency from "@/pages/Emergency";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,11 +45,11 @@ const App = () => (
               <Route path="/reminders" element={<Reminders />} />
               <Route path="/telemedicine" element={<Telemedicine />} />
               <Route path="/nearby" element={<NearbyServices />} />
-              <Route path="/consultation" element={<PlaceholderPage title="AI Consultation" description="Chat with AI assistant coming in Phase 2." />} />
-              <Route path="/analytics" element={<PlaceholderPage title="Health Analytics" description="Health analytics dashboard coming in Phase 2." />} />
-              <Route path="/reports" element={<PlaceholderPage title="AI Reports" description="AI-generated health reports coming in Phase 2." />} />
-              <Route path="/emergency" element={<PlaceholderPage title="Emergency" description="Emergency services and first-aid coming in Phase 2." />} />
-              <Route path="/inventory" element={<PlaceholderPage title="Inventory" description="Pharmacist inventory management coming in Phase 2." />} />
+              <Route path="/consultation" element={<AIConsultation />} />
+              <Route path="/analytics" element={<HealthAnalytics />} />
+              <Route path="/reports" element={<AIReports />} />
+              <Route path="/emergency" element={<Emergency />} />
+              <Route path="/inventory" element={<AIConsultation />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
