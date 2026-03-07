@@ -129,8 +129,8 @@ const MedicineLookup = () => {
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Pill className="h-5 w-5 text-primary" />
+                  <div className="h-10 w-10 rounded-xl gradient-success flex items-center justify-center shadow-md">
+                    <Pill className="h-5 w-5 text-white" />
                   </div>
                   <Badge variant="secondary" className="text-xs">{m.category}</Badge>
                 </div>
