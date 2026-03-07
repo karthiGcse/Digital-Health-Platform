@@ -285,7 +285,7 @@ const SymptomChecker = () => {
 
         {/* History Sidebar */}
         <div>
-          <Card className="rounded-card shadow-sm">
+          <Card className="card-hover">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Analysis History</CardTitle>
