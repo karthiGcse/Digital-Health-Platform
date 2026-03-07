@@ -177,7 +177,7 @@ const SymptomChecker = () => {
                 </div>
               </div>
 
-              <Button onClick={analyze} disabled={loading} className="w-full">
+              <Button onClick={analyze} disabled={loading} className="w-full gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
                 {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing...</> : <><Activity className="h-4 w-4 mr-2" /> Analyze with AI</>}
               </Button>
             </CardContent>
