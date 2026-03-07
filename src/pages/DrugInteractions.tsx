@@ -110,8 +110,13 @@ const DrugInteractions = () => {
       </div>
 
       {mode === 'pair' ? (
-        <Card className="rounded-card shadow-sm">
-          <CardHeader><CardTitle className="text-lg">Check Drug Interaction</CardTitle></CardHeader>
+        <Card className="card-hover">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <div className="stat-icon-orange h-8 w-8"><AlertTriangle className="h-4 w-4" /></div>
+              <CardTitle className="text-lg">Check Drug Interaction</CardTitle>
+            </div>
+          </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
