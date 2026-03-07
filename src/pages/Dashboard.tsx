@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Activity, Pill, Calendar, AlertTriangle, MessageSquare, AlertCircle,
-  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell
+  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -21,19 +21,19 @@ const symptomData = [
 ];
 
 const recentActivity = [
-  { icon: Pill, text: 'Took Metformin 500mg', time: '2 hours ago', color: 'text-green-500' },
-  { icon: Activity, text: 'Symptom check completed', time: '5 hours ago', color: 'text-primary' },
-  { icon: FileText, text: 'Prescription uploaded', time: '1 day ago', color: 'text-purple-500' },
-  { icon: MessageSquare, text: 'AI Consultation session', time: '2 days ago', color: 'text-amber-500' },
+  { icon: Pill, text: 'Took Metformin 500mg', time: '2 hours ago', iconClass: 'stat-icon-green' },
+  { icon: Activity, text: 'Symptom check completed', time: '5 hours ago', iconClass: 'stat-icon-blue' },
+  { icon: FileText, text: 'Prescription uploaded', time: '1 day ago', iconClass: 'stat-icon-purple' },
+  { icon: MessageSquare, text: 'AI Consultation session', time: '2 days ago', iconClass: 'stat-icon-orange' },
 ];
 
 const quickActions = [
-  { title: 'Symptom Checker', icon: Activity, url: '/symptoms', color: 'bg-blue-500/10 text-blue-600' },
-  { title: 'Medicine Lookup', icon: Pill, url: '/medicines', color: 'bg-green-500/10 text-green-600' },
-  { title: 'Book Appointment', icon: Calendar, url: '/telemedicine', color: 'bg-purple-500/10 text-purple-600' },
-  { title: 'Drug Interactions', icon: AlertTriangle, url: '/interactions', color: 'bg-amber-500/10 text-amber-600' },
-  { title: 'AI Consultation', icon: MessageSquare, url: '/consultation', color: 'bg-indigo-500/10 text-indigo-600' },
-  { title: 'Emergency', icon: AlertCircle, url: '/emergency', color: 'bg-red-500/10 text-red-600' },
+  { title: 'Symptom Checker', icon: Activity, url: '/symptoms', gradient: 'gradient-cool' },
+  { title: 'Medicine Lookup', icon: Pill, url: '/medicines', gradient: 'gradient-success' },
+  { title: 'Book Appointment', icon: Calendar, url: '/telemedicine', gradient: 'gradient-health' },
+  { title: 'Drug Interactions', icon: AlertTriangle, url: '/interactions', gradient: 'gradient-warm' },
+  { title: 'AI Consultation', icon: MessageSquare, url: '/consultation', gradient: 'gradient-health' },
+  { title: 'Emergency', icon: AlertCircle, url: '/emergency', gradient: 'gradient-danger' },
 ];
 
 const Dashboard = () => {
@@ -44,41 +44,48 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-card bg-gradient-to-r from-primary to-blue-700 p-6 md:p-8 text-primary-foreground">
+      <div className="page-header gradient-health animate-gradient p-6 md:p-8">
         <div className="relative z-10">
-          <h2 className="text-2xl md:text-3xl font-heading font-bold">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="h-5 w-5 text-white/80" />
+            <span className="text-white/70 text-xs font-medium uppercase tracking-wider">Health Dashboard</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-heading font-bold text-white">
             Welcome back, {profile?.name || 'User'} 👋
           </h2>
-          <p className="mt-1 text-primary-foreground/80 text-sm md:text-base">Your health journey continues. Stay on track with your medications.</p>
+          <p className="mt-1 text-white/75 text-sm md:text-base">Your health journey continues. Stay on track with your medications.</p>
           <div className="flex flex-wrap gap-2 mt-4">
-            <Button size="sm" variant="secondary" onClick={() => navigate('/symptoms')}>
+            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/symptoms')}>
               <Activity className="h-3.5 w-3.5 mr-1" /> Symptom Check
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => navigate('/telemedicine')}>
+            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/telemedicine')}>
               <Calendar className="h-3.5 w-3.5 mr-1" /> Book Doctor
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => navigate('/prescriptions')}>
+            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/prescriptions')}>
               <FileText className="h-3.5 w-3.5 mr-1" /> View Prescriptions
             </Button>
           </div>
         </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 right-20 w-32 h-32 bg-white/5 rounded-full translate-y-1/2" />
+        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 right-20 w-40 h-40 bg-white/5 rounded-full translate-y-1/2" />
+        <div className="absolute top-1/2 left-1/3 w-20 h-20 bg-white/5 rounded-full" />
       </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Adherence Rate', value: '87%', icon: Heart, trend: '+3%', up: true, color: 'text-green-500' },
-          { label: 'Active Reminders', value: '5', icon: Bell, trend: '2 today', up: true, color: 'text-primary' },
-          { label: 'Risk Score', value: riskScore.toString(), icon: Activity, trend: '-5', up: false, color: riskScore < 40 ? 'text-green-500' : 'text-amber-500' },
-          { label: 'Prescriptions', value: '3', icon: FileText, trend: '1 active', up: true, color: 'text-purple-500' },
+          { label: 'Adherence Rate', value: '87%', icon: Heart, trend: '+3%', up: true, iconClass: 'stat-icon-green' },
+          { label: 'Active Reminders', value: '5', icon: Bell, trend: '2 today', up: true, iconClass: 'stat-icon-blue' },
+          { label: 'Risk Score', value: riskScore.toString(), icon: Activity, trend: '-5', up: false, iconClass: riskScore < 40 ? 'stat-icon-green' : 'stat-icon-orange' },
+          { label: 'Prescriptions', value: '3', icon: FileText, trend: '1 active', up: true, iconClass: 'stat-icon-purple' },
         ].map((stat) => (
-          <Card key={stat.label} className="rounded-card shadow-sm hover:shadow-md transition-shadow">
+          <Card key={stat.label} className="card-hover">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <stat.icon className={`h-5 w-5 ${stat.color}`} />
-                <div className={`flex items-center gap-0.5 text-xs ${stat.up ? 'text-green-500' : 'text-amber-500'}`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className={stat.iconClass}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
+                <div className={`flex items-center gap-0.5 text-xs font-semibold ${stat.up ? 'text-success' : 'text-warning'}`}>
                   {stat.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                   {stat.trend}
                 </div>
@@ -92,46 +99,63 @@ const Dashboard = () => {
 
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Adherence Chart */}
-        <Card className="lg:col-span-2 rounded-card shadow-sm">
+        <Card className="lg:col-span-2 card-hover">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Medication Adherence (7 Days)</CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="stat-icon-blue h-8 w-8">
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <CardTitle className="text-base">Medication Adherence (7 Days)</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={adherenceData}>
                 <defs>
                   <linearGradient id="adherenceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(217, 91%, 53%)" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="hsl(217, 91%, 53%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor="hsl(217, 91%, 53%)" stopOpacity={0.4} />
+                    <stop offset="50%" stopColor="hsl(271, 81%, 56%)" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="hsl(271, 81%, 56%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="day" axisLine={false} tickLine={false} fontSize={12} />
                 <YAxis domain={[0, 100]} axisLine={false} tickLine={false} fontSize={12} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Area type="monotone" dataKey="adherence" stroke="hsl(217, 91%, 53%)" fill="url(#adherenceGradient)" strokeWidth={2} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }} />
+                <Area type="monotone" dataKey="adherence" stroke="hsl(217, 91%, 53%)" fill="url(#adherenceGradient)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Risk Score */}
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Health Risk Score</CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="stat-icon-green h-8 w-8">
+                <Heart className="h-4 w-4" />
+              </div>
+              <CardTitle className="text-base">Health Risk Score</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
             <div className="relative h-32 w-32">
               <svg viewBox="0 0 100 100" className="transform -rotate-90">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(142, 71%, 45%)" strokeWidth="8"
+                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#riskGradient)" strokeWidth="8"
                   strokeDasharray={`${(riskScore / 100) * 251.3} 251.3`} strokeLinecap="round" />
+                <defs>
+                  <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="hsl(152, 76%, 42%)" />
+                    <stop offset="100%" stopColor="hsl(170, 70%, 45%)" />
+                  </linearGradient>
+                </defs>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-heading font-bold">{riskScore}</span>
                 <span className="text-xs text-muted-foreground">Low Risk</span>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-green-500">
+            <div className="flex items-center gap-1 mt-2 text-sm text-success font-medium">
               <TrendingDown className="h-3.5 w-3.5" /> Improved by 5 points
             </div>
           </CardContent>
@@ -140,41 +164,40 @@ const Dashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-4">
         {/* Quick Actions */}
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {quickActions.map((action) => (
-                <Button
+                <button
                   key={action.title}
-                  variant="ghost"
-                  className={`h-auto flex-col gap-2 p-4 rounded-xl ${action.color} hover:opacity-80`}
+                  className={`${action.gradient} h-auto flex flex-col items-center gap-2 p-4 rounded-xl text-white hover:opacity-90 transition-all hover:scale-[1.02] shadow-md`}
                   onClick={() => navigate(action.url)}
                 >
                   <action.icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{action.title}</span>
-                </Button>
+                  <span className="text-xs font-semibold">{action.title}</span>
+                </button>
               ))}
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Activity */}
-        <Card className="rounded-card shadow-sm">
+        <Card className="card-hover">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Recent Activity</CardTitle>
-              <Button variant="link" size="sm" className="text-xs">View All</Button>
+              <Button variant="link" size="sm" className="text-xs text-primary">View All</Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {recentActivity.map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className={`mt-0.5 h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0`}>
-                    <item.icon className={`h-4 w-4 ${item.color}`} />
+                  <div className={`${item.iconClass} h-9 w-9 shrink-0`}>
+                    <item.icon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item.text}</p>
@@ -190,17 +213,28 @@ const Dashboard = () => {
       </div>
 
       {/* Symptom Frequency */}
-      <Card className="rounded-card shadow-sm">
+      <Card className="card-hover">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Symptom Frequency (Last 7 Days)</CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="stat-icon-orange h-8 w-8">
+              <Activity className="h-4 w-4" />
+            </div>
+            <CardTitle className="text-base">Symptom Frequency (Last 7 Days)</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={symptomData} layout="vertical">
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="hsl(217, 91%, 53%)" />
+                  <stop offset="100%" stopColor="hsl(271, 81%, 56%)" />
+                </linearGradient>
+              </defs>
               <XAxis type="number" axisLine={false} tickLine={false} fontSize={12} />
               <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} fontSize={12} width={80} />
-              <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-              <Bar dataKey="count" fill="hsl(217, 91%, 53%)" radius={[0, 6, 6, 0]} barSize={16} />
+              <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }} />
+              <Bar dataKey="count" fill="url(#barGradient)" radius={[0, 8, 8, 0]} barSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

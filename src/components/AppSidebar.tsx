@@ -14,11 +14,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+const roleGradients: Record<AppRole, string> = {
+  patient: 'gradient-success',
+  pharmacist: 'gradient-cool',
+  doctor: 'gradient-health',
+  admin: 'gradient-danger',
+};
+
 const roleColors: Record<AppRole, string> = {
-  patient: 'bg-green-500/20 text-green-400',
-  pharmacist: 'bg-blue-500/20 text-blue-400',
-  doctor: 'bg-purple-500/20 text-purple-400',
-  admin: 'bg-red-500/20 text-red-400',
+  patient: 'bg-success/20 text-success',
+  pharmacist: 'bg-info/20 text-info',
+  doctor: 'bg-accent/20 text-accent',
+  admin: 'bg-destructive/20 text-destructive',
 };
 
 interface NavItem {
@@ -92,8 +99,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0">
-            <Heart className="h-4 w-4 text-primary-foreground" />
+          <div className="h-9 w-9 rounded-xl gradient-health flex items-center justify-center shrink-0 shadow-glow">
+            <Heart className="h-4 w-4 text-white" />
           </div>
           {!collapsed && (
             <div className="animate-fade-in">
@@ -103,9 +110,9 @@ export function AppSidebar() {
           )}
         </div>
         {!collapsed && profile && (
-          <div className="mt-4 p-3 rounded-lg bg-sidebar-accent/50">
+          <div className="mt-4 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border">
             <p className="text-sm font-medium text-sidebar-primary-foreground truncate">{profile.name || profile.email}</p>
-            <Badge className={cn('mt-1 text-[10px] font-medium capitalize border-0', roleColors[role])}>
+            <Badge className={cn('mt-1 text-[10px] font-semibold capitalize border-0', roleColors[role])}>
               {role}
             </Badge>
           </div>
@@ -114,7 +121,7 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/40 text-[10px] uppercase tracking-wider">Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/40 text-[10px] uppercase tracking-wider font-semibold">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
@@ -126,15 +133,15 @@ export function AppSidebar() {
                         to={item.url}
                         end
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all',
+                          'flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all',
                           'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                         )}
-                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        activeClassName="bg-sidebar-primary/15 text-sidebar-primary font-medium shadow-sm"
                       >
-                        <item.icon className="h-4 w-4 shrink-0" />
+                        <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-primary")} />
                         {!collapsed && <span>{item.title}</span>}
                         {!collapsed && isActive && (
-                          <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                          <div className="ml-auto h-2 w-2 rounded-full gradient-health shadow-glow" />
                         )}
                       </NavLink>
                     </SidebarMenuButton>
@@ -151,7 +158,7 @@ export function AppSidebar() {
           variant="ghost"
           size="sm"
           onClick={signOut}
-          className="w-full justify-start gap-3 text-sidebar-foreground/60 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-3 text-sidebar-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
         >
           <LogOut className="h-4 w-4" />
           {!collapsed && <span>Logout</span>}
