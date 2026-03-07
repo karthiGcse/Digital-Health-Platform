@@ -172,7 +172,7 @@ const SymptomChecker = () => {
                 <p className="text-xs text-muted-foreground mb-2">Common symptoms (click to add):</p>
                 <div className="flex flex-wrap gap-2">
                   {commonSymptoms.map(s => (
-                    <Button key={s} variant="outline" size="sm" className="text-xs rounded-full" onClick={() => addSymptom(s)}>{s}</Button>
+                    <Button key={s} variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all" onClick={() => addSymptom(s)}>{s}</Button>
                   ))}
                 </div>
               </div>
