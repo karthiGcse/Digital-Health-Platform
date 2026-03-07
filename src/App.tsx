@@ -17,7 +17,10 @@ import Reminders from "@/pages/Reminders";
 import Telemedicine from "@/pages/Telemedicine";
 import NearbyServices from "@/pages/NearbyServices";
 import ComingSoon from "@/pages/ComingSoon";
-import PlaceholderPage from "@/pages/PlaceholderPage";
+import AIConsultation from "@/pages/AIConsultation";
+import HealthAnalytics from "@/pages/HealthAnalytics";
+import AIReports from "@/pages/AIReports";
+import Emergency from "@/pages/Emergency";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
