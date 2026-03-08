@@ -395,6 +395,48 @@ export type Database = {
         }
         Relationships: []
       }
+      wearable_devices: {
+        Row: {
+          battery: number
+          brand: string
+          connected: boolean
+          created_at: string
+          icon: string
+          id: string
+          last_sync: string
+          name: string
+          sync_enabled: boolean
+          type: string
+          user_id: string
+        }
+        Insert: {
+          battery?: number
+          brand?: string
+          connected?: boolean
+          created_at?: string
+          icon?: string
+          id?: string
+          last_sync?: string
+          name: string
+          sync_enabled?: boolean
+          type?: string
+          user_id: string
+        }
+        Update: {
+          battery?: number
+          brand?: string
+          connected?: boolean
+          created_at?: string
+          icon?: string
+          id?: string
+          last_sync?: string
+          name?: string
+          sync_enabled?: boolean
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
