@@ -33,6 +33,7 @@ import DroneDelivery from "@/pages/DroneDelivery";
 import HospitalQueue from "@/pages/HospitalQueue";
 import AutoRefill from "@/pages/AutoRefill";
 import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
+import PharmacyInventory from "@/pages/PharmacyInventory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
@@ -61,7 +62,7 @@ const App = () => (
               <Route path="/analytics" element={<HealthAnalytics />} />
               <Route path="/reports" element={<AIReports />} />
               <Route path="/emergency" element={<Emergency />} />
-              <Route path="/inventory" element={<AIConsultation />} />
+              <Route path="/inventory" element={<PharmacyInventory />} />
               <Route path="/image-diagnosis" element={<ImageDiagnosis />} />
               <Route path="/mental-health" element={<MentalHealth />} />
               <Route path="/family-health" element={<FamilyHealthHub />} />
