@@ -25,6 +25,14 @@ import ImageDiagnosis from "@/pages/ImageDiagnosis";
 import MentalHealth from "@/pages/MentalHealth";
 import FamilyHealthHub from "@/pages/FamilyHealthHub";
 import VoiceAssistant from "@/pages/VoiceAssistant";
+import GeneticProfiling from "@/pages/GeneticProfiling";
+import WearableIntegration from "@/pages/WearableIntegration";
+import HomeLabBooking from "@/pages/HomeLabBooking";
+import BlockchainRecords from "@/pages/BlockchainRecords";
+import DroneDelivery from "@/pages/DroneDelivery";
+import HospitalQueue from "@/pages/HospitalQueue";
+import AutoRefill from "@/pages/AutoRefill";
+import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
