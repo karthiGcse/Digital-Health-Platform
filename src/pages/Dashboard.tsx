@@ -273,34 +273,39 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Additional Features - All 40 */}
-      <Card className="card-hover">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="stat-icon-purple h-8 w-8">
-                <Rocket className="h-4 w-4" />
-              </div>
-              <CardTitle className="text-base">All Features ({additionalFeatures.length})</CardTitle>
+      {/* Explore All Features CTA */}
+      <Card
+        className="card-hover cursor-pointer group overflow-hidden relative"
+        onClick={() => navigate('/coming-soon')}
+      >
+        <div className="absolute inset-0 gradient-health opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500" />
+        <CardContent className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            {/* Icon Grid Preview */}
+            <div className="grid grid-cols-5 gap-2 shrink-0">
+              {additionalFeatures.slice(0, 10).map((feature) => (
+                <div
+                  key={feature.route}
+                  className={`${feature.gradient} h-10 w-10 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300`}
+                >
+                  <feature.icon className="h-4 w-4 text-white" />
+                </div>
+              ))}
             </div>
-            <Button variant="link" size="sm" className="text-xs text-primary gap-1" onClick={() => navigate('/coming-soon')}>
-              View All <ExternalLink className="h-3 w-3" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {additionalFeatures.map((feature) => (
-              <button
-                key={feature.route}
-                onClick={() => navigate(feature.route)}
-                className={`${feature.gradient} flex flex-col items-center gap-2 p-4 rounded-xl text-white hover:opacity-90 transition-all hover:scale-[1.02] shadow-md text-center`}
-              >
-                <feature.icon className="h-6 w-6" />
-                <span className="text-xs font-semibold leading-tight">{feature.title}</span>
-                <span className="text-[10px] text-white/70 leading-tight">{feature.desc}</span>
-              </button>
-            ))}
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                <div className="stat-icon-purple h-8 w-8">
+                  <Rocket className="h-4 w-4" />
+                </div>
+                <CardTitle className="text-base">Explore All {additionalFeatures.length} Features</CardTitle>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                View the complete S47 Health ecosystem — AI diagnostics, telehealth, wellness, genomics & more organized in one unified dashboard.
+              </p>
+              <div className="flex items-center justify-center md:justify-start gap-1 mt-3 text-primary text-sm font-semibold group-hover:gap-2 transition-all">
+                Open Unified Dashboard <ExternalLink className="h-3.5 w-3.5" />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
