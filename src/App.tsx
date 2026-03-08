@@ -95,7 +95,6 @@ const App = () => (
               <Route path="/radiology" element={<Radiology />} />
               <Route path="/vaccination" element={<Vaccination />} />
               <Route path="/nutrition" element={<Nutrition />} />
-              <Route path="/physiotherapy" element={<Physiotherapy />} />
               
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
               <Route path="/insurance" element={<Insurance />} />
