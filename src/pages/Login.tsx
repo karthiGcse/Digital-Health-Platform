@@ -1,45 +1,76 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth, AppRole } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { toast } from '@/hooks/use-toast';
-import { Heart, Stethoscope } from 'lucide-react';
-
-const demoAccounts = [
-  { label: 'Patient Demo', email: 'patient@demo.com' },
-  { label: 'Pharmacist Demo', email: 'pharmacist@demo.com' },
-  { label: 'Doctor Demo', email: 'doctor@demo.com' },
-  { label: 'Admin Demo', email: 'admin@demo.com' },
-];
+import { Heart, Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<'email' | 'otp'>('email');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signIn(email, password);
-      toast({ title: 'Welcome back!', description: 'Successfully logged in.' });
-      navigate('/dashboard');
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false },
+      });
+      if (error) throw error;
+      setStep('otp');
+      toast({ title: 'OTP Sent! 📧', description: `Check your inbox at ${email}` });
     } catch (err: any) {
-      toast({ title: 'Login failed', description: err.message, variant: 'destructive' });
+      toast({ title: 'Failed to send OTP', description: err.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fillDemo = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('demo123');
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.length !== 6) {
+      toast({ title: 'Enter 6-digit code', variant: 'destructive' });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'email',
+      });
+      if (error) throw error;
+      toast({ title: 'Welcome back! 🎉', description: 'Successfully logged in.' });
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast({ title: 'Invalid OTP', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false },
+      });
+      if (error) throw error;
+      toast({ title: 'OTP Resent! 📧', description: 'Check your inbox again.' });
+    } catch (err: any) {
+      toast({ title: 'Failed to resend', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,47 +86,89 @@ const Login = () => {
           <p className="text-muted-foreground">AI-Powered Telepharmacy Platform</p>
         </div>
 
-        <Card className="rounded-card shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl">Sign In</CardTitle>
-            <CardDescription>Enter your credentials to access your dashboard</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Quick Demo Login</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {demoAccounts.map(d => (
-                    <Button key={d.email} type="button" variant="outline" size="sm" onClick={() => fillDemo(d.email)} className="text-xs">
-                      {d.label}
-                    </Button>
-                  ))}
+        {step === 'email' ? (
+          <Card className="rounded-card shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" /> Sign In
+              </CardTitle>
+              <CardDescription>Enter your email to receive a one-time login code</CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSendOTP}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex-col gap-3">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline font-medium">
-                Forgot password?
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link to="/register" className="text-primary hover:underline font-medium">Sign up</Link>
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
+              </CardContent>
+              <CardFooter className="flex-col gap-3">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Sending OTP...' : 'Send OTP Code'}
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Don't have an account?{' '}
+                  <Link to="/register" className="text-primary hover:underline font-medium">Sign up</Link>
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
+        ) : (
+          <Card className="rounded-card shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-primary" /> Enter OTP
+              </CardTitle>
+              <CardDescription>
+                We sent a 6-digit code to <strong>{email}</strong>
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleVerifyOTP}>
+              <CardContent className="space-y-6">
+                <div className="flex justify-center">
+                  <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+              </CardContent>
+              <CardFooter className="flex-col gap-3">
+                <Button type="submit" className="w-full" disabled={isLoading || otp.length !== 6}>
+                  {isLoading ? 'Verifying...' : 'Verify & Sign In'}
+                </Button>
+                <div className="flex items-center gap-4 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => { setStep('email'); setOtp(''); }}
+                    className="text-muted-foreground hover:underline flex items-center gap-1"
+                  >
+                    <ArrowLeft className="h-3 w-3" /> Change email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={isLoading}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Resend code
+                  </button>
+                </div>
+              </CardFooter>
+            </form>
+          </Card>
+        )}
       </div>
     </div>
   );

@@ -80,6 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error;
   };
 
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
