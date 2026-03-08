@@ -466,6 +466,16 @@ const ClinicalTrials = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={getUserLocation}
+                disabled={locationLoading}
+                className="gap-2"
+              >
+                <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-pulse' : ''}`} />
+                {locationLoading ? 'Locating...' : 'Update Location'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -478,47 +488,65 @@ const ClinicalTrials = () => {
                     <Microscope className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No trials match your search criteria</p>
                   </div>
-                ) : filteredTrials.map((t) => (
-                  <div key={t.id} className="p-4 rounded-xl border hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-sm">{t.title}</h4>
-                        <p className="text-xs text-muted-foreground">{t.sponsor}</p>
+                ) : filteredTrials.map((t) => {
+                  const openStatus = isOpenNow(t.openingHours);
+                  return (
+                    <div key={t.id} className="p-4 rounded-xl border hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm">{t.title}</h4>
+                          <p className="text-xs text-muted-foreground">{t.sponsor}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => toggleSaveTrial(t.id)}
+                          >
+                            {savedTrials.includes(t.id) ? (
+                              <BookmarkCheck className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Badge className={t.match >= 90 ? 'bg-success/10 text-success' : t.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{t.match}% Match</Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => toggleSaveTrial(t.id)}
-                        >
-                          {savedTrials.includes(t.id) ? (
-                            <BookmarkCheck className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Bookmark className="h-4 w-4" />
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant="secondary">{t.phase}</Badge>
+                        <Badge variant="outline">{t.condition}</Badge>
+                        <Badge className={openStatus.isOpen ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}>
+                          <Clock className="h-3 w-3 mr-1" />
+                          {openStatus.isOpen ? 'Open' : 'Closed'} · {openStatus.nextChange}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{t.address}</span>
+                        <span className="shrink-0 font-medium text-foreground">({t.distance})</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={t.status === 'Recruiting' ? 'default' : 'secondary'}>{t.status}</Badge>
+                          {appliedTrials.includes(t.id) && (
+                            <Badge className="bg-success/10 text-success">Applied</Badge>
                           )}
-                        </Button>
-                        <Badge className={t.match >= 90 ? 'bg-success/10 text-success' : t.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{t.match}% Match</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {t.lat !== 0 && (
+                            <Button size="sm" variant="ghost" onClick={() => openInMaps(t)}>
+                              <MapIcon className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button size="sm" variant="outline" onClick={() => setSelectedTrial(t)}>
+                            <ExternalLink className="h-3 w-3 mr-1" /> Details
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge variant="secondary">{t.phase}</Badge>
-                      <Badge variant="outline">{t.condition}</Badge>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" />{t.location} ({t.distance})</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={t.status === 'Recruiting' ? 'default' : 'secondary'}>{t.status}</Badge>
-                        {appliedTrials.includes(t.id) && (
-                          <Badge className="bg-success/10 text-success">Applied</Badge>
-                        )}
-                      </div>
-                      <Button size="sm" variant="outline" onClick={() => setSelectedTrial(t)}>
-                        <ExternalLink className="h-3 w-3 mr-1" /> View Details
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
