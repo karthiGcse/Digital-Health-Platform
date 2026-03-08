@@ -180,9 +180,14 @@ const SymptomChecker = () => {
               </div>
 
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Common symptoms (click to add):</p>
+                <p className="text-xs text-muted-foreground mb-2">Select category:</p>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {Object.keys(symptomCategories).map(cat => (
+                    <Button key={cat} variant={selectedCategory === cat ? 'default' : 'outline'} size="sm" className="text-xs rounded-full" onClick={() => setSelectedCategory(cat)}>{cat}</Button>
+                  ))}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {commonSymptoms.map(s => (
+                  {symptomCategories[selectedCategory].map(s => (
                     <Button key={s} variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all" onClick={() => addSymptom(s)}>{s}</Button>
                   ))}
                 </div>
