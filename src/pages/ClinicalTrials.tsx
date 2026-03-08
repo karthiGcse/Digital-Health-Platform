@@ -610,13 +610,31 @@ const ClinicalTrials = () => {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Filter className="h-4 w-4" /> Matched Clinical Trials ({filteredTrials.length})</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Filter className="h-4 w-4" /> Matched Clinical Trials ({filteredTrials.length})
+                {distanceFilter !== 'all' && filteredTrials.length === 0 && (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    (Try "Any Distance" to see all trials)
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {filteredTrials.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Microscope className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No trials match your search criteria</p>
+                    {distanceFilter !== 'all' && (
+                      <Button 
+                        variant="link" 
+                        className="mt-2" 
+                        onClick={() => setDistanceFilter('all')}
+                      >
+                        Show all trials (remove distance filter)
+                      </Button>
+                    )}
                   </div>
                 ) : filteredTrials.map((t) => {
                   const openStatus = isOpenNow(t.openingHours);
