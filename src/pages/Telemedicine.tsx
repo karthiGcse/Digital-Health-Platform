@@ -98,12 +98,55 @@ const Telemedicine = () => {
 
   const formatTime = (secs: number) => `${Math.floor(secs / 60).toString().padStart(2, '0')}:${(secs % 60).toString().padStart(2, '0')}`;
 
+  const detectLocation = () => {
+    if (!navigator.geolocation) { toast.error('Geolocation not supported'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setNearbyLocation(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`); toast.success('Location detected'); },
+      () => toast.error('Location access denied')
+    );
+  };
+
+  const searchNearby = async () => {
+    if (!nearbyLocation.trim()) { toast.error('Enter your location first'); return; }
+    setNearbyLoading(true); setNearbySearched(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('nearby-services', {
+        body: { location: nearbyLocation, query: 'hospitals and pharmacies with telemedicine' },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      const enriched = (data.facilities || []).map((f: NearbyFacility) => ({
+        ...f,
+        whatsapp: f.phone ? `+91${f.phone.replace(/\D/g, '').slice(-10)}` : undefined,
+      }));
+      setNearbyFacilities(enriched);
+    } catch (e: any) { toast.error(e.message || 'Search failed'); }
+    finally { setNearbyLoading(false); }
+  };
+
+  const startFacilityCall = (facility: NearbyFacility, type: 'video' | 'audio') => {
+    if (!facility.open_now) { toast.error(`${facility.name} is currently closed`); return; }
+    const fakeDoctor: Doctor = {
+      id: facility.name, name: facility.name, specialty: facility.type,
+      experience: '', rating: facility.rating, fee: 0, available: true,
+      languages: [], nextSlot: '', avatar: facility.name.slice(0, 2).toUpperCase(),
+      whatsapp: facility.whatsapp || '', symptoms: [],
+    };
+    setCallDoctor(fakeDoctor); setCallType(type); setInCall(true); setCallDuration(0); setMicOn(true); setCamOn(true);
+    toast.success(`Connecting ${type} call with ${facility.name}...`);
+    const interval = setInterval(() => setCallDuration(prev => prev + 1), 1000);
+    (window as any).__callInterval = interval;
+  };
+
+  const typeIcons: Record<string, string> = { hospital: '🏥', pharmacy: '💊', clinic: '🩺', lab: '🔬', emergency: '🚨' };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full grid grid-cols-3 mb-4">
+        <TabsList className="w-full grid grid-cols-4 mb-4">
           <TabsTrigger value="doctors" className="text-xs sm:text-sm"><Stethoscope className="h-4 w-4 mr-1.5" />Doctors</TabsTrigger>
           <TabsTrigger value="symptoms" className="text-xs sm:text-sm"><Search className="h-4 w-4 mr-1.5" />By Symptom</TabsTrigger>
+          <TabsTrigger value="nearby" className="text-xs sm:text-sm"><MapPin className="h-4 w-4 mr-1.5" />Nearby</TabsTrigger>
           <TabsTrigger value="pharmacy" className="text-xs sm:text-sm"><Building2 className="h-4 w-4 mr-1.5" />Pharmacy</TabsTrigger>
         </TabsList>
 
