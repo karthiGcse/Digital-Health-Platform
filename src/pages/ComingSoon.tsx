@@ -265,7 +265,7 @@ const ComingSoon = () => {
                     </div>
 
                     {/* Arrow indicator */}
-                    <div className="flex items-center gap-1 text-[9px] font-semibold text-muted-foreground/50 group-hover:text-primary transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
+                    <div className="flex items-center gap-1 text-[9px] font-semibold text-white/30 group-hover:text-cyan-300 transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
                       Open <ArrowRight className="h-2.5 w-2.5" />
                     </div>
                   </CardContent>
