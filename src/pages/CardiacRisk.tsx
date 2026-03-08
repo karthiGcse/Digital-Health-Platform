@@ -77,6 +77,77 @@ const CardiacRisk = () => {
     }
   };
 
+  const exportPDF = useCallback(() => {
+    const doc = new jsPDF();
+    const m = 20;
+    let y = m;
+
+    doc.setFontSize(20);
+    doc.setTextColor(220, 50, 50);
+    doc.text('S47 Health — Cardiac Risk Report', m, y);
+    y += 12;
+    doc.setDrawColor(200);
+    doc.line(m, y, 190, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.setTextColor(30, 30, 30);
+    doc.text(`Overall 10-Year Risk: ${overallRisk}%`, m, y);
+    y += 8;
+    doc.text(`Heart Age: ${Math.round(Number(formData.age) + overallRisk * 0.5)} years`, m, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, m, y);
+    y += 12;
+
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('Risk Factors:', m, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    riskFactors.forEach(f => {
+      doc.text(`• ${f.name}: ${f.value} (${f.status}) — Score: ${f.score}`, m + 4, y);
+      y += 6;
+    });
+    y += 6;
+
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('6-Month Trend:', m, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    trendData.forEach(t => {
+      doc.text(`${t.month}: Risk ${t.risk}% | BP ${t.bp} | LDL ${t.ldl}`, m + 4, y);
+      y += 5;
+    });
+    y += 8;
+
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text('Input Parameters:', m, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    doc.text(`Age: ${formData.age} | Gender: ${formData.gender} | BP: ${formData.systolic}/${formData.diastolic}`, m + 4, y);
+    y += 5;
+    doc.text(`LDL: ${formData.ldl} | HDL: ${formData.hdl} | Total Cholesterol: ${formData.totalCholesterol}`, m + 4, y);
+    y += 5;
+    doc.text(`Blood Sugar: ${formData.bloodSugar} | BMI: ${formData.bmi} | Exercise: ${formData.exercise}x/week`, m + 4, y);
+    y += 5;
+    doc.text(`Smoking: ${formData.smoking} | Sleep: ${formData.sleep}hrs | Stress: ${formData.stress}`, m + 4, y);
+    y += 12;
+
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text('Disclaimer: AI-generated for educational purposes only. Consult a cardiologist for medical advice.', m, 280);
+
+    doc.save(`S47-Cardiac-Report-${Date.now()}.pdf`);
+    toast({ title: '📄 Report Downloaded', description: 'PDF cardiac report saved successfully.' });
+  }, [overallRisk, riskFactors, formData, toast]);
+
   const runAssessment = async () => {
     setShowInput(false);
     setAnalyzing(true);
