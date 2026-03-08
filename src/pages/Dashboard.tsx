@@ -43,7 +43,7 @@ const additionalFeatures = [
   { icon: Syringe, title: 'Vaccination Scheduler', desc: 'Automated vaccine scheduling', route: '/vaccination', gradient: 'gradient-warm' },
   { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
   { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
-  { icon: Microscope, title: 'Clinical Trials', desc: 'Match with trials worldwide', route: '/clinical-trials', gradient: 'gradient-cool' },
+  
   { icon: TestTube, title: 'Pathology Analyzer', desc: 'AI lab report analysis', route: '/pathology', gradient: 'gradient-warm' },
   { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
   { icon: Baby, title: 'Maternal Health', desc: 'Pregnancy & child tracking', route: '/maternal-health', gradient: 'gradient-success' },
