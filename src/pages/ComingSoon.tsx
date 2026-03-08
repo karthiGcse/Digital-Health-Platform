@@ -2,19 +2,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Rocket, Trophy } from 'lucide-react';
+import { Rocket, Trophy, CheckCircle2, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const features = [
   { id: '1', icon: '🧬', title: 'AI Genetic Health Profiling', tag: 'AI', eta: 'Q4 2025', progress: 65, desc: 'Personalized health insights based on genetic markers.', benefits: ['Tailored medication recommendations', 'Genetic risk assessment', 'Family health tree analysis'] },
   { id: '2', icon: '⌚', title: 'Wearable Device Integration', tag: 'IoT', eta: 'Q1 2026', progress: 40, desc: 'Connect your fitness trackers and smartwatches.', benefits: ['Real-time vitals monitoring', 'Automatic health data sync', 'Smart alerts for anomalies'] },
-  { id: '3', icon: '🤖', title: 'AI Image Diagnosis', tag: 'AI Vision', eta: 'Q4 2025', progress: 70, desc: 'Upload medical images for AI-powered analysis.', benefits: ['Skin condition detection', 'X-ray preliminary analysis', 'Eye health screening'] },
+  { id: '3', icon: '🤖', title: 'AI Image Diagnosis', tag: 'AI Vision', eta: 'Launched ✅', progress: 100, desc: 'Upload medical images for AI-powered analysis.', benefits: ['Skin condition detection', 'X-ray preliminary analysis', 'Eye health screening'], launched: true, route: '/image-diagnosis' },
   { id: '4', icon: '🏠', title: 'Home Lab Test Booking', tag: 'Service', eta: 'Q2 2026', progress: 30, desc: 'Book lab tests from home with doorstep sample collection.', benefits: ['Doorstep sample collection', 'Digital reports in 24hrs', 'Insurance integration'] },
-  { id: '5', icon: '💬', title: 'Multilingual Voice Assistant', tag: 'Voice', eta: 'Q1 2026', progress: 55, desc: 'Talk to your health assistant in your language.', benefits: ['10+ language support', 'Voice-based medication reminders', 'Hands-free emergency calls'] },
+  { id: '5', icon: '💬', title: 'Multilingual Voice Assistant', tag: 'Voice', eta: 'Launched ✅', progress: 100, desc: 'Talk to your health assistant in your language.', benefits: ['10+ language support', 'Voice-based interactions', 'Text-to-speech responses'], launched: true, route: '/voice-assistant' },
   { id: '6', icon: '🔒', title: 'Blockchain Health Records', tag: 'Security', eta: 'Q3 2026', progress: 25, desc: 'Secure, tamper-proof medical records on blockchain.', benefits: ['Immutable records', 'Cross-hospital portability', 'Patient-controlled access'] },
   { id: '7', icon: '🚁', title: 'Drone Medicine Delivery', tag: 'Logistics', eta: 'Q4 2026', progress: 15, desc: 'Emergency medicine delivery via autonomous drones.', benefits: ['30-minute delivery', 'Rural area coverage', 'Temperature-controlled cargo'] },
-  { id: '8', icon: '🧠', title: 'Mental Health AI Companion', tag: 'Wellness', eta: 'Q4 2025', progress: 60, desc: 'AI-powered mental health support and therapy.', benefits: ['24/7 emotional support', 'CBT-based exercises', 'Mood tracking & insights'] },
-  { id: '9', icon: '👨‍👩‍👧', title: 'Family Health Hub', tag: 'Family', eta: 'Q1 2026', progress: 45, desc: 'Manage your family\'s health in one place.', benefits: ['Child vaccination tracker', 'Elder care monitoring', 'Shared prescriptions'] },
+  { id: '8', icon: '🧠', title: 'Mental Health AI Companion', tag: 'Wellness', eta: 'Launched ✅', progress: 100, desc: 'AI-powered mental health support and therapy.', benefits: ['24/7 emotional support', 'CBT-based exercises', 'Mood tracking & insights'], launched: true, route: '/mental-health' },
+  { id: '9', icon: '👨‍👩‍👧', title: 'Family Health Hub', tag: 'Family', eta: 'Launched ✅', progress: 100, desc: 'Manage your family\'s health in one place.', benefits: ['Child vaccination tracker', 'Elder care monitoring', 'Shared prescriptions'], launched: true, route: '/family-health' },
   { id: '10', icon: '🏥', title: 'Hospital Queue Management', tag: 'Efficiency', eta: 'Q2 2026', progress: 35, desc: 'Real-time hospital queue tracking and booking.', benefits: ['Live wait times', 'Smart slot booking', 'Queue position alerts'] },
   { id: '11', icon: '💊', title: 'Auto Refill & Subscription', tag: 'Pharmacy', eta: 'Q3 2026', progress: 20, desc: 'Automatic medication refills on schedule.', benefits: ['Never miss a refill', 'Cost savings on bulk', 'Pharmacy comparison'] },
   { id: '12', icon: '🌍', title: 'Global Telemedicine Network', tag: 'Global', eta: 'Q4 2026', progress: 10, desc: 'Connect with doctors worldwide for specialist consultations.', benefits: ['Access to global specialists', 'Multi-timezone scheduling', 'Translation support'] },
@@ -30,9 +31,10 @@ const tagColors: Record<string, string> = {
 };
 
 const ComingSoon = () => {
+  const navigate = useNavigate();
   const [votes, setVotes] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
-    features.forEach(f => { initial[f.id] = Math.floor(Math.random() * 200) + 50; });
+    features.forEach(f => { initial[f.id] = f.launched ? Math.floor(Math.random() * 200) + 300 : Math.floor(Math.random() * 200) + 50; });
     return initial;
   });
   const [voted, setVoted] = useState<Set<string>>(new Set());
@@ -46,6 +48,7 @@ const ComingSoon = () => {
   const sortedByVotes = [...features].sort((a, b) => (votes[b.id] || 0) - (votes[a.id] || 0));
   const topThreeIds = new Set(sortedByVotes.slice(0, 3).map(f => f.id));
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+  const launchedCount = features.filter(f => f.launched).length;
 
   return (
     <div className="space-y-6">
@@ -54,7 +57,7 @@ const ComingSoon = () => {
         <div className="relative z-10">
           <h2 className="text-2xl md:text-3xl font-heading font-bold">Help Shape the Future of S47 Health</h2>
           <p className="mt-1 text-primary-foreground/80 text-sm">Vote for features you want to see next. Your voice matters!</p>
-          <div className="flex gap-4 mt-4">
+          <div className="flex gap-6 mt-4">
             <div className="text-center">
               <p className="text-2xl font-bold">{totalVotes}</p>
               <p className="text-xs text-primary-foreground/70">Total Votes</p>
@@ -62,6 +65,10 @@ const ComingSoon = () => {
             <div className="text-center">
               <p className="text-2xl font-bold">{features.length}</p>
               <p className="text-xs text-primary-foreground/70">Features</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-300">{launchedCount}</p>
+              <p className="text-xs text-primary-foreground/70">Launched</p>
             </div>
           </div>
         </div>
@@ -82,10 +89,15 @@ const ComingSoon = () => {
       {/* Feature Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {features.map(f => (
-          <Card key={f.id} className="rounded-card shadow-sm hover:shadow-md transition-shadow relative">
-            {topThreeIds.has(f.id) && (
+          <Card key={f.id} className={`rounded-card shadow-sm hover:shadow-md transition-shadow relative ${f.launched ? 'border-success/30 bg-success/[0.02]' : ''}`}>
+            {topThreeIds.has(f.id) && !f.launched && (
               <div className="absolute -top-2 -right-2 z-10">
                 <Badge className="bg-amber-500 text-white border-0 gap-1"><Trophy className="h-3 w-3" /> Most Voted</Badge>
+              </div>
+            )}
+            {f.launched && (
+              <div className="absolute -top-2 -right-2 z-10">
+                <Badge className="bg-success text-success-foreground border-0 gap-1"><CheckCircle2 className="h-3 w-3" /> Live</Badge>
               </div>
             )}
             <CardContent className="p-5 space-y-3">
@@ -98,26 +110,33 @@ const ComingSoon = () => {
               <ul className="space-y-1">
                 {f.benefits.map((b, i) => (
                   <li key={i} className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <div className="h-1 w-1 rounded-full bg-primary shrink-0" /> {b}
+                    <div className={`h-1 w-1 rounded-full ${f.launched ? 'bg-success' : 'bg-primary'} shrink-0`} /> {b}
                   </li>
                 ))}
               </ul>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">ETA: {f.eta}</span>
+                  <span className={`${f.launched ? 'text-success font-medium' : 'text-muted-foreground'}`}>{f.eta}</span>
                   <span className="font-medium">{f.progress}%</span>
                 </div>
-                <Progress value={f.progress} className="h-1.5" />
+                <Progress value={f.progress} className={`h-1.5 ${f.launched ? '[&>div]:bg-success' : ''}`} />
               </div>
-              <Button
-                size="sm"
-                variant={voted.has(f.id) ? 'secondary' : 'outline'}
-                className="w-full text-xs"
-                onClick={() => handleVote(f.id)}
-                disabled={voted.has(f.id)}
-              >
-                {voted.has(f.id) ? '✓ Voted' : '👍 Vote'} ({votes[f.id]})
-              </Button>
+              {f.launched ? (
+                <Button size="sm" className="w-full text-xs gap-1.5 bg-success hover:bg-success/90 text-success-foreground"
+                  onClick={() => navigate(f.route!)}>
+                  <ExternalLink className="h-3 w-3" /> Open Feature
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant={voted.has(f.id) ? 'secondary' : 'outline'}
+                  className="w-full text-xs"
+                  onClick={() => handleVote(f.id)}
+                  disabled={voted.has(f.id)}
+                >
+                  {voted.has(f.id) ? '✓ Voted' : '👍 Vote'} ({votes[f.id]})
+                </Button>
+              )}
             </CardContent>
           </Card>
         ))}
