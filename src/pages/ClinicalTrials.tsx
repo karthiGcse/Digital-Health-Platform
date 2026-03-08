@@ -279,6 +279,7 @@ const ClinicalTrials = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [trialsWithDistance, setTrialsWithDistance] = useState<Trial[]>(allTrials);
+  const [distanceFilter, setDistanceFilter] = useState('all');
 
   // Get user's real-time location
   const getUserLocation = useCallback(() => {
