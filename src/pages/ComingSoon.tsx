@@ -228,8 +228,8 @@ const ComingSoon = () => {
               {category.emoji}
             </div>
             <div>
-              <h2 className="text-lg font-heading font-bold">{category.label}</h2>
-              <p className="text-[11px] text-muted-foreground">{category.features.length} features available</p>
+              <h2 className="text-lg font-heading font-bold text-white">{category.label}</h2>
+              <p className="text-[11px] text-white/50">{category.features.length} features available</p>
             </div>
             <Badge variant="secondary" className={`ml-auto text-[10px] font-bold bg-gradient-to-r ${categoryGradients[catIdx]} text-white border-0`}>
               {category.features.length}
