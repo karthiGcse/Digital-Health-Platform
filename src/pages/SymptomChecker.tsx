@@ -204,6 +204,52 @@ const SymptomChecker = () => {
         </p>
       </div>
 
+      {/* Patient Type Selector */}
+      <div className="grid grid-cols-3 gap-3">
+        {(Object.entries(patientTypeConfig) as [PatientType, typeof patientTypeConfig[PatientType]][]).map(([type, config]) => {
+          const Icon = config.icon;
+          return (
+            <button
+              key={type}
+              onClick={() => { setPatientType(type); setSelectedCategory('General'); }}
+              className={`relative p-4 rounded-2xl border-2 transition-all text-left ${
+                patientType === type
+                  ? 'border-primary bg-primary/5 shadow-md'
+                  : 'border-border hover:border-primary/30 hover:bg-muted/50'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                  patientType === type ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="font-medium text-sm">{config.label}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{config.description}</p>
+              {patientType === type && (
+                <div className="absolute top-2 right-2 h-3 w-3 rounded-full bg-primary" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Emergency Rules for selected patient type */}
+      <Card className="border-destructive/20 bg-destructive/5">
+        <CardContent className="p-4">
+          <h4 className="font-heading font-semibold text-sm text-destructive mb-2 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Important Rules — {patientTypeConfig[patientType].label}
+          </h4>
+          <ul className="space-y-1.5">
+            {emergencyRules[patientType].map((rule, i) => (
+              <li key={i} className="text-xs text-destructive/80">{rule}</li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Input Form */}
         <div className="lg:col-span-2 space-y-4">
@@ -212,6 +258,7 @@ const SymptomChecker = () => {
               <div className="flex items-center gap-2">
                 <div className="stat-icon-blue h-8 w-8"><Activity className="h-4 w-4" /></div>
                 <CardTitle className="text-lg">Describe Your Symptoms</CardTitle>
+                <Badge variant="outline" className="ml-auto text-xs">{patientTypeConfig[patientType].label}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
