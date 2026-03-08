@@ -540,31 +540,70 @@ const ClinicalTrials = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Select value={selectedCity} onValueChange={selectCity}>
-                  <SelectTrigger className="w-full md:w-40">
-                    <SelectValue placeholder="Select City" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map(city => (
-                      <SelectItem key={city.name} value={city.name}>{city.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={getUserLocation}
-                  disabled={locationLoading}
-                  className="gap-2"
-                >
-                  <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-pulse' : ''}`} />
-                  {locationLoading ? 'Locating...' : 'Use GPS'}
-                </Button>
-                {selectedCity && (
-                  <Badge variant="secondary" className="gap-1">
-                    <MapPin className="h-3 w-3" /> {selectedCity}
-                  </Badge>
+              
+              {/* Location Selection Card */}
+              <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Navigation className="h-4 w-4 text-primary" />
+                  <h4 className="font-semibold text-sm">Your Location</h4>
+                  {selectedCity && (
+                    <Badge className="bg-success/10 text-success ml-auto">
+                      <MapPin className="h-3 w-3 mr-1" /> {selectedCity}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Set your location to find nearby clinical trials and calculate accurate distances.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant={selectedCity === 'Current Location' ? 'default' : 'outline'}
+                    size="sm" 
+                    onClick={() => {
+                      setLocationLoading(true);
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          const { latitude, longitude } = position.coords;
+                          setUserLocation({ lat: latitude, lng: longitude });
+                          setSelectedCity('Current Location');
+                          updateDistancesFromLocation(latitude, longitude);
+                          setLocationLoading(false);
+                          toast.success('GPS location activated! Showing nearby trials.');
+                        },
+                        (error) => {
+                          setLocationLoading(false);
+                          if (error.code === error.PERMISSION_DENIED) {
+                            toast.error('Location permission denied. Please enable in browser settings or select a city.');
+                          } else {
+                            toast.error('Could not get location. Please select a city manually.');
+                          }
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                      );
+                    }}
+                    disabled={locationLoading}
+                    className="gap-2"
+                  >
+                    <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-spin' : ''}`} />
+                    {locationLoading ? 'Getting GPS...' : selectedCity === 'Current Location' ? 'GPS Active' : 'Use My Current Location'}
+                  </Button>
+                  <span className="text-xs text-muted-foreground self-center">or select city:</span>
+                  <Select value={selectedCity !== 'Current Location' ? selectedCity : ''} onValueChange={selectCity}>
+                    <SelectTrigger className="w-36 h-8">
+                      <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities.map(city => (
+                        <SelectItem key={city.name} value={city.name}>{city.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedCity === 'Current Location' && userLocation && (
+                  <p className="text-xs text-success mt-2 flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    GPS active: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
+                  </p>
                 )}
               </div>
             </CardContent>
