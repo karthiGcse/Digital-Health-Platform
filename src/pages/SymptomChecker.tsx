@@ -11,7 +11,15 @@ import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock, Baby, User, Hea
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const symptomCategories: Record<string, string[]> = {
+type PatientType = 'child' | 'adult' | 'pregnant';
+
+const patientTypeConfig: Record<PatientType, { label: string; icon: typeof Baby; description: string; ageRange: string }> = {
+  child: { label: 'Child (0-12)', icon: Baby, description: 'Pediatric symptom assessment with child-safe guidelines', ageRange: '0-12' },
+  adult: { label: 'Adult (13+)', icon: User, description: 'Standard adult symptom assessment', ageRange: '13+' },
+  pregnant: { label: 'Pregnant', icon: Heart, description: 'Pregnancy-safe assessment with OB/GYN guidance', ageRange: '18-45' },
+};
+
+const baseSymptomCategories: Record<string, string[]> = {
   'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness', 'Dehydration', 'Body Ache', 'Swollen Lymph Nodes'],
   'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness', 'Tingling', 'Tremors', 'Fainting', 'Migraine', 'Light Sensitivity'],
   'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion', 'Coughing Blood', 'Difficulty Breathing', 'Hoarseness'],
@@ -25,7 +33,6 @@ const symptomCategories: Record<string, string[]> = {
   'Eyes': ['Eye Pain', 'Red Eyes', 'Watery Eyes', 'Dry Eyes', 'Double Vision', 'Eye Floaters', 'Swollen Eyelids', 'Sensitivity to Light'],
   'Hormonal': ['Excessive Thirst', 'Unexplained Weight Gain', 'Hot Flashes', 'Irregular Periods', 'Excessive Hunger', 'Cold Intolerance', 'Heat Intolerance', 'Mood Changes'],
   'Allergies': ['Sneezing Fits', 'Watery Eyes', 'Hives', 'Swollen Face', 'Throat Swelling', 'Anaphylaxis', 'Food Intolerance', 'Drug Reaction'],
-  'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'],
   'Dental': ['Toothache', 'Bleeding Gums', 'Bad Breath', 'Jaw Stiffness', 'Tooth Sensitivity', 'Mouth Ulcers', 'Swollen Gums'],
   'Reproductive': ['Pelvic Pain', 'Abnormal Discharge', 'Erectile Dysfunction', 'Painful Intercourse', 'Infertility Concerns', 'Breast Pain', 'Menstrual Cramps', 'Heavy Periods'],
   'Liver & Kidney': ['Jaundice', 'Dark Urine', 'Pale Stools', 'Abdominal Swelling', 'Flank Pain', 'Swollen Ankles', 'Metallic Taste', 'Foamy Urine'],
@@ -35,15 +42,57 @@ const symptomCategories: Record<string, string[]> = {
   'Sleep': ['Snoring', 'Sleep Apnea', 'Restless Legs', 'Sleepwalking', 'Excessive Daytime Sleepiness', 'Night Terrors', 'Difficulty Falling Asleep', 'Early Waking'],
 };
 
-interface AnalysisResult {
-  risk_score: number;
-  severity: string;
-  detected_symptoms: { name: string; severity: string }[];
-  possible_conditions: { name: string; probability: number; description: string }[];
-  recommended_actions: string[];
-  emergency_flag: boolean;
-  follow_up_questions?: string[];
-}
+const childOnlyCategories: Record<string, string[]> = {
+  'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting', 'Colic', 'Cradle Cap', 'Thumb Sucking Issues'],
+  'Child Growth': ['Slow Weight Gain', 'Short Stature', 'Delayed Milestones', 'Speech Delay', 'Walking Delay', 'Poor Coordination', 'Learning Difficulty'],
+  'Child Infections': ['Hand Foot Mouth', 'Chickenpox', 'Measles', 'Mumps', 'Whooping Cough', 'Croup', 'RSV Symptoms', 'Pinworms'],
+};
+
+const pregnancyOnlyCategories: Record<string, string[]> = {
+  'Pregnancy General': ['Morning Sickness', 'Fatigue', 'Frequent Urination', 'Food Cravings', 'Food Aversions', 'Mood Changes', 'Breast Tenderness', 'Constipation'],
+  'Pregnancy Warning': ['Vaginal Bleeding', 'Severe Headache', 'Vision Changes', 'Severe Abdominal Pain', 'Reduced Fetal Movement', 'Leaking Fluid', 'High Blood Pressure', 'Swollen Hands/Face'],
+  'Pregnancy Trimester': ['First Trimester Nausea', 'Second Trimester Back Pain', 'Third Trimester Braxton Hicks', 'Pelvic Pressure', 'Swollen Feet', 'Heartburn', 'Shortness of Breath', 'Insomnia'],
+  'Labor Signs': ['Regular Contractions', 'Water Breaking', 'Bloody Show', 'Lower Back Pain', 'Nesting Urge', 'Diarrhea Before Labor', 'Cervical Pressure', 'Loss of Mucus Plug'],
+  'Postpartum': ['Postpartum Bleeding', 'Breast Engorgement', 'Postpartum Depression', 'Difficulty Breastfeeding', 'Perineal Pain', 'Hair Loss', 'Fatigue', 'Mood Swings'],
+};
+
+// Categories to exclude per patient type
+const excludedCategories: Record<PatientType, string[]> = {
+  child: ['Reproductive', 'Hormonal', 'Sleep'],
+  adult: [],
+  pregnant: [],
+};
+
+const getSymptomCategories = (patientType: PatientType): Record<string, string[]> => {
+  const filtered = Object.fromEntries(
+    Object.entries(baseSymptomCategories).filter(([key]) => !excludedCategories[patientType].includes(key))
+  );
+
+  if (patientType === 'child') return { ...filtered, ...childOnlyCategories };
+  if (patientType === 'pregnant') return { ...filtered, ...pregnancyOnlyCategories };
+  return { ...filtered, 'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'] };
+};
+
+const emergencyRules: Record<PatientType, string[]> = {
+  child: [
+    '⚠️ For children under 3 months with fever above 100.4°F (38°C), seek immediate medical care.',
+    '⚠️ Signs of dehydration in children (no tears, dry mouth, no wet diapers for 6+ hrs) require urgent attention.',
+    '⚠️ Any seizure in a child requires emergency evaluation.',
+    '⚠️ Difficulty breathing, blue lips, or persistent vomiting — call emergency immediately.',
+  ],
+  adult: [
+    '⚠️ Chest pain with shortness of breath may indicate a cardiac emergency — call 112 immediately.',
+    '⚠️ Sudden weakness on one side, slurred speech, or vision loss may indicate stroke — act FAST.',
+    '⚠️ Severe allergic reactions (anaphylaxis) with throat swelling require epinephrine and emergency care.',
+  ],
+  pregnant: [
+    '⚠️ Vaginal bleeding at any stage of pregnancy requires immediate medical evaluation.',
+    '⚠️ Severe headache with vision changes may indicate preeclampsia — seek urgent care.',
+    '⚠️ Reduced fetal movement after 28 weeks — contact your OB/GYN immediately.',
+    '⚠️ Leaking fluid or regular contractions before 37 weeks may indicate preterm labor.',
+    '⚠️ Many medications are unsafe during pregnancy — never self-medicate without doctor advice.',
+  ],
+};
 
 interface HistoryItem {
   id: string;
