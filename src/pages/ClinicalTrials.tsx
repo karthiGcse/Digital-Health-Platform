@@ -349,9 +349,26 @@ const ClinicalTrials = () => {
       const matchesPhase = phaseFilter === 'all' || trial.phase === phaseFilter;
       const matchesStatus = statusFilter === 'all' || trial.status === statusFilter;
       const matchesCondition = conditionFilter === 'all' || trial.condition === conditionFilter;
-      return matchesSearch && matchesPhase && matchesStatus && matchesCondition;
+      
+      // Distance filter
+      let matchesDistance = true;
+      if (distanceFilter !== 'all' && userLocation) {
+        if (distanceFilter === 'remote') {
+          matchesDistance = trial.lat === 0 && trial.lng === 0;
+        } else {
+          const maxDistance = parseInt(distanceFilter);
+          if (trial.lat === 0 && trial.lng === 0) {
+            matchesDistance = false; // Exclude remote for distance filters
+          } else {
+            const dist = calculateDistance(userLocation.lat, userLocation.lng, trial.lat, trial.lng);
+            matchesDistance = dist <= maxDistance;
+          }
+        }
+      }
+      
+      return matchesSearch && matchesPhase && matchesStatus && matchesCondition && matchesDistance;
     }).sort((a, b) => b.match - a.match);
-  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, trialsWithDistance]);
+  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, distanceFilter, trialsWithDistance, userLocation]);
 
   const savedTrialsList = useMemo(() => trialsWithDistance.filter(t => savedTrials.includes(t.id)), [savedTrials, trialsWithDistance]);
 
