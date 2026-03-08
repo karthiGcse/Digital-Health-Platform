@@ -32,7 +32,7 @@ const routeToTranslationKey: Record<string, string> = {
   '/global-telemedicine': 'nav.globalTelemedicine',
   '/coming-soon': 'nav.comingSoon',
   '/radiology': 'nav.radiology',
-  '/vaccination': 'nav.vaccination',
+  
   '/nutrition': 'nav.nutrition',
   
   '/cardiac-risk': 'nav.cardiacRisk',
