@@ -258,6 +258,37 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+      {/* Additional Features */}
+      <Card className="card-hover">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="stat-icon-purple h-8 w-8">
+                <Rocket className="h-4 w-4" />
+              </div>
+              <CardTitle className="text-base">Additional Features</CardTitle>
+            </div>
+            <Button variant="link" size="sm" className="text-xs text-primary gap-1" onClick={() => navigate('/coming-soon')}>
+              View Roadmap <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {additionalFeatures.map((feature) => (
+              <button
+                key={feature.route}
+                onClick={() => navigate(feature.route)}
+                className={`${feature.gradient} flex flex-col items-center gap-2 p-4 rounded-xl text-white hover:opacity-90 transition-all hover:scale-[1.02] shadow-md text-center`}
+              >
+                <feature.icon className="h-6 w-6" />
+                <span className="text-xs font-semibold leading-tight">{feature.title}</span>
+                <span className="text-[10px] text-white/70 leading-tight">{feature.desc}</span>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
