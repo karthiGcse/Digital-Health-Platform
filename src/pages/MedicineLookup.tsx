@@ -152,7 +152,7 @@ const MedicineLookup = () => {
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="h-14 w-14 rounded-xl bg-muted/50 flex items-center justify-center overflow-hidden p-1">
-                    <img src={getMedicineImage(m.category)} alt={m.category || 'Medicine'} className="h-full w-full object-contain" />
+                    <img src={getMedicineImage(m.name)} alt={m.name} className="h-full w-full object-contain" />
                   </div>
                   <Badge variant="secondary" className="text-xs rounded-full">{m.category}</Badge>
                 </div>
