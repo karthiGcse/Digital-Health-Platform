@@ -15,6 +15,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<AppRole>('patient');
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -23,14 +24,42 @@ const Register = () => {
     setIsLoading(true);
     try {
       await signUp(email, password, name, role);
-      toast({ title: 'Account created!', description: 'Redirecting to dashboard...' });
-      navigate('/dashboard');
+      setEmailSent(true);
+      toast({ title: 'Verification email sent!', description: 'Please check your inbox to verify your account.' });
     } catch (err: any) {
       toast({ title: 'Registration failed', description: err.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <Card className="rounded-card shadow-sm text-center">
+            <CardHeader>
+              <div className="flex justify-center mb-4">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Heart className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-xl">Check your email</CardTitle>
+              <CardDescription>
+                We've sent a verification link to <strong>{email}</strong>. Please click the link to verify your account.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="flex-col gap-3">
+              <p className="text-sm text-muted-foreground">
+                Already verified?{' '}
+                <Link to="/login" className="text-primary hover:underline font-medium">Sign in</Link>
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
