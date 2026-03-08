@@ -3,9 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Watch, Heart, Footprints, Flame, Moon, Droplets, Activity, Wifi, WifiOff } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Watch, Heart, Footprints, Flame, Moon, Droplets, Activity, Wifi, WifiOff, Plus, Bluetooth, BluetoothSearching, Smartphone, Trash2, RefreshCw, Loader2, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { toast } from '@/components/ui/sonner';
 
 const heartRateData = Array.from({ length: 24 }, (_, i) => ({
   time: `${i}:00`,
@@ -17,10 +20,33 @@ const stepsData = [
   { day: 'Thu', steps: 7500 }, { day: 'Fri', steps: 9100 }, { day: 'Sat', steps: 12000 }, { day: 'Sun', steps: 5400 },
 ];
 
-const devices = [
-  { name: 'Apple Watch Series 9', type: 'Smartwatch', connected: true, battery: 72, lastSync: '2 min ago' },
-  { name: 'Fitbit Charge 6', type: 'Fitness Tracker', connected: false, battery: 45, lastSync: '3 hours ago' },
-  { name: 'Oura Ring Gen 3', type: 'Sleep Tracker', connected: true, battery: 88, lastSync: '10 min ago' },
+interface Device {
+  id: string;
+  name: string;
+  type: string;
+  brand: string;
+  connected: boolean;
+  battery: number;
+  lastSync: string;
+  icon: string;
+  syncEnabled: boolean;
+}
+
+const initialDevices: Device[] = [
+  { id: '1', name: 'Apple Watch Series 9', type: 'Smartwatch', brand: 'Apple', connected: true, battery: 72, lastSync: '2 min ago', icon: '⌚', syncEnabled: true },
+  { id: '2', name: 'Fitbit Charge 6', type: 'Fitness Tracker', brand: 'Fitbit', connected: false, battery: 45, lastSync: '3 hours ago', icon: '📱', syncEnabled: false },
+  { id: '3', name: 'Oura Ring Gen 3', type: 'Sleep Tracker', brand: 'Oura', connected: true, battery: 88, lastSync: '10 min ago', icon: '💍', syncEnabled: true },
+];
+
+const availableDevices = [
+  { name: 'Apple Watch', models: ['Series 9', 'Series 8', 'Ultra 2', 'SE'], icon: '⌚', brand: 'Apple', type: 'Smartwatch' },
+  { name: 'Samsung Galaxy Watch', models: ['6 Classic', '6', '5 Pro', 'FE'], icon: '⌚', brand: 'Samsung', type: 'Smartwatch' },
+  { name: 'Fitbit', models: ['Charge 6', 'Sense 2', 'Versa 4', 'Inspire 3'], icon: '📱', brand: 'Fitbit', type: 'Fitness Tracker' },
+  { name: 'Garmin', models: ['Venu 3', 'Forerunner 965', 'Fenix 7', 'Vivosmart 5'], icon: '⌚', brand: 'Garmin', type: 'Smartwatch' },
+  { name: 'Oura Ring', models: ['Gen 3', 'Gen 3 Horizon'], icon: '💍', brand: 'Oura', type: 'Sleep Tracker' },
+  { name: 'Xiaomi Mi Band', models: ['8 Pro', '8', '7 Pro'], icon: '📱', brand: 'Xiaomi', type: 'Fitness Tracker' },
+  { name: 'Whoop', models: ['4.0', '3.0'], icon: '📱', brand: 'Whoop', type: 'Performance Tracker' },
+  { name: 'Polar', models: ['Vantage V3', 'Ignite 3', 'Pacer Pro'], icon: '⌚', brand: 'Polar', type: 'Sports Watch' },
 ];
 
 const vitals = [
@@ -34,6 +60,81 @@ const vitals = [
 
 const WearableIntegration = () => {
   const [selectedDevice, setSelectedDevice] = useState(0);
+  const [devices, setDevices] = useState<Device[]>(initialDevices);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showPairingDialog, setShowPairingDialog] = useState(false);
+  const [showDeviceSettings, setShowDeviceSettings] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<typeof availableDevices[0] | null>(null);
+  const [pairingStep, setPairingStep] = useState<'scanning' | 'found' | 'pairing' | 'success'>('scanning');
+  const [selectedModel, setSelectedModel] = useState('');
+  const [syncingDeviceId, setSyncingDeviceId] = useState<string | null>(null);
+
+  const handleAddDevice = () => {
+    setShowAddDialog(true);
+    setSelectedBrand(null);
+    setSelectedModel('');
+  };
+
+  const handleSelectBrand = (brand: typeof availableDevices[0]) => {
+    setSelectedBrand(brand);
+  };
+
+  const handleStartPairing = (model: string) => {
+    setSelectedModel(model);
+    setShowAddDialog(false);
+    setShowPairingDialog(true);
+    setPairingStep('scanning');
+
+    // Simulate pairing flow
+    setTimeout(() => setPairingStep('found'), 2000);
+    setTimeout(() => setPairingStep('pairing'), 3500);
+    setTimeout(() => {
+      setPairingStep('success');
+      const newDevice: Device = {
+        id: Date.now().toString(),
+        name: `${selectedBrand!.name} ${model}`,
+        type: selectedBrand!.type,
+        brand: selectedBrand!.brand,
+        connected: true,
+        battery: Math.floor(Math.random() * 40) + 60,
+        lastSync: 'Just now',
+        icon: selectedBrand!.icon,
+        syncEnabled: true,
+      };
+      setDevices(prev => [...prev, newDevice]);
+      toast.success(`${selectedBrand!.name} ${model} connected successfully!`);
+    }, 5500);
+  };
+
+  const handleDisconnect = (deviceId: string) => {
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: false, syncEnabled: false } : d));
+    setShowDeviceSettings(null);
+    toast.info('Device disconnected');
+  };
+
+  const handleReconnect = (deviceId: string) => {
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: true, syncEnabled: true, lastSync: 'Just now' } : d));
+    toast.success('Device reconnected!');
+  };
+
+  const handleRemoveDevice = (deviceId: string) => {
+    setDevices(prev => prev.filter(d => d.id !== deviceId));
+    setShowDeviceSettings(null);
+    toast.info('Device removed');
+  };
+
+  const handleSyncDevice = (deviceId: string) => {
+    setSyncingDeviceId(deviceId);
+    setTimeout(() => {
+      setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, lastSync: 'Just now' } : d));
+      setSyncingDeviceId(null);
+      toast.success('Data synced successfully!');
+    }, 2000);
+  };
+
+  const handleToggleSync = (deviceId: string, enabled: boolean) => {
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, syncEnabled: enabled } : d));
+  };
 
   return (
     <div className="space-y-6">
@@ -48,28 +149,111 @@ const WearableIntegration = () => {
         <Watch className="absolute top-4 right-6 h-20 w-20 text-white/10" />
       </div>
 
-      {/* Devices */}
-      <div className="grid sm:grid-cols-3 gap-4">
-        {devices.map((d, i) => (
-          <motion.div key={d.name} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card className={`rounded-card cursor-pointer transition-all ${selectedDevice === i ? 'ring-2 ring-primary' : ''}`} onClick={() => setSelectedDevice(i)}>
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <Watch className="h-5 w-5 text-primary" />
-                  {d.connected ? <Badge className="bg-success/10 text-success border-0 text-xs gap-1"><Wifi className="h-3 w-3" /> Connected</Badge>
-                    : <Badge variant="outline" className="text-muted-foreground text-xs gap-1"><WifiOff className="h-3 w-3" /> Offline</Badge>}
-                </div>
-                <h4 className="font-medium text-sm">{d.name}</h4>
-                <p className="text-xs text-muted-foreground">{d.type}</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>🔋 {d.battery}%</span>
-                  <span>Synced {d.lastSync}</span>
-                </div>
-                <Progress value={d.battery} className="h-1" />
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      {/* Devices + Add Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">My Devices</h2>
+        <Button onClick={handleAddDevice} size="sm" className="gap-2">
+          <Plus className="h-4 w-4" /> Connect Device
+        </Button>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnimatePresence>
+          {devices.map((d, i) => (
+            <motion.div
+              key={d.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <Card className={`rounded-card cursor-pointer transition-all hover:shadow-md ${selectedDevice === i ? 'ring-2 ring-primary' : ''}`} onClick={() => setSelectedDevice(i)}>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{d.icon}</span>
+                      <Watch className="h-4 w-4 text-primary" />
+                    </div>
+                    {d.connected
+                      ? <Badge className="bg-success/10 text-success border-0 text-xs gap-1"><Wifi className="h-3 w-3" /> Connected</Badge>
+                      : <Badge variant="outline" className="text-muted-foreground text-xs gap-1"><WifiOff className="h-3 w-3" /> Offline</Badge>
+                    }
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm">{d.name}</h4>
+                    <p className="text-xs text-muted-foreground">{d.type}</p>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>🔋 {d.battery}%</span>
+                    <span>Synced {d.lastSync}</span>
+                  </div>
+                  <Progress value={d.battery} className="h-1" />
+
+                  {/* Device action buttons */}
+                  <div className="flex gap-2 pt-1">
+                    {d.connected ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs h-8 gap-1"
+                          onClick={(e) => { e.stopPropagation(); handleSyncDevice(d.id); }}
+                          disabled={syncingDeviceId === d.id}
+                        >
+                          {syncingDeviceId === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                          {syncingDeviceId === d.id ? 'Syncing...' : 'Sync'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={(e) => { e.stopPropagation(); setShowDeviceSettings(d.id); }}
+                        >
+                          Settings
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="flex-1 text-xs h-8 gap-1"
+                          onClick={(e) => { e.stopPropagation(); handleReconnect(d.id); }}
+                        >
+                          <Bluetooth className="h-3 w-3" /> Reconnect
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8 text-destructive hover:text-destructive"
+                          onClick={(e) => { e.stopPropagation(); handleRemoveDevice(d.id); }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Add device card */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+          <Card
+            className="rounded-card border-dashed border-2 border-muted-foreground/20 cursor-pointer hover:border-primary/40 hover:bg-accent/30 transition-all h-full flex items-center justify-center min-h-[180px]"
+            onClick={handleAddDevice}
+          >
+            <CardContent className="p-4 text-center space-y-2">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Plus className="h-6 w-6 text-primary" />
+              </div>
+              <p className="text-sm font-medium text-muted-foreground">Add New Device</p>
+              <p className="text-xs text-muted-foreground/70">Connect via Bluetooth</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Vitals */}
@@ -137,6 +321,179 @@ const WearableIntegration = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Device Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bluetooth className="h-5 w-5 text-primary" />
+              {selectedBrand ? `Select ${selectedBrand.name} Model` : 'Connect a Smartwatch'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedBrand ? 'Choose your device model to start pairing.' : 'Select your device brand to get started.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {!selectedBrand ? (
+            <div className="grid grid-cols-2 gap-3 py-2">
+              {availableDevices.map((device) => (
+                <Card
+                  key={device.name}
+                  className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all"
+                  onClick={() => handleSelectBrand(device)}
+                >
+                  <CardContent className="p-4 text-center space-y-2">
+                    <span className="text-3xl">{device.icon}</span>
+                    <p className="text-sm font-medium">{device.name}</p>
+                    <p className="text-xs text-muted-foreground">{device.type}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2 py-2">
+              <Button variant="ghost" size="sm" className="text-xs mb-2" onClick={() => setSelectedBrand(null)}>
+                ← Back to brands
+              </Button>
+              {selectedBrand.models.map((model) => (
+                <Card
+                  key={model}
+                  className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all"
+                  onClick={() => handleStartPairing(model)}
+                >
+                  <CardContent className="p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">{selectedBrand.icon}</span>
+                      <div>
+                        <p className="text-sm font-medium">{selectedBrand.name} {model}</p>
+                        <p className="text-xs text-muted-foreground">{selectedBrand.type}</p>
+                      </div>
+                    </div>
+                    <Bluetooth className="h-4 w-4 text-primary" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Pairing Dialog */}
+      <Dialog open={showPairingDialog} onOpenChange={(open) => { if (!open && pairingStep === 'success') setShowPairingDialog(false); else if (!open) { setShowPairingDialog(false); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {pairingStep === 'scanning' && 'Scanning for Device...'}
+              {pairingStep === 'found' && 'Device Found!'}
+              {pairingStep === 'pairing' && 'Pairing...'}
+              {pairingStep === 'success' && 'Connected!'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center py-8 space-y-4">
+            <AnimatePresence mode="wait">
+              {pairingStep === 'scanning' && (
+                <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
+                  <div className="relative mx-auto w-20 h-20">
+                    <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.2, 0.5] }} transition={{ repeat: Infinity, duration: 1.5 }} className="absolute inset-0 rounded-full bg-primary/20" />
+                    <div className="absolute inset-2 rounded-full bg-primary/10 flex items-center justify-center">
+                      <BluetoothSearching className="h-8 w-8 text-primary" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Make sure your device is nearby and Bluetooth is enabled</p>
+                </motion.div>
+              )}
+              {pairingStep === 'found' && (
+                <motion.div key="found" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+                    <Smartphone className="h-8 w-8 text-success" />
+                  </div>
+                  <p className="text-sm font-medium">{selectedBrand?.name} {selectedModel}</p>
+                  <p className="text-xs text-muted-foreground">Connecting to device...</p>
+                </motion.div>
+              )}
+              {pairingStep === 'pairing' && (
+                <motion.div key="pairing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
+                  <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
+                  <p className="text-sm text-muted-foreground">Establishing secure connection...</p>
+                  <p className="text-xs text-muted-foreground/70">Please confirm pairing on your device</p>
+                </motion.div>
+              )}
+              {pairingStep === 'success' && (
+                <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }} className="mx-auto w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+                    <Check className="h-8 w-8 text-success" />
+                  </motion.div>
+                  <p className="text-sm font-medium">{selectedBrand?.name} {selectedModel}</p>
+                  <p className="text-xs text-success">Successfully paired and syncing data</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {pairingStep === 'success' && (
+            <DialogFooter>
+              <Button className="w-full" onClick={() => setShowPairingDialog(false)}>Done</Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Device Settings Dialog */}
+      <Dialog open={!!showDeviceSettings} onOpenChange={() => setShowDeviceSettings(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Device Settings</DialogTitle>
+            <DialogDescription>
+              {devices.find(d => d.id === showDeviceSettings)?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          {showDeviceSettings && (() => {
+            const device = devices.find(d => d.id === showDeviceSettings);
+            if (!device) return null;
+            return (
+              <div className="space-y-4 py-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Auto Sync</p>
+                    <p className="text-xs text-muted-foreground">Automatically sync health data</p>
+                  </div>
+                  <Switch checked={device.syncEnabled} onCheckedChange={(checked) => handleToggleSync(device.id, checked)} />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Battery</p>
+                    <p className="text-xs text-muted-foreground">{device.battery}% remaining</p>
+                  </div>
+                  <Progress value={device.battery} className="w-20 h-2" />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Last Synced</p>
+                    <p className="text-xs text-muted-foreground">{device.lastSync}</p>
+                  </div>
+                  <Button variant="outline" size="sm" className="text-xs gap-1" onClick={() => { handleSyncDevice(device.id); setShowDeviceSettings(null); }}>
+                    <RefreshCw className="h-3 w-3" /> Sync Now
+                  </Button>
+                </div>
+
+                <div className="border-t pt-4 space-y-2">
+                  <Button variant="outline" className="w-full text-sm" onClick={() => handleDisconnect(device.id)}>
+                    <WifiOff className="h-4 w-4 mr-2" /> Disconnect
+                  </Button>
+                  <Button variant="ghost" className="w-full text-sm text-destructive hover:text-destructive" onClick={() => handleRemoveDevice(device.id)}>
+                    <Trash2 className="h-4 w-4 mr-2" /> Remove Device
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
