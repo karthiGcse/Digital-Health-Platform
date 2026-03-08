@@ -24,8 +24,6 @@ const symptomCategories: Record<string, string[]> = {
   'ENT': ['Ear Pain', 'Hearing Loss', 'Tinnitus', 'Nasal Congestion', 'Difficulty Swallowing'],
 };
 
-const [selectedCategory, setSelectedCategory] = useState<string>('General');
-
 interface AnalysisResult {
   risk_score: number;
   severity: string;
