@@ -116,7 +116,15 @@ const ComingSoon = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="min-h-screen -m-4 md:-m-6 p-4 md:p-6 relative">
+      {/* Page background */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.15),transparent_50%)]" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_right,rgba(236,72,153,0.12),transparent_50%)]" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_left,rgba(16,185,129,0.08),transparent_40%)]" />
+      <div className="fixed inset-0 -z-10 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+
+      <div className="space-y-10 pb-10">
       {/* Stunning Hero */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -220,8 +228,8 @@ const ComingSoon = () => {
               {category.emoji}
             </div>
             <div>
-              <h2 className="text-lg font-heading font-bold">{category.label}</h2>
-              <p className="text-[11px] text-muted-foreground">{category.features.length} features available</p>
+              <h2 className="text-lg font-heading font-bold text-white">{category.label}</h2>
+              <p className="text-[11px] text-white/50">{category.features.length} features available</p>
             </div>
             <Badge variant="secondary" className={`ml-auto text-[10px] font-bold bg-gradient-to-r ${categoryGradients[catIdx]} text-white border-0`}>
               {category.features.length}
@@ -233,7 +241,7 @@ const ComingSoon = () => {
             {category.features.map((feature) => (
               <motion.div key={feature.route} variants={itemVariants}>
                 <Card
-                  className="group cursor-pointer relative overflow-hidden border border-border/50 hover:border-transparent transition-all duration-500 h-full hover:shadow-xl hover:shadow-primary/5"
+                  className="group cursor-pointer relative overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 transition-all duration-500 h-full hover:shadow-xl hover:shadow-primary/10"
                   onClick={() => navigate(feature.route)}
                 >
                   {/* Hover glow */}
@@ -252,12 +260,12 @@ const ComingSoon = () => {
                     </div>
 
                     <div className="space-y-0.5">
-                      <p className="text-xs font-bold leading-tight group-hover:text-primary transition-colors duration-300">{feature.title}</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">{feature.desc}</p>
+                      <p className="text-xs font-bold leading-tight text-white group-hover:text-cyan-300 transition-colors duration-300">{feature.title}</p>
+                      <p className="text-[10px] text-white/40 leading-tight">{feature.desc}</p>
                     </div>
 
                     {/* Arrow indicator */}
-                    <div className="flex items-center gap-1 text-[9px] font-semibold text-muted-foreground/50 group-hover:text-primary transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
+                    <div className="flex items-center gap-1 text-[9px] font-semibold text-white/30 group-hover:text-cyan-300 transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
                       Open <ArrowRight className="h-2.5 w-2.5" />
                     </div>
                   </CardContent>
@@ -290,6 +298,7 @@ const ComingSoon = () => {
           </p>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 };
