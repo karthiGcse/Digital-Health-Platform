@@ -542,6 +542,54 @@ export type Database = {
         }
         Relationships: []
       }
+      telemedicine_bookings: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          consultation_type: string
+          created_at: string
+          doctor_country: string
+          doctor_name: string
+          doctor_specialty: string
+          id: string
+          notes: string | null
+          price: string
+          status: string
+          timezone: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          consultation_type?: string
+          created_at?: string
+          doctor_country: string
+          doctor_name: string
+          doctor_specialty: string
+          id?: string
+          notes?: string | null
+          price?: string
+          status?: string
+          timezone?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          consultation_type?: string
+          created_at?: string
+          doctor_country?: string
+          doctor_name?: string
+          doctor_specialty?: string
+          id?: string
+          notes?: string | null
+          price?: string
+          status?: string
+          timezone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wearable_devices: {
         Row: {
           battery: number
