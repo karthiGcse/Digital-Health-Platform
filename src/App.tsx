@@ -98,29 +98,13 @@ const App = () => (
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/physiotherapy" element={<Physiotherapy />} />
               
-              <Route path="/pathology" element={<Pathology />} />
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
-              <Route path="/maternal-health" element={<MaternalHealth />} />
-              <Route path="/dental-health" element={<DentalHealth />} />
               <Route path="/insurance" element={<Insurance />} />
-              <Route path="/sleep-health" element={<SleepHealth />} />
-              <Route path="/orthopedic" element={<Orthopedic />} />
-              <Route path="/fall-detection" element={<FallDetection />} />
-              <Route path="/ar-surgery" element={<ARSurgery />} />
-              <Route path="/skincare" element={<Skincare />} />
               <Route path="/blood-donation" element={<BloodDonation />} />
               <Route path="/yoga" element={<Yoga />} />
-              <Route path="/bed-availability" element={<BedAvailability />} />
               <Route path="/epigenetics" element={<Epigenetics />} />
-              <Route path="/second-opinion" element={<SecondOpinion />} />
-              <Route path="/fever-tracker" element={<FeverTracker />} />
-              <Route path="/doctor-reviews" element={<DoctorReviews />} />
               <Route path="/health-wallet" element={<HealthWallet />} />
-              <Route path="/microbiome" element={<Microbiome />} />
               <Route path="/hearing-health" element={<HearingHealth />} />
-              <Route path="/respiratory" element={<Respiratory />} />
-              <Route path="/pharmacogenomics" element={<Pharmacogenomics />} />
-              <Route path="/peer-support" element={<PeerSupport />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
