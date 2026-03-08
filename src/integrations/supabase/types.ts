@@ -272,6 +272,51 @@ export type Database = {
         }
         Relationships: []
       }
+      nutrition_plans: {
+        Row: {
+          calories: number
+          carbs: number
+          created_at: string
+          fat: number
+          id: string
+          items: Json
+          meal_name: string
+          meal_time: string
+          meal_type: string
+          notes: string | null
+          protein: number
+          user_id: string
+        }
+        Insert: {
+          calories?: number
+          carbs?: number
+          created_at?: string
+          fat?: number
+          id?: string
+          items?: Json
+          meal_name: string
+          meal_time?: string
+          meal_type?: string
+          notes?: string | null
+          protein?: number
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          carbs?: number
+          created_at?: string
+          fat?: number
+          id?: string
+          items?: Json
+          meal_name?: string
+          meal_time?: string
+          meal_type?: string
+          notes?: string | null
+          protein?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       pharmacy_inventory: {
         Row: {
           alternative_group: string | null
