@@ -41,7 +41,7 @@ import Radiology from "@/pages/Radiology";
 import Vaccination from "@/pages/Vaccination";
 import Nutrition from "@/pages/Nutrition";
 import Physiotherapy from "@/pages/Physiotherapy";
-import ClinicalTrials from "@/pages/ClinicalTrials";
+
 import Pathology from "@/pages/Pathology";
 import CardiacRisk from "@/pages/CardiacRisk";
 import MaternalHealth from "@/pages/MaternalHealth";
