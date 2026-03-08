@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Microscope, MapPin, CheckCircle2, Clock, ExternalLink, Filter, Search, Heart, Calendar, Users, Building, FileText, Star, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Microscope, MapPin, CheckCircle2, Clock, ExternalLink, Filter, Search, Heart, Calendar, Users, Building, FileText, Star, Bookmark, BookmarkCheck, Navigation, MapIcon, Phone, Mail, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Trial {
@@ -14,7 +14,10 @@ interface Trial {
   title: string;
   sponsor: string;
   location: string;
-  distance: string;
+  address: string;
+  lat: number;
+  lng: number;
+  distance?: string;
   phase: string;
   status: string;
   match: number;
@@ -27,6 +30,9 @@ interface Trial {
   endDate: string;
   participants: number;
   contactEmail: string;
+  contactPhone: string;
+  website: string;
+  openingHours: { day: string; open: string; close: string }[];
 }
 
 const allTrials: Trial[] = [
@@ -35,7 +41,9 @@ const allTrials: Trial[] = [
     title: 'Phase III Diabetes Management Trial', 
     sponsor: 'HealthCorp Pharma', 
     location: 'Mumbai, India', 
-    distance: '5 km', 
+    address: 'Kokilaben Dhirubhai Ambani Hospital, Andheri West, Mumbai 400053',
+    lat: 19.1334,
+    lng: 72.8262,
     phase: 'Phase III', 
     status: 'Recruiting', 
     match: 95, 
@@ -47,7 +55,18 @@ const allTrials: Trial[] = [
     startDate: '2024-03-01',
     endDate: '2025-03-01',
     participants: 500,
-    contactEmail: 'diabetes-trial@healthcorp.com'
+    contactEmail: 'diabetes-trial@healthcorp.com',
+    contactPhone: '+91 22 3069 6969',
+    website: 'https://healthcorp-trials.com',
+    openingHours: [
+      { day: 'Monday', open: '09:00', close: '18:00' },
+      { day: 'Tuesday', open: '09:00', close: '18:00' },
+      { day: 'Wednesday', open: '09:00', close: '18:00' },
+      { day: 'Thursday', open: '09:00', close: '18:00' },
+      { day: 'Friday', open: '09:00', close: '17:00' },
+      { day: 'Saturday', open: '10:00', close: '14:00' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
   { 
     id: '2',
