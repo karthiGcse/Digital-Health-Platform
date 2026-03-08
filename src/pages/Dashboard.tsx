@@ -144,11 +144,9 @@ const Dashboard = () => {
 
         <div className="relative z-10 p-7 md:p-10">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] backdrop-blur-xl rounded-full px-4 py-1.5 mb-5">
-              <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-              </motion.div>
-              <span className="text-white/50 text-[11px] font-bold tracking-widest uppercase">{t('dashboard.title')}</span>
+            <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.1] backdrop-blur-md rounded-full px-4 py-1.5 mb-5">
+              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-white/60 text-[11px] font-semibold tracking-wide">All Systems Live</span>
             </div>
           </motion.div>
 
