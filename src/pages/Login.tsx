@@ -1,16 +1,26 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, AppRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Heart, Mail, Lock } from 'lucide-react';
+import { Heart, Lock, Stethoscope, Pill, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type LoginRole = 'patient' | 'doctor' | 'pharmacist';
+
+const roleConfig: { role: LoginRole; label: string; icon: React.ElementType; color: string; activeColor: string }[] = [
+  { role: 'patient', label: 'Patient', icon: User, color: 'text-emerald-600', activeColor: 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' },
+  { role: 'doctor', label: 'Doctor', icon: Stethoscope, color: 'text-purple-600', activeColor: 'border-purple-500 bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300' },
+  { role: 'pharmacist', label: 'Pharmacist', icon: Pill, color: 'text-blue-600', activeColor: 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' },
+];
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<LoginRole>('patient');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -20,7 +30,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       await signIn(email, password);
-      toast({ title: 'Welcome back! 🎉', description: 'Successfully logged in.' });
+      toast({ title: 'Welcome back! 🎉', description: `Logged in as ${selectedRole}.` });
       navigate('/dashboard');
     } catch (err: any) {
       toast({ title: 'Login failed', description: err.message, variant: 'destructive' });
@@ -42,12 +52,32 @@ const Login = () => {
           <p className="text-muted-foreground">AI-Powered Telepharmacy Platform</p>
         </div>
 
+        {/* Role Selection */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {roleConfig.map(({ role, label, icon: Icon, color, activeColor }) => (
+            <button
+              key={role}
+              type="button"
+              onClick={() => setSelectedRole(role)}
+              className={cn(
+                'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200',
+                selectedRole === role
+                  ? activeColor
+                  : 'border-border bg-card hover:border-muted-foreground/30'
+              )}
+            >
+              <Icon className={cn('h-6 w-6', selectedRole === role ? '' : color)} />
+              <span className="text-sm font-medium">{label}</span>
+            </button>
+          ))}
+        </div>
+
         <Card className="rounded-card shadow-sm">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Mail className="h-5 w-5 text-primary" /> Sign In
+            <CardTitle className="text-xl">
+              Sign In as {roleConfig.find(r => r.role === selectedRole)?.label}
             </CardTitle>
-            <CardDescription>Enter your email and password to log in</CardDescription>
+            <CardDescription>Enter your email and password</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
