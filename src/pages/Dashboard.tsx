@@ -39,14 +39,14 @@ const additionalFeatures = [
   { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
   { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
   { icon: Stethoscope, title: 'AI Radiology', desc: 'CT scan, MRI & ultrasound AI analysis', route: '/radiology', gradient: 'gradient-cool' },
-  { icon: Syringe, title: 'Vaccination Scheduler', desc: 'Automated vaccine scheduling', route: '/vaccination', gradient: 'gradient-warm' },
+  
   { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
   { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
   
   { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
   { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance', gradient: 'gradient-health' },
   { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation', gradient: 'gradient-danger' },
-  { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', gradient: 'gradient-success' },
+  
   { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics', gradient: 'gradient-health' },
   { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet', gradient: 'gradient-health' },
   { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health', gradient: 'gradient-warm' },

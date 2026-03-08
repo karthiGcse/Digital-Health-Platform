@@ -38,13 +38,13 @@ import AutoRefill from "@/pages/AutoRefill";
 import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
 import PharmacyInventory from "@/pages/PharmacyInventory";
 import Radiology from "@/pages/Radiology";
-import Vaccination from "@/pages/Vaccination";
+
 import Nutrition from "@/pages/Nutrition";
 
 import CardiacRisk from "@/pages/CardiacRisk";
 import Insurance from "@/pages/Insurance";
 import BloodDonation from "@/pages/BloodDonation";
-import Yoga from "@/pages/Yoga";
+
 import Epigenetics from "@/pages/Epigenetics";
 import HealthWallet from "@/pages/HealthWallet";
 import HearingHealth from "@/pages/HearingHealth";
@@ -93,13 +93,13 @@ const App = () => (
               <Route path="/auto-refill" element={<AutoRefill />} />
               <Route path="/global-telemedicine" element={<GlobalTelemedicine />} />
               <Route path="/radiology" element={<Radiology />} />
-              <Route path="/vaccination" element={<Vaccination />} />
+              
               <Route path="/nutrition" element={<Nutrition />} />
               
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
               <Route path="/insurance" element={<Insurance />} />
               <Route path="/blood-donation" element={<BloodDonation />} />
-              <Route path="/yoga" element={<Yoga />} />
+              
               <Route path="/epigenetics" element={<Epigenetics />} />
               <Route path="/health-wallet" element={<HealthWallet />} />
               <Route path="/hearing-health" element={<HearingHealth />} />
