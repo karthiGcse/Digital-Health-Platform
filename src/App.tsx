@@ -66,6 +66,14 @@ const App = () => (
               <Route path="/mental-health" element={<MentalHealth />} />
               <Route path="/family-health" element={<FamilyHealthHub />} />
               <Route path="/voice-assistant" element={<VoiceAssistant />} />
+              <Route path="/genetic-profiling" element={<GeneticProfiling />} />
+              <Route path="/wearables" element={<WearableIntegration />} />
+              <Route path="/lab-booking" element={<HomeLabBooking />} />
+              <Route path="/blockchain-records" element={<BlockchainRecords />} />
+              <Route path="/drone-delivery" element={<DroneDelivery />} />
+              <Route path="/hospital-queue" element={<HospitalQueue />} />
+              <Route path="/auto-refill" element={<AutoRefill />} />
+              <Route path="/global-telemedicine" element={<GlobalTelemedicine />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
