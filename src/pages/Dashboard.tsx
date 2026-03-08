@@ -8,9 +8,8 @@ import {
   TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
   Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
   Shield, Plane, Building2, RefreshCw, Globe2, Users, Syringe, Apple,
-  Dumbbell, Microscope, TestTube, HeartPulse, Baby, Smile, ShieldCheck,
-  Moon, Bone, PersonStanding, Glasses, Droplets, Move3D, Ear, Wind,
-  Star, Wallet, CircleDot, ThermometerSun, UsersRound, Stethoscope
+  Dumbbell, HeartPulse, ShieldCheck, CircleDot, Move3D, Ear,
+  Wallet, Stethoscope
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
