@@ -527,16 +527,33 @@ const ClinicalTrials = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={getUserLocation}
-                disabled={locationLoading}
-                className="gap-2"
-              >
-                <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-pulse' : ''}`} />
-                {locationLoading ? 'Locating...' : 'Update Location'}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select value={selectedCity} onValueChange={selectCity}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="Select City" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map(city => (
+                      <SelectItem key={city.name} value={city.name}>{city.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={getUserLocation}
+                  disabled={locationLoading}
+                  className="gap-2"
+                >
+                  <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-pulse' : ''}`} />
+                  {locationLoading ? 'Locating...' : 'Use GPS'}
+                </Button>
+                {selectedCity && (
+                  <Badge variant="secondary" className="gap-1">
+                    <MapPin className="h-3 w-3" /> {selectedCity}
+                  </Badge>
+                )}
+              </div>
             </CardContent>
           </Card>
 
