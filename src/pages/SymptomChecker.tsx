@@ -27,6 +27,12 @@ const symptomCategories: Record<string, string[]> = {
   'Allergies': ['Sneezing Fits', 'Watery Eyes', 'Hives', 'Swollen Face', 'Throat Swelling', 'Anaphylaxis', 'Food Intolerance', 'Drug Reaction'],
   'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'],
   'Dental': ['Toothache', 'Bleeding Gums', 'Bad Breath', 'Jaw Stiffness', 'Tooth Sensitivity', 'Mouth Ulcers', 'Swollen Gums'],
+  'Reproductive': ['Pelvic Pain', 'Abnormal Discharge', 'Erectile Dysfunction', 'Painful Intercourse', 'Infertility Concerns', 'Breast Pain', 'Menstrual Cramps', 'Heavy Periods'],
+  'Liver & Kidney': ['Jaundice', 'Dark Urine', 'Pale Stools', 'Abdominal Swelling', 'Flank Pain', 'Swollen Ankles', 'Metallic Taste', 'Foamy Urine'],
+  'Infectious': ['High Fever', 'Body Rash', 'Swollen Glands', 'Persistent Cough', 'Cold Sores', 'Wound Infection', 'Fungal Infection', 'Parasitic Symptoms'],
+  'Blood & Immune': ['Easy Bruising', 'Prolonged Bleeding', 'Frequent Infections', 'Pale Skin', 'Chronic Fatigue', 'Swollen Spleen', 'Blood Clots', 'Autoimmune Flares'],
+  'Nutrition': ['Vitamin Deficiency', 'Iron Deficiency', 'Calcium Deficiency', 'Protein Deficiency', 'Electrolyte Imbalance', 'Malnutrition Signs', 'Obesity Concerns'],
+  'Sleep': ['Snoring', 'Sleep Apnea', 'Restless Legs', 'Sleepwalking', 'Excessive Daytime Sleepiness', 'Night Terrors', 'Difficulty Falling Asleep', 'Early Waking'],
 };
 
 interface AnalysisResult {
