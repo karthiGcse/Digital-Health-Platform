@@ -5,9 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RefreshCw, Package, Calendar, Clock, DollarSign, Pill, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RefreshCw, Package, Calendar, DollarSign, Pill, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Subscription {
   id: string;
@@ -37,11 +41,64 @@ const pharmacies = [
 const AutoRefill = () => {
   const [subs, setSubs] = useState(initialSubscriptions);
   const [showCompare, setShowCompare] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newMedicine, setNewMedicine] = useState('');
+  const [newDosage, setNewDosage] = useState('');
+  const [newFrequency, setNewFrequency] = useState('Monthly');
+  const [newPrice, setNewPrice] = useState('');
+  const { user } = useAuth();
 
   const toggleSub = (id: string) => {
     setSubs(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
     const sub = subs.find(s => s.id === id);
     toast.success(sub?.active ? `Paused ${sub.medicine} refill` : `Resumed ${sub?.medicine} refill`);
+  };
+
+  const deleteSub = (id: string) => {
+    const sub = subs.find(s => s.id === id);
+    setSubs(prev => prev.filter(s => s.id !== id));
+    toast.success(`Removed ${sub?.medicine} subscription`);
+  };
+
+  const handleAddSubscription = async () => {
+    if (!newMedicine.trim() || !newDosage.trim() || !newPrice) return;
+
+    const price = Number(newPrice);
+    const savings = Math.round(price * 0.15);
+    const freqDays = newFrequency === 'Monthly' ? 30 : newFrequency === 'Every 2 months' ? 60 : newFrequency === 'Weekly' ? 7 : 90;
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + freqDays);
+
+    const newSub: Subscription = {
+      id: Date.now().toString(),
+      medicine: newMedicine.trim(),
+      dosage: newDosage.trim(),
+      frequency: newFrequency,
+      nextRefill: nextDate.toISOString().split('T')[0],
+      price,
+      active: true,
+      daysLeft: freqDays,
+      savings,
+    };
+
+    setSubs(prev => [newSub, ...prev]);
+    toast.success(`${newMedicine} subscription activated!`);
+
+    if (user) {
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: '💊 New Auto-Refill Subscription',
+        message: `"${newMedicine}" (${newDosage}) has been added. Next refill: ${nextDate.toLocaleDateString()}.`,
+        type: 'success',
+        link: '/auto-refill',
+      });
+    }
+
+    setNewMedicine('');
+    setNewDosage('');
+    setNewFrequency('Monthly');
+    setNewPrice('');
+    setShowAddForm(false);
   };
 
   const activeSubs = subs.filter(s => s.active);
@@ -92,7 +149,7 @@ const AutoRefill = () => {
                       <h4 className="font-medium text-sm">{s.medicine}</h4>
                       {s.daysLeft <= 3 && s.active && <Badge className="bg-warning/10 text-warning border-0 text-[10px] gap-1"><AlertCircle className="h-3 w-3" /> Refill Soon</Badge>}
                     </div>
-                    <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap gap-3 mt-1 text-xs text-muted-foreground">
                       <span>{s.dosage}</span>
                       <span className="flex items-center gap-1"><RefreshCw className="h-3 w-3" /> {s.frequency}</span>
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Next: {s.nextRefill}</span>
@@ -102,7 +159,12 @@ const AutoRefill = () => {
                       <span className="text-xs text-success">Save ₹{s.savings}</span>
                     </div>
                   </div>
-                  <Switch checked={s.active} onCheckedChange={() => toggleSub(s.id)} />
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deleteSub(s.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Switch checked={s.active} onCheckedChange={() => toggleSub(s.id)} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -133,9 +195,58 @@ const AutoRefill = () => {
         </motion.div>
       )}
 
-      <Button className="w-full gap-2" onClick={() => toast.info('Add medicine subscription form coming soon')}>
+      <Button className="w-full gap-2" onClick={() => setShowAddForm(true)}>
         <Plus className="h-4 w-4" /> Add New Subscription
       </Button>
+
+      {/* Add Subscription Dialog */}
+      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Pill className="h-5 w-5 text-primary" />Add New Subscription</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Medicine Name</Label>
+              <Input placeholder="e.g. Aspirin 75mg" value={newMedicine} onChange={e => setNewMedicine(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Dosage</Label>
+              <Input placeholder="e.g. 1 tablet/day" value={newDosage} onChange={e => setNewDosage(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Refill Frequency</Label>
+              <Select value={newFrequency} onValueChange={setNewFrequency}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Weekly">Weekly</SelectItem>
+                  <SelectItem value="Monthly">Monthly</SelectItem>
+                  <SelectItem value="Every 2 months">Every 2 months</SelectItem>
+                  <SelectItem value="Quarterly">Quarterly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Price (₹)</Label>
+              <Input type="number" placeholder="e.g. 250" value={newPrice} onChange={e => setNewPrice(e.target.value)} />
+            </div>
+            {newPrice && Number(newPrice) > 0 && (
+              <div className="p-3 rounded-xl bg-success/10 text-center">
+                <p className="text-xs text-muted-foreground">Estimated Savings</p>
+                <p className="text-lg font-heading font-bold text-success">₹{Math.round(Number(newPrice) * 0.15)}/refill</p>
+                <p className="text-[10px] text-muted-foreground">15% auto-refill discount applied</p>
+              </div>
+            )}
+            <Button
+              className="w-full"
+              onClick={handleAddSubscription}
+              disabled={!newMedicine.trim() || !newDosage.trim() || !newPrice || Number(newPrice) <= 0}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" /> Activate Subscription
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
