@@ -46,7 +46,7 @@ const additionalFeatures = [
   { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
   { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance', gradient: 'gradient-health' },
   { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation', gradient: 'gradient-danger' },
-  { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', gradient: 'gradient-success' },
+  
   { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics', gradient: 'gradient-health' },
   { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet', gradient: 'gradient-health' },
   { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health', gradient: 'gradient-warm' },

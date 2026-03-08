@@ -99,7 +99,7 @@ const App = () => (
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
               <Route path="/insurance" element={<Insurance />} />
               <Route path="/blood-donation" element={<BloodDonation />} />
-              <Route path="/yoga" element={<Yoga />} />
+              
               <Route path="/epigenetics" element={<Epigenetics />} />
               <Route path="/health-wallet" element={<HealthWallet />} />
               <Route path="/hearing-health" element={<HearingHealth />} />

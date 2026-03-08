@@ -38,7 +38,7 @@ const routeToTranslationKey: Record<string, string> = {
   '/cardiac-risk': 'nav.cardiacRisk',
   '/insurance': 'nav.insurance',
   '/blood-donation': 'nav.bloodDonation',
-  '/yoga': 'nav.yoga',
+  
   '/epigenetics': 'nav.epigenetics',
   '/health-wallet': 'nav.healthWallet',
   '/hearing-health': 'nav.hearingHealth',
