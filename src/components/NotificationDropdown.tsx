@@ -40,12 +40,13 @@ const NotificationDropdown = () => {
     if (!user) return;
 
     const fetchNotifications = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
+      console.log('[Notifications] fetch result:', { data, error, userId: user.id });
       if (data) setNotifications(data as Notification[]);
     };
 
