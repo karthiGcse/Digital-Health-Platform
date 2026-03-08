@@ -298,6 +298,7 @@ const ComingSoon = () => {
           </p>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 };
