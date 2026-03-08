@@ -2,27 +2,42 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import TopBar from '@/components/TopBar';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const pageTitles: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/symptoms': 'Symptom Checker',
-  '/medicines': 'Medicine Lookup',
-  '/interactions': 'Drug Interactions',
-  '/prescriptions': 'Prescriptions',
-  '/reminders': 'Smart Reminders',
-  '/telemedicine': 'Telemedicine',
-  '/nearby': 'Nearby Services',
-  '/consultation': 'AI Consultation',
-  '/analytics': 'Health Analytics',
-  '/reports': 'AI Reports',
-  '/emergency': 'Emergency',
-  '/inventory': 'Inventory',
-  '/coming-soon': 'Coming Soon',
+const routeToTranslationKey: Record<string, string> = {
+  '/dashboard': 'nav.dashboard',
+  '/symptoms': 'nav.symptomChecker',
+  '/medicines': 'nav.medicineLookup',
+  '/interactions': 'nav.drugInteractions',
+  '/prescriptions': 'nav.prescriptions',
+  '/reminders': 'nav.reminders',
+  '/telemedicine': 'nav.telemedicine',
+  '/nearby': 'nav.nearby',
+  '/consultation': 'nav.consultation',
+  '/analytics': 'nav.analytics',
+  '/reports': 'nav.reports',
+  '/emergency': 'nav.emergency',
+  '/inventory': 'nav.inventory',
+  '/image-diagnosis': 'nav.imageDiagnosis',
+  '/mental-health': 'nav.mentalHealth',
+  '/family-health': 'nav.familyHealth',
+  '/voice-assistant': 'nav.voiceAssistant',
+  '/genetic-profiling': 'nav.geneticProfiling',
+  '/wearables': 'nav.wearables',
+  '/lab-booking': 'nav.labBooking',
+  '/blockchain-records': 'nav.blockchain',
+  '/drone-delivery': 'nav.droneDelivery',
+  '/hospital-queue': 'nav.hospitalQueue',
+  '/auto-refill': 'nav.autoRefill',
+  '/global-telemedicine': 'nav.globalTelemedicine',
+  '/coming-soon': 'nav.comingSoon',
 };
 
 const AppLayout = () => {
   const location = useLocation();
-  const title = pageTitles[location.pathname] || 'S47 Health';
+  const { t } = useLanguage();
+  const key = routeToTranslationKey[location.pathname];
+  const title = key ? t(key) : 'S47 Health';
 
   return (
     <SidebarProvider>

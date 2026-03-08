@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,26 +21,27 @@ const symptomData = [
   { name: 'Fever', count: 1 }, { name: 'Nausea', count: 1 },
 ];
 
-const recentActivity = [
-  { icon: Pill, text: 'Took Metformin 500mg', time: '2 hours ago', iconClass: 'stat-icon-green' },
-  { icon: Activity, text: 'Symptom check completed', time: '5 hours ago', iconClass: 'stat-icon-blue' },
-  { icon: FileText, text: 'Prescription uploaded', time: '1 day ago', iconClass: 'stat-icon-purple' },
-  { icon: MessageSquare, text: 'AI Consultation session', time: '2 days ago', iconClass: 'stat-icon-orange' },
-];
-
-const quickActions = [
-  { title: 'Symptom Checker', icon: Activity, url: '/symptoms', gradient: 'gradient-cool' },
-  { title: 'Medicine Lookup', icon: Pill, url: '/medicines', gradient: 'gradient-success' },
-  { title: 'Book Appointment', icon: Calendar, url: '/telemedicine', gradient: 'gradient-health' },
-  { title: 'Drug Interactions', icon: AlertTriangle, url: '/interactions', gradient: 'gradient-warm' },
-  { title: 'AI Consultation', icon: MessageSquare, url: '/consultation', gradient: 'gradient-health' },
-  { title: 'Emergency', icon: AlertCircle, url: '/emergency', gradient: 'gradient-danger' },
-];
-
 const Dashboard = () => {
   const { profile } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const riskScore = 32;
+
+  const recentActivity = [
+    { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, iconClass: 'stat-icon-green' },
+    { icon: Activity, text: t('activity.symptomCheck'), time: `5 ${t('time.hoursAgo')}`, iconClass: 'stat-icon-blue' },
+    { icon: FileText, text: t('activity.prescriptionUpload'), time: `1 ${t('time.dayAgo')}`, iconClass: 'stat-icon-purple' },
+    { icon: MessageSquare, text: t('activity.aiSession'), time: `2 ${t('time.daysAgo')}`, iconClass: 'stat-icon-orange' },
+  ];
+
+  const quickActions = [
+    { title: t('actions.symptomChecker'), icon: Activity, url: '/symptoms', gradient: 'gradient-cool' },
+    { title: t('actions.medicineLookup'), icon: Pill, url: '/medicines', gradient: 'gradient-success' },
+    { title: t('actions.bookAppointment'), icon: Calendar, url: '/telemedicine', gradient: 'gradient-health' },
+    { title: t('actions.drugInteractions'), icon: AlertTriangle, url: '/interactions', gradient: 'gradient-warm' },
+    { title: t('actions.aiConsultation'), icon: MessageSquare, url: '/consultation', gradient: 'gradient-health' },
+    { title: t('actions.emergency'), icon: AlertCircle, url: '/emergency', gradient: 'gradient-danger' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -48,21 +50,21 @@ const Dashboard = () => {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="h-5 w-5 text-white/80" />
-            <span className="text-white/70 text-xs font-medium uppercase tracking-wider">Health Dashboard</span>
+            <span className="text-white/70 text-xs font-medium uppercase tracking-wider">{t('dashboard.title')}</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-heading font-bold text-white">
-            Welcome back, {profile?.name || 'User'} 👋
+            {t('dashboard.welcome')}, {profile?.name || 'User'} 👋
           </h2>
-          <p className="mt-1 text-white/75 text-sm md:text-base">Your health journey continues. Stay on track with your medications.</p>
+          <p className="mt-1 text-white/75 text-sm md:text-base">{t('dashboard.subtitle')}</p>
           <div className="flex flex-wrap gap-2 mt-4">
             <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/symptoms')}>
-              <Activity className="h-3.5 w-3.5 mr-1" /> Symptom Check
+              <Activity className="h-3.5 w-3.5 mr-1" /> {t('dashboard.symptomCheck')}
             </Button>
             <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/telemedicine')}>
-              <Calendar className="h-3.5 w-3.5 mr-1" /> Book Doctor
+              <Calendar className="h-3.5 w-3.5 mr-1" /> {t('dashboard.bookDoctor')}
             </Button>
             <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/prescriptions')}>
-              <FileText className="h-3.5 w-3.5 mr-1" /> View Prescriptions
+              <FileText className="h-3.5 w-3.5 mr-1" /> {t('dashboard.viewPrescriptions')}
             </Button>
           </div>
         </div>
@@ -74,10 +76,10 @@ const Dashboard = () => {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Adherence Rate', value: '87%', icon: Heart, trend: '+3%', up: true, iconClass: 'stat-icon-green' },
-          { label: 'Active Reminders', value: '5', icon: Bell, trend: '2 today', up: true, iconClass: 'stat-icon-blue' },
-          { label: 'Risk Score', value: riskScore.toString(), icon: Activity, trend: '-5', up: false, iconClass: riskScore < 40 ? 'stat-icon-green' : 'stat-icon-orange' },
-          { label: 'Prescriptions', value: '3', icon: FileText, trend: '1 active', up: true, iconClass: 'stat-icon-purple' },
+          { label: t('dashboard.adherenceRate'), value: '87%', icon: Heart, trend: '+3%', up: true, iconClass: 'stat-icon-green' },
+          { label: t('dashboard.activeReminders'), value: '5', icon: Bell, trend: `2 ${t('dashboard.today')}`, up: true, iconClass: 'stat-icon-blue' },
+          { label: t('dashboard.riskScore'), value: riskScore.toString(), icon: Activity, trend: '-5', up: false, iconClass: riskScore < 40 ? 'stat-icon-green' : 'stat-icon-orange' },
+          { label: t('dashboard.prescriptions'), value: '3', icon: FileText, trend: `1 ${t('dashboard.active')}`, up: true, iconClass: 'stat-icon-purple' },
         ].map((stat) => (
           <Card key={stat.label} className="card-hover">
             <CardContent className="p-4">
@@ -105,7 +107,7 @@ const Dashboard = () => {
               <div className="stat-icon-blue h-8 w-8">
                 <TrendingUp className="h-4 w-4" />
               </div>
-              <CardTitle className="text-base">Medication Adherence (7 Days)</CardTitle>
+              <CardTitle className="text-base">{t('dashboard.medicationAdherence')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -134,7 +136,7 @@ const Dashboard = () => {
               <div className="stat-icon-green h-8 w-8">
                 <Heart className="h-4 w-4" />
               </div>
-              <CardTitle className="text-base">Health Risk Score</CardTitle>
+              <CardTitle className="text-base">{t('dashboard.healthRiskScore')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
@@ -152,11 +154,11 @@ const Dashboard = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-heading font-bold">{riskScore}</span>
-                <span className="text-xs text-muted-foreground">Low Risk</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.lowRisk')}</span>
               </div>
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-success font-medium">
-              <TrendingDown className="h-3.5 w-3.5" /> Improved by 5 points
+              <TrendingDown className="h-3.5 w-3.5" /> {t('dashboard.improvedBy')}
             </div>
           </CardContent>
         </Card>
@@ -166,7 +168,7 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <Card className="card-hover">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Quick Actions</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.quickActions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
@@ -188,8 +190,8 @@ const Dashboard = () => {
         <Card className="card-hover">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Recent Activity</CardTitle>
-              <Button variant="link" size="sm" className="text-xs text-primary">View All</Button>
+              <CardTitle className="text-base">{t('dashboard.recentActivity')}</CardTitle>
+              <Button variant="link" size="sm" className="text-xs text-primary">{t('dashboard.viewAll')}</Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -219,7 +221,7 @@ const Dashboard = () => {
             <div className="stat-icon-orange h-8 w-8">
               <Activity className="h-4 w-4" />
             </div>
-            <CardTitle className="text-base">Symptom Frequency (Last 7 Days)</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.symptomFrequency')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>

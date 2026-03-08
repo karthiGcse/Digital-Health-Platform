@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth, AppRole } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar
@@ -30,85 +31,86 @@ const roleColors: Record<AppRole, string> = {
 };
 
 interface NavItem {
-  title: string;
+  titleKey: string;
   url: string;
   icon: any;
 }
 
 const navByRole: Record<AppRole, NavItem[]> = {
   patient: [
-    { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-    { title: 'Symptom Checker', url: '/symptoms', icon: Activity },
-    { title: 'Medicine Lookup', url: '/medicines', icon: Pill },
-    { title: 'Drug Interactions', url: '/interactions', icon: AlertTriangle },
-    { title: 'Prescriptions', url: '/prescriptions', icon: FileText },
-    { title: 'Reminders', url: '/reminders', icon: Bell },
-    { title: 'Telemedicine', url: '/telemedicine', icon: Video },
-    { title: 'Nearby Services', url: '/nearby', icon: MapPin },
-    { title: 'AI Consultation', url: '/consultation', icon: MessageSquare },
-    { title: 'Image Diagnosis', url: '/image-diagnosis', icon: Scan },
-    { title: 'Mental Health', url: '/mental-health', icon: Brain },
-    { title: 'Family Health', url: '/family-health', icon: Users },
-    { title: 'Voice Assistant', url: '/voice-assistant', icon: Globe },
-    { title: 'Genetic Profiling', url: '/genetic-profiling', icon: Dna },
-    { title: 'Wearable Devices', url: '/wearables', icon: Watch },
-    { title: 'Home Lab Tests', url: '/lab-booking', icon: FlaskConical },
-    { title: 'Blockchain Records', url: '/blockchain-records', icon: Shield },
-    { title: 'Drone Delivery', url: '/drone-delivery', icon: Plane },
-    { title: 'Hospital Queue', url: '/hospital-queue', icon: Building2 },
-    { title: 'Auto Refill', url: '/auto-refill', icon: RefreshCw },
-    { title: 'Global Telemedicine', url: '/global-telemedicine', icon: Globe2 },
-    { title: 'Health Analytics', url: '/analytics', icon: BarChart3 },
-    { title: 'AI Reports', url: '/reports', icon: FileBarChart },
-    { title: 'Emergency', url: '/emergency', icon: AlertCircle },
-    { title: 'Coming Soon', url: '/coming-soon', icon: Rocket },
+    { titleKey: 'nav.dashboard', url: '/dashboard', icon: LayoutDashboard },
+    { titleKey: 'nav.symptomChecker', url: '/symptoms', icon: Activity },
+    { titleKey: 'nav.medicineLookup', url: '/medicines', icon: Pill },
+    { titleKey: 'nav.drugInteractions', url: '/interactions', icon: AlertTriangle },
+    { titleKey: 'nav.prescriptions', url: '/prescriptions', icon: FileText },
+    { titleKey: 'nav.reminders', url: '/reminders', icon: Bell },
+    { titleKey: 'nav.telemedicine', url: '/telemedicine', icon: Video },
+    { titleKey: 'nav.nearby', url: '/nearby', icon: MapPin },
+    { titleKey: 'nav.consultation', url: '/consultation', icon: MessageSquare },
+    { titleKey: 'nav.imageDiagnosis', url: '/image-diagnosis', icon: Scan },
+    { titleKey: 'nav.mentalHealth', url: '/mental-health', icon: Brain },
+    { titleKey: 'nav.familyHealth', url: '/family-health', icon: Users },
+    { titleKey: 'nav.voiceAssistant', url: '/voice-assistant', icon: Globe },
+    { titleKey: 'nav.geneticProfiling', url: '/genetic-profiling', icon: Dna },
+    { titleKey: 'nav.wearables', url: '/wearables', icon: Watch },
+    { titleKey: 'nav.labBooking', url: '/lab-booking', icon: FlaskConical },
+    { titleKey: 'nav.blockchain', url: '/blockchain-records', icon: Shield },
+    { titleKey: 'nav.droneDelivery', url: '/drone-delivery', icon: Plane },
+    { titleKey: 'nav.hospitalQueue', url: '/hospital-queue', icon: Building2 },
+    { titleKey: 'nav.autoRefill', url: '/auto-refill', icon: RefreshCw },
+    { titleKey: 'nav.globalTelemedicine', url: '/global-telemedicine', icon: Globe2 },
+    { titleKey: 'nav.analytics', url: '/analytics', icon: BarChart3 },
+    { titleKey: 'nav.reports', url: '/reports', icon: FileBarChart },
+    { titleKey: 'nav.emergency', url: '/emergency', icon: AlertCircle },
+    { titleKey: 'nav.comingSoon', url: '/coming-soon', icon: Rocket },
   ],
   pharmacist: [
-    { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-    { title: 'Medicine DB', url: '/medicines', icon: Pill },
-    { title: 'Interactions', url: '/interactions', icon: AlertTriangle },
-    { title: 'Prescriptions', url: '/prescriptions', icon: FileText },
-    { title: 'Telemedicine', url: '/telemedicine', icon: Video },
-    { title: 'Nearby Services', url: '/nearby', icon: MapPin },
-    { title: 'AI Consultation', url: '/consultation', icon: MessageSquare },
-    { title: 'Image Diagnosis', url: '/image-diagnosis', icon: Scan },
-    { title: 'Voice Assistant', url: '/voice-assistant', icon: Globe },
-    { title: 'Analytics', url: '/analytics', icon: BarChart3 },
-    { title: 'Inventory', url: '/inventory', icon: Package },
-    { title: 'Coming Soon', url: '/coming-soon', icon: Rocket },
+    { titleKey: 'nav.dashboard', url: '/dashboard', icon: LayoutDashboard },
+    { titleKey: 'nav.medicineLookup', url: '/medicines', icon: Pill },
+    { titleKey: 'nav.drugInteractions', url: '/interactions', icon: AlertTriangle },
+    { titleKey: 'nav.prescriptions', url: '/prescriptions', icon: FileText },
+    { titleKey: 'nav.telemedicine', url: '/telemedicine', icon: Video },
+    { titleKey: 'nav.nearby', url: '/nearby', icon: MapPin },
+    { titleKey: 'nav.consultation', url: '/consultation', icon: MessageSquare },
+    { titleKey: 'nav.imageDiagnosis', url: '/image-diagnosis', icon: Scan },
+    { titleKey: 'nav.voiceAssistant', url: '/voice-assistant', icon: Globe },
+    { titleKey: 'nav.analytics', url: '/analytics', icon: BarChart3 },
+    { titleKey: 'nav.inventory', url: '/inventory', icon: Package },
+    { titleKey: 'nav.comingSoon', url: '/coming-soon', icon: Rocket },
   ],
   doctor: [
-    { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-    { title: 'Symptom Analysis', url: '/symptoms', icon: Activity },
-    { title: 'Drug Reference', url: '/medicines', icon: BookOpen },
-    { title: 'Drug Interactions', url: '/interactions', icon: AlertTriangle },
-    { title: 'Prescriptions', url: '/prescriptions', icon: FileText },
-    { title: 'Telemedicine', url: '/telemedicine', icon: Video },
-    { title: 'Nearby Services', url: '/nearby', icon: MapPin },
-    { title: 'AI Consultation', url: '/consultation', icon: MessageSquare },
-    { title: 'Image Diagnosis', url: '/image-diagnosis', icon: Scan },
-    { title: 'Mental Health', url: '/mental-health', icon: Brain },
-    { title: 'Family Health', url: '/family-health', icon: Users },
-    { title: 'Voice Assistant', url: '/voice-assistant', icon: Globe },
-    { title: 'Analytics', url: '/analytics', icon: BarChart3 },
-    { title: 'Reports', url: '/reports', icon: FileBarChart },
-    { title: 'Coming Soon', url: '/coming-soon', icon: Rocket },
+    { titleKey: 'nav.dashboard', url: '/dashboard', icon: LayoutDashboard },
+    { titleKey: 'nav.symptomChecker', url: '/symptoms', icon: Activity },
+    { titleKey: 'nav.medicineLookup', url: '/medicines', icon: BookOpen },
+    { titleKey: 'nav.drugInteractions', url: '/interactions', icon: AlertTriangle },
+    { titleKey: 'nav.prescriptions', url: '/prescriptions', icon: FileText },
+    { titleKey: 'nav.telemedicine', url: '/telemedicine', icon: Video },
+    { titleKey: 'nav.nearby', url: '/nearby', icon: MapPin },
+    { titleKey: 'nav.consultation', url: '/consultation', icon: MessageSquare },
+    { titleKey: 'nav.imageDiagnosis', url: '/image-diagnosis', icon: Scan },
+    { titleKey: 'nav.mentalHealth', url: '/mental-health', icon: Brain },
+    { titleKey: 'nav.familyHealth', url: '/family-health', icon: Users },
+    { titleKey: 'nav.voiceAssistant', url: '/voice-assistant', icon: Globe },
+    { titleKey: 'nav.analytics', url: '/analytics', icon: BarChart3 },
+    { titleKey: 'nav.reports', url: '/reports', icon: FileBarChart },
+    { titleKey: 'nav.comingSoon', url: '/coming-soon', icon: Rocket },
   ],
   admin: [
-    { title: 'Admin Dashboard', url: '/dashboard', icon: LayoutDashboard },
-    { title: 'System Analytics', url: '/analytics', icon: BarChart3 },
-    { title: 'Medicine Database', url: '/medicines', icon: Pill },
-    { title: 'Telemedicine', url: '/telemedicine', icon: Video },
-    { title: 'Nearby Services', url: '/nearby', icon: MapPin },
-    { title: 'AI Consultation', url: '/consultation', icon: MessageSquare },
-    { title: 'Image Diagnosis', url: '/image-diagnosis', icon: Scan },
-    { title: 'Reports', url: '/reports', icon: FileBarChart },
-    { title: 'Coming Soon', url: '/coming-soon', icon: Rocket },
+    { titleKey: 'nav.dashboard', url: '/dashboard', icon: LayoutDashboard },
+    { titleKey: 'nav.analytics', url: '/analytics', icon: BarChart3 },
+    { titleKey: 'nav.medicineLookup', url: '/medicines', icon: Pill },
+    { titleKey: 'nav.telemedicine', url: '/telemedicine', icon: Video },
+    { titleKey: 'nav.nearby', url: '/nearby', icon: MapPin },
+    { titleKey: 'nav.consultation', url: '/consultation', icon: MessageSquare },
+    { titleKey: 'nav.imageDiagnosis', url: '/image-diagnosis', icon: Scan },
+    { titleKey: 'nav.reports', url: '/reports', icon: FileBarChart },
+    { titleKey: 'nav.comingSoon', url: '/coming-soon', icon: Rocket },
   ],
 };
 
 export function AppSidebar() {
   const { profile, signOut } = useAuth();
+  const { t } = useLanguage();
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
@@ -141,11 +143,12 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/40 text-[10px] uppercase tracking-wider font-semibold">Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/40 text-[10px] uppercase tracking-wider font-semibold">{t('nav.navigation')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
                 const isActive = location.pathname === item.url;
+                const title = t(item.titleKey);
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild>
@@ -159,7 +162,7 @@ export function AppSidebar() {
                         activeClassName="bg-sidebar-primary/15 text-sidebar-primary font-medium shadow-sm"
                       >
                         <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-primary")} />
-                        {!collapsed && <span>{item.title}</span>}
+                        {!collapsed && <span>{title}</span>}
                         {!collapsed && isActive && (
                           <div className="ml-auto h-2 w-2 rounded-full gradient-health shadow-glow" />
                         )}
@@ -181,7 +184,7 @@ export function AppSidebar() {
           className="w-full justify-start gap-3 text-sidebar-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-xl"
         >
           <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Logout</span>}
+          {!collapsed && <span>{t('nav.logout')}</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
