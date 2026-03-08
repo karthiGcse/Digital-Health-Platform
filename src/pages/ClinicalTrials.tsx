@@ -279,6 +279,7 @@ const ClinicalTrials = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [trialsWithDistance, setTrialsWithDistance] = useState<Trial[]>(allTrials);
+  const [distanceFilter, setDistanceFilter] = useState('all');
 
   // Get user's real-time location
   const getUserLocation = useCallback(() => {
@@ -348,9 +349,26 @@ const ClinicalTrials = () => {
       const matchesPhase = phaseFilter === 'all' || trial.phase === phaseFilter;
       const matchesStatus = statusFilter === 'all' || trial.status === statusFilter;
       const matchesCondition = conditionFilter === 'all' || trial.condition === conditionFilter;
-      return matchesSearch && matchesPhase && matchesStatus && matchesCondition;
+      
+      // Distance filter
+      let matchesDistance = true;
+      if (distanceFilter !== 'all' && userLocation) {
+        if (distanceFilter === 'remote') {
+          matchesDistance = trial.lat === 0 && trial.lng === 0;
+        } else {
+          const maxDistance = parseInt(distanceFilter);
+          if (trial.lat === 0 && trial.lng === 0) {
+            matchesDistance = false; // Exclude remote for distance filters
+          } else {
+            const dist = calculateDistance(userLocation.lat, userLocation.lng, trial.lat, trial.lng);
+            matchesDistance = dist <= maxDistance;
+          }
+        }
+      }
+      
+      return matchesSearch && matchesPhase && matchesStatus && matchesCondition && matchesDistance;
     }).sort((a, b) => b.match - a.match);
-  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, trialsWithDistance]);
+  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, distanceFilter, trialsWithDistance, userLocation]);
 
   const savedTrialsList = useMemo(() => trialsWithDistance.filter(t => savedTrials.includes(t.id)), [savedTrials, trialsWithDistance]);
 
@@ -463,6 +481,18 @@ const ClinicalTrials = () => {
                     <SelectItem value="Recruiting">Recruiting</SelectItem>
                     <SelectItem value="Enrolling">Enrolling</SelectItem>
                     <SelectItem value="Active">Active</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={distanceFilter} onValueChange={setDistanceFilter}>
+                  <SelectTrigger className="w-full md:w-36"><SelectValue placeholder="Distance" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Distance</SelectItem>
+                    <SelectItem value="10">Within 10 km</SelectItem>
+                    <SelectItem value="25">Within 25 km</SelectItem>
+                    <SelectItem value="50">Within 50 km</SelectItem>
+                    <SelectItem value="100">Within 100 km</SelectItem>
+                    <SelectItem value="500">Within 500 km</SelectItem>
+                    <SelectItem value="remote">Remote Only</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
