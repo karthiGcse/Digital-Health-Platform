@@ -281,6 +281,63 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_settings: {
+        Row: {
+          appointment_notifications: boolean
+          created_at: string
+          email_enabled: boolean
+          health_alerts: boolean
+          id: string
+          prescription_notifications: boolean
+          promotional: boolean
+          push_enabled: boolean
+          quiet_hours_enabled: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          reminder_notifications: boolean
+          sms_enabled: boolean
+          sms_phone_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_notifications?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          health_alerts?: boolean
+          id?: string
+          prescription_notifications?: boolean
+          promotional?: boolean
+          push_enabled?: boolean
+          quiet_hours_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_notifications?: boolean
+          sms_enabled?: boolean
+          sms_phone_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_notifications?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          health_alerts?: boolean
+          id?: string
+          prescription_notifications?: boolean
+          promotional?: boolean
+          push_enabled?: boolean
+          quiet_hours_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_notifications?: boolean
+          sms_enabled?: boolean
+          sms_phone_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
