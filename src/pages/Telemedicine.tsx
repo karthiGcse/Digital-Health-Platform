@@ -20,6 +20,16 @@ interface Pharmacy {
   id: string; name: string; location: string; available: boolean; whatsapp: string; avatar: string; rating: number;
 }
 
+interface NearbyFacility {
+  name: string; type: string; address: string; phone?: string; rating: number;
+  distance_km: number; open_now: boolean; hours?: string; specialties?: string[];
+  emergency_available?: boolean; whatsapp?: string;
+}
+
+interface Pharmacy {
+  id: string; name: string; location: string; available: boolean; whatsapp: string; avatar: string; rating: number;
+}
+
 const doctors: Doctor[] = [
   { id: '1', name: 'Dr. Priya Sharma', specialty: 'General Physician', experience: '12 years', rating: 4.8, fee: 500, available: true, languages: ['English', 'Hindi'], nextSlot: 'Now', avatar: 'PS', whatsapp: '+919876543210', symptoms: ['Fever', 'Cold', 'Cough', 'Headache', 'Body Pain', 'Fatigue'] },
   { id: '2', name: 'Dr. Rajesh Kumar', specialty: 'Cardiologist', experience: '18 years', rating: 4.9, fee: 1200, available: true, languages: ['English', 'Hindi', 'Tamil'], nextSlot: '2:30 PM', avatar: 'RK', whatsapp: '+919876543211', symptoms: ['Chest Pain', 'Shortness of Breath', 'Palpitations', 'High BP', 'Dizziness'] },
