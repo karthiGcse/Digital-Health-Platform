@@ -94,6 +94,16 @@ const emergencyRules: Record<PatientType, string[]> = {
   ],
 };
 
+interface AnalysisResult {
+  risk_score: number;
+  severity: string;
+  detected_symptoms: { name: string; severity: string }[];
+  possible_conditions: { name: string; probability: number; description: string }[];
+  recommended_actions: string[];
+  emergency_flag: boolean;
+  follow_up_questions?: string[];
+}
+
 interface HistoryItem {
   id: string;
   symptoms: string;
