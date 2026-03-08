@@ -42,6 +42,7 @@ const routeToTranslationKey: Record<string, string> = {
   '/epigenetics': 'nav.epigenetics',
   '/health-wallet': 'nav.healthWallet',
   '/hearing-health': 'nav.hearingHealth',
+  '/notification-settings': 'Notification Settings',
 };
 
 const AppLayout = () => {
