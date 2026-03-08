@@ -184,7 +184,7 @@ const MedicineLookup = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-16 w-16 rounded-xl bg-muted/50 flex items-center justify-center overflow-hidden p-1">
-                      <img src={getMedicineImage(selected.category)} alt={selected.category || 'Medicine'} className="h-full w-full object-contain" />
+                      <img src={getMedicineImage(selected.name)} alt={selected.name} className="h-full w-full object-contain" />
                     </div>
                     <div>
                       <h2 className="font-heading font-bold text-xl">{selected.name}</h2>
