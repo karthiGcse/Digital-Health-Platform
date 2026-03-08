@@ -51,10 +51,38 @@ const VoiceAssistant = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
+  const getLangCode = useCallback((lang: string) => {
+    const map: Record<string, string> = {
+      en: 'en-US', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', bn: 'bn-IN',
+      mr: 'mr-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN',
+      ur: 'ur-PK', es: 'es-ES', fr: 'fr-FR', ar: 'ar-SA',
+    };
+    return map[lang] || 'en-US';
+  }, []);
+
+  const speakText = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[#*_`~>\-|]/g, '').replace(/\[.*?\]\(.*?\)/g, '');
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = getLangCode(language);
+    utterance.rate = 0.95;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }, [language, getLangCode]);
+
+  const stopSpeaking = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
+
   const sendMessage = async (text?: string) => {
     const msg = text || input.trim();
     if (!msg) return;
     setInput('');
+    stopSpeaking();
     const userMsg: Message = { role: 'user', content: msg };
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
@@ -68,6 +96,9 @@ const VoiceAssistant = () => {
       const assistantMsg: Message = { role: 'assistant', content: data.response };
       setMessages(prev => [...prev, assistantMsg]);
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+      if (autoRead && data.response) {
+        speakText(data.response);
+      }
     } catch (e: any) {
       toast.error(e.message || 'Failed to get response');
     } finally {
