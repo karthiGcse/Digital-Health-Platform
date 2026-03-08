@@ -130,16 +130,6 @@ const VoiceAssistant = () => {
     setIsListening(true);
   };
 
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language === 'en' ? 'en-US' : `${language}-IN`;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-    }
-  };
 
   const phrases = quickPhrases[language] || quickPhrases.en;
 
