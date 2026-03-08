@@ -318,8 +318,14 @@ const MedicineLookup = () => {
                     </div>
                     <div>
                       <h2 className="font-heading font-bold text-xl">{selected.name}</h2>
-                      <p className="text-sm text-muted-foreground">{selected.brand}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{selected.strength}</p>
+                      {selected.brand && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md bg-card/50 font-semibold">
+                            {selected.brand}
+                          </Badge>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">{selected.strength}</p>
                     </div>
                   </div>
                   <Button variant="ghost" size="icon" className="rounded-xl hover:bg-card/60" onClick={() => setSelected(null)}>
