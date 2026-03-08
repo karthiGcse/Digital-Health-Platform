@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -8,14 +9,17 @@ import {
   Building2, RefreshCw, Globe2, Stethoscope, Apple, Dumbbell,
   HeartPulse, ShieldCheck, CircleDot, Ear, Wallet, FileText,
   Bell, MapPin, BarChart3, Sparkles, Zap, ArrowRight, Star,
-  Layers, ChevronRight
+  Layers, ChevronRight, Search
 } from 'lucide-react';
+import { useState } from 'react';
 
 const categories = [
   {
-    label: 'Core Health Tools',
-    desc: 'Essential tools for daily health management',
+    label: 'Core Health',
+    desc: 'Essential daily health tools',
     icon: Activity,
+    accent: 'bg-blue-500',
+    accentLight: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
     features: [
       { icon: Activity, title: 'Symptom Checker', desc: 'AI-powered symptom analysis', route: '/symptoms' },
       { icon: Pill, title: 'Medicine Lookup', desc: 'Drug info & alternatives', route: '/medicines' },
@@ -27,21 +31,25 @@ const categories = [
   },
   {
     label: 'AI & Diagnostics',
-    desc: 'Smart AI-powered health insights',
+    desc: 'Smart AI-powered insights',
     icon: Brain,
+    accent: 'bg-violet-500',
+    accentLight: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
     features: [
       { icon: MessageSquare, title: 'AI Consultation', desc: '24/7 AI doctor chat', route: '/consultation' },
-      { icon: Scan, title: 'Image Diagnosis', desc: 'Medical image AI analysis', route: '/image-diagnosis' },
-      { icon: Brain, title: 'Mental Health AI', desc: 'Emotional support & therapy', route: '/mental-health' },
-      { icon: Stethoscope, title: 'AI Radiology', desc: 'CT, MRI & ultrasound AI', route: '/radiology' },
+      { icon: Scan, title: 'Image Diagnosis', desc: 'Medical image AI', route: '/image-diagnosis' },
+      { icon: Brain, title: 'Mental Health AI', desc: 'Emotional support', route: '/mental-health' },
+      { icon: Stethoscope, title: 'AI Radiology', desc: 'CT, MRI & ultrasound', route: '/radiology' },
       { icon: BarChart3, title: 'Health Analytics', desc: 'Trends & insights', route: '/analytics' },
       { icon: FileText, title: 'AI Reports', desc: 'Auto-generated reports', route: '/reports' },
     ],
   },
   {
-    label: 'Telehealth & Services',
-    desc: 'Connect with healthcare providers',
+    label: 'Telehealth',
+    desc: 'Connect with providers',
     icon: Globe2,
+    accent: 'bg-cyan-500',
+    accentLight: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
     features: [
       { icon: Calendar, title: 'Telemedicine', desc: 'Video doctor visits', route: '/telemedicine' },
       { icon: Globe2, title: 'Global Telemedicine', desc: 'Worldwide specialists', route: '/global-telemedicine' },
@@ -52,9 +60,11 @@ const categories = [
     ],
   },
   {
-    label: 'Wellness & Lifestyle',
-    desc: 'Nutrition, fitness & wellness tracking',
+    label: 'Wellness',
+    desc: 'Nutrition, fitness & lifestyle',
     icon: HeartPulse,
+    accent: 'bg-emerald-500',
+    accentLight: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
     features: [
       { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans', route: '/nutrition' },
       { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient match', route: '/blood-donation' },
@@ -63,8 +73,10 @@ const categories = [
   },
   {
     label: 'Advanced & Genomics',
-    desc: 'Cutting-edge health technology',
+    desc: 'Cutting-edge health tech',
     icon: Dna,
+    accent: 'bg-pink-500',
+    accentLight: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
     features: [
       { icon: Dna, title: 'Genetic Profiling', desc: 'DNA-based health insights', route: '/genetic-profiling' },
       { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics' },
@@ -75,9 +87,11 @@ const categories = [
     ],
   },
   {
-    label: 'Finance & Management',
-    desc: 'Health finance & automation tools',
+    label: 'Finance & Tools',
+    desc: 'Health finance & automation',
     icon: Wallet,
+    accent: 'bg-amber-500',
+    accentLight: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
     features: [
       { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance' },
       { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet' },
@@ -91,141 +105,142 @@ const totalFeatures = categories.reduce((sum, c) => sum + c.features.length, 0);
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.04 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' as const } },
 };
 
 const ComingSoon = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+
+  const filteredCategories = categories.map(cat => ({
+    ...cat,
+    features: cat.features.filter(f =>
+      f.title.toLowerCase().includes(search.toLowerCase()) ||
+      f.desc.toLowerCase().includes(search.toLowerCase())
+    ),
+  })).filter(cat => cat.features.length > 0);
 
   return (
-    <div className="space-y-10 pb-8">
-      {/* ===== HERO — clean, light ===== */}
+    <div className="space-y-8 pb-8">
+      {/* ═══ HERO ═══ */}
       <motion.div
-        initial={{ opacity: 0, y: -15 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/90 via-primary to-accent/80 p-8 md:p-12"
+        className="relative overflow-hidden rounded-2xl p-7 md:p-10"
+        style={{
+          background: 'linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(230, 50%, 15%) 50%, hsl(260, 40%, 18%) 100%)',
+        }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/4" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+        <div className="absolute top-0 right-0 w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-violet-500/8 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/4" />
 
         <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15, duration: 0.4 }}
-            className="flex items-center gap-2 mb-4"
-          >
-            <Layers className="h-4 w-4 text-primary-foreground/70" />
-            <span className="text-primary-foreground/60 text-xs font-bold uppercase tracking-[0.25em]">S47 Health Platform</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
+            <Badge className="bg-white/8 text-white/60 border-white/10 text-[10px] font-medium mb-4 backdrop-blur-sm">
+              <Layers className="h-3 w-3 mr-1" /> S47 Health Platform
+            </Badge>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            className="text-3xl md:text-5xl font-heading font-extrabold text-primary-foreground leading-tight tracking-tight"
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-3xl md:text-4xl font-heading font-extrabold text-white tracking-tight"
           >
             Unified Health Dashboard
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.4 }}
-            className="mt-3 text-primary-foreground/55 text-sm md:text-base max-w-xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-2 text-white/40 text-sm max-w-lg"
           >
-            {totalFeatures} features across {categories.length} categories — everything you need for complete health management.
+            {totalFeatures} features across {categories.length} categories — your complete health ecosystem.
           </motion.p>
 
+          {/* Stats row */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.4 }}
-            className="flex flex-wrap gap-3 mt-8"
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap gap-6 mt-6"
           >
             {[
-              { value: totalFeatures, label: 'Features', icon: Zap },
-              { value: categories.length, label: 'Categories', icon: Layers },
-              { value: '100%', label: 'All Live', icon: Star },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="flex items-center gap-2.5 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2.5"
-              >
-                <stat.icon className="h-4 w-4 text-primary-foreground/70" />
-                <div>
-                  <p className="text-lg font-bold text-primary-foreground leading-none">{stat.value}</p>
-                  <p className="text-[9px] text-primary-foreground/40 uppercase tracking-widest font-semibold mt-0.5">{stat.label}</p>
-                </div>
+              { value: totalFeatures, label: 'Features' },
+              { value: categories.length, label: 'Categories' },
+              { value: '100%', label: 'Live' },
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="text-xl font-heading font-extrabold text-white">{s.value}</p>
+                <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-semibold">{s.label}</p>
               </div>
             ))}
           </motion.div>
         </div>
       </motion.div>
 
-      {/* ===== CATEGORIES ===== */}
-      {categories.map((category, catIdx) => (
+      {/* ═══ SEARCH ═══ */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Search features..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-card text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+        />
+      </div>
+
+      {/* ═══ CATEGORIES ═══ */}
+      {filteredCategories.map((category) => (
         <motion.div
           key={category.label}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
+          viewport={{ once: true, margin: '-30px' }}
           variants={containerVariants}
-          className="space-y-4"
+          className="space-y-3"
         >
           {/* Category Header */}
           <motion.div
-            initial={{ opacity: 0, x: -15 }}
+            initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.35 }}
             className="flex items-center gap-3"
           >
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <category.icon className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-heading font-bold text-foreground">{category.label}</h2>
-              <p className="text-xs text-muted-foreground">{category.desc}</p>
-            </div>
-            <Badge variant="secondary" className="text-[10px] font-semibold">
-              {category.features.length} features
-            </Badge>
+            <div className={`h-2 w-2 rounded-full ${category.accent}`} />
+            <h2 className="text-base font-heading font-bold text-foreground">{category.label}</h2>
+            <div className="flex-1 h-px bg-border/40" />
+            <span className="text-[10px] text-muted-foreground font-medium">{category.features.length}</span>
           </motion.div>
 
-          {/* Feature Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+          {/* Feature Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5">
             {category.features.map((feature) => (
               <motion.div key={feature.route} variants={itemVariants}>
                 <Card
-                  className="group cursor-pointer h-full hover:shadow-md hover:border-primary/20 transition-all duration-300 hover:-translate-y-0.5"
+                  className="group cursor-pointer h-full border-border/50 hover:border-primary/25 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5"
                   onClick={() => navigate(feature.route)}
                 >
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-3 h-full justify-center">
-                    {/* Icon */}
-                    <div className="h-12 w-12 rounded-xl bg-primary/8 group-hover:bg-primary/15 flex items-center justify-center transition-colors duration-300">
-                      <feature.icon className="h-5 w-5 text-primary group-hover:scale-110 transition-transform duration-300" />
+                  <CardContent className="p-3.5 flex flex-col items-center text-center gap-2.5 h-full justify-center">
+                    <div className="h-10 w-10 rounded-xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-all duration-300">
+                      <feature.icon className="h-4.5 w-4.5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                     </div>
-
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-foreground leading-tight">
-                        {feature.title}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">
-                        {feature.desc}
-                      </p>
+                    <div>
+                      <p className="text-[13px] font-semibold text-foreground leading-tight">{feature.title}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{feature.desc}</p>
                     </div>
-
-                    {/* Hover arrow */}
-                    <div className="flex items-center gap-1 text-[10px] font-semibold text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
-                      Open <ArrowRight className="h-2.5 w-2.5" />
+                    <div className="flex items-center gap-1 text-[9px] font-semibold text-primary opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                      Open <ChevronRight className="h-2.5 w-2.5" />
                     </div>
                   </CardContent>
                 </Card>
@@ -235,24 +250,33 @@ const ComingSoon = () => {
         </motion.div>
       ))}
 
-      {/* ===== FOOTER CTA ===== */}
+      {/* ═══ FOOTER ═══ */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/90 via-primary to-accent/80 p-8 md:p-12 text-center"
+        className="relative overflow-hidden rounded-2xl p-8 md:p-10 text-center"
+        style={{
+          background: 'linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(230, 50%, 15%) 50%, hsl(260, 40%, 18%) 100%)',
+        }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.12),transparent_60%)]" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
         <div className="relative z-10">
-          <Sparkles className="h-7 w-7 text-primary-foreground/70 mx-auto mb-3" />
-          <p className="text-primary-foreground/50 text-xs font-medium mb-2">All {totalFeatures} features are live and ready</p>
-          <h3 className="text-2xl md:text-3xl font-heading font-extrabold text-primary-foreground leading-tight">
-            Start Exploring Your Health Journey
+          <Sparkles className="h-6 w-6 text-amber-400/70 mx-auto mb-3" />
+          <h3 className="text-xl md:text-2xl font-heading font-extrabold text-white">
+            Your Health, Powered by AI
           </h3>
-          <p className="text-primary-foreground/45 text-sm mt-2 max-w-md mx-auto">
-            Click any feature above to dive in. Your health, powered by AI.
+          <p className="text-white/35 text-sm mt-2 max-w-md mx-auto">
+            All {totalFeatures} features are live. Click any module above to get started.
           </p>
+          <Button
+            className="mt-5 bg-white/10 hover:bg-white/20 text-white border border-white/10 gap-1.5"
+            size="sm"
+            onClick={() => navigate('/dashboard')}
+          >
+            Back to Dashboard <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </motion.div>
     </div>
