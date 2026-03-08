@@ -234,7 +234,7 @@ const CardiacRisk = () => {
             <Button variant="secondary" size="sm" onClick={() => setShowInput(true)}>
               <Plus className="h-4 w-4 mr-1" /> New Assessment
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => { toast({ title: '📄 Report Downloaded', description: 'PDF cardiac report saved.' }); }}>
+            <Button variant="secondary" size="sm" onClick={exportPDF}>
               <Download className="h-4 w-4 mr-1" /> Export PDF
             </Button>
           </div>
