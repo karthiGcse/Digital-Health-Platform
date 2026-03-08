@@ -11,7 +11,20 @@ import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock } from 'lucide-r
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const commonSymptoms = ['Fever', 'Headache', 'Cough', 'Chest Pain', 'Nausea', 'Dizziness', 'Shortness of Breath', 'Fatigue'];
+const symptomCategories: Record<string, string[]> = {
+  'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness'],
+  'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness'],
+  'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion'],
+  'Cardiac': ['Chest Pain', 'Palpitations', 'Rapid Heartbeat', 'Swollen Legs', 'High Blood Pressure'],
+  'Digestive': ['Nausea', 'Vomiting', 'Diarrhea', 'Constipation', 'Abdominal Pain', 'Bloating', 'Heartburn', 'Blood in Stool'],
+  'Musculoskeletal': ['Joint Pain', 'Back Pain', 'Muscle Ache', 'Stiffness', 'Swelling', 'Cramps'],
+  'Skin': ['Rash', 'Itching', 'Hives', 'Bruising', 'Dry Skin', 'Skin Discoloration', 'Wound Not Healing'],
+  'Mental Health': ['Anxiety', 'Depression', 'Insomnia', 'Mood Swings', 'Panic Attacks', 'Stress'],
+  'Urinary': ['Painful Urination', 'Frequent Urination', 'Blood in Urine', 'Incontinence'],
+  'ENT': ['Ear Pain', 'Hearing Loss', 'Tinnitus', 'Nasal Congestion', 'Difficulty Swallowing'],
+};
+
+const [selectedCategory, setSelectedCategory] = useState<string>('General');
 
 interface AnalysisResult {
   risk_score: number;
