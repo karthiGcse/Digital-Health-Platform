@@ -13,8 +13,8 @@ import {
   CheckCircle2, Target, Flame, Trophy
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, RadialBarChart, RadialBar } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 const adherenceData = [
@@ -29,27 +29,27 @@ const symptomData = [
 ];
 
 const additionalFeatures = [
-  { icon: Scan, title: 'AI Image Diagnosis', route: '/image-diagnosis', color: 'from-indigo-500 to-violet-500' },
-  { icon: Brain, title: 'Mental Health AI', route: '/mental-health', color: 'from-pink-500 to-violet-500' },
-  { icon: Users, title: 'Family Health Hub', route: '/family-health', color: 'from-orange-500 to-pink-500' },
-  { icon: Globe, title: 'Voice Assistant', route: '/voice-assistant', color: 'from-indigo-500 to-cyan-500' },
-  { icon: Dna, title: 'Genetic Profiling', route: '/genetic-profiling', color: 'from-purple-500 to-pink-500' },
-  { icon: Watch, title: 'Wearable Integration', route: '/wearables', color: 'from-sky-500 to-blue-500' },
+  { icon: Scan, title: 'AI Image Diagnosis', route: '/image-diagnosis', color: 'from-emerald-500 to-green-600' },
+  { icon: Brain, title: 'Mental Health AI', route: '/mental-health', color: 'from-teal-500 to-emerald-500' },
+  { icon: Users, title: 'Family Health Hub', route: '/family-health', color: 'from-green-500 to-lime-500' },
+  { icon: Globe, title: 'Voice Assistant', route: '/voice-assistant', color: 'from-emerald-400 to-teal-500' },
+  { icon: Dna, title: 'Genetic Profiling', route: '/genetic-profiling', color: 'from-teal-600 to-green-500' },
+  { icon: Watch, title: 'Wearable Integration', route: '/wearables', color: 'from-green-400 to-emerald-500' },
   { icon: FlaskConical, title: 'Home Lab Booking', route: '/lab-booking', color: 'from-emerald-500 to-teal-500' },
-  { icon: Shield, title: 'Blockchain Records', route: '/blockchain-records', color: 'from-red-500 to-orange-500' },
-  { icon: Plane, title: 'Drone Delivery', route: '/drone-delivery', color: 'from-orange-500 to-amber-500' },
-  { icon: Building2, title: 'Hospital Queue', route: '/hospital-queue', color: 'from-teal-500 to-cyan-500' },
-  { icon: RefreshCw, title: 'Auto Refill', route: '/auto-refill', color: 'from-emerald-500 to-teal-500' },
-  { icon: Globe2, title: 'Global Telemedicine', route: '/global-telemedicine', color: 'from-cyan-500 to-blue-500' },
-  { icon: Stethoscope, title: 'AI Radiology', route: '/radiology', color: 'from-blue-500 to-violet-500' },
-  { icon: Apple, title: 'Nutrition Planner', route: '/nutrition', color: 'from-emerald-500 to-green-500' },
-  { icon: Dumbbell, title: 'Physio & Rehab', route: '/physiotherapy', color: 'from-cyan-500 to-emerald-500' },
-  { icon: HeartPulse, title: 'Cardiac Risk', route: '/cardiac-risk', color: 'from-rose-500 to-red-500' },
-  { icon: ShieldCheck, title: 'Insurance Optimizer', route: '/insurance', color: 'from-blue-500 to-violet-500' },
-  { icon: CircleDot, title: 'Blood Donation', route: '/blood-donation', color: 'from-red-500 to-pink-500' },
-  { icon: Dna, title: 'Epigenetics', route: '/epigenetics', color: 'from-violet-500 to-indigo-500' },
-  { icon: Wallet, title: 'Health Wallet', route: '/health-wallet', color: 'from-amber-500 to-orange-500' },
-  { icon: Ear, title: 'Hearing Health', route: '/hearing-health', color: 'from-amber-500 to-emerald-500' },
+  { icon: Shield, title: 'Blockchain Records', route: '/blockchain-records', color: 'from-green-600 to-emerald-500' },
+  { icon: Plane, title: 'Drone Delivery', route: '/drone-delivery', color: 'from-lime-500 to-green-500' },
+  { icon: Building2, title: 'Hospital Queue', route: '/hospital-queue', color: 'from-teal-500 to-green-500' },
+  { icon: RefreshCw, title: 'Auto Refill', route: '/auto-refill', color: 'from-emerald-500 to-lime-500' },
+  { icon: Globe2, title: 'Global Telemedicine', route: '/global-telemedicine', color: 'from-green-500 to-teal-500' },
+  { icon: Stethoscope, title: 'AI Radiology', route: '/radiology', color: 'from-teal-500 to-emerald-600' },
+  { icon: Apple, title: 'Nutrition Planner', route: '/nutrition', color: 'from-lime-500 to-emerald-500' },
+  { icon: Dumbbell, title: 'Physio & Rehab', route: '/physiotherapy', color: 'from-green-500 to-emerald-500' },
+  { icon: HeartPulse, title: 'Cardiac Risk', route: '/cardiac-risk', color: 'from-emerald-600 to-teal-600' },
+  { icon: ShieldCheck, title: 'Insurance Optimizer', route: '/insurance', color: 'from-teal-500 to-green-600' },
+  { icon: CircleDot, title: 'Blood Donation', route: '/blood-donation', color: 'from-green-500 to-emerald-400' },
+  { icon: Dna, title: 'Epigenetics', route: '/epigenetics', color: 'from-emerald-500 to-green-500' },
+  { icon: Wallet, title: 'Health Wallet', route: '/health-wallet', color: 'from-lime-500 to-green-600' },
+  { icon: Ear, title: 'Hearing Health', route: '/hearing-health', color: 'from-teal-400 to-emerald-500' },
 ];
 
 const Dashboard = () => {
@@ -60,33 +60,33 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<'week' | 'month'>('week');
 
   const recentActivity = [
-    { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, gradient: 'from-emerald-500 to-teal-500', status: 'completed' },
-    { icon: Activity, text: t('activity.symptomCheck'), time: `5 ${t('time.hoursAgo')}`, gradient: 'from-blue-500 to-cyan-500', status: 'completed' },
-    { icon: FileText, text: t('activity.prescriptionUpload'), time: `1 ${t('time.dayAgo')}`, gradient: 'from-violet-500 to-purple-500', status: 'pending' },
-    { icon: MessageSquare, text: t('activity.aiSession'), time: `2 ${t('time.daysAgo')}`, gradient: 'from-amber-500 to-orange-500', status: 'completed' },
+    { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, gradient: 'from-emerald-500 to-green-500', status: 'completed' },
+    { icon: Activity, text: t('activity.symptomCheck'), time: `5 ${t('time.hoursAgo')}`, gradient: 'from-teal-500 to-emerald-500', status: 'completed' },
+    { icon: FileText, text: t('activity.prescriptionUpload'), time: `1 ${t('time.dayAgo')}`, gradient: 'from-green-500 to-lime-500', status: 'pending' },
+    { icon: MessageSquare, text: t('activity.aiSession'), time: `2 ${t('time.daysAgo')}`, gradient: 'from-emerald-400 to-teal-500', status: 'completed' },
   ];
 
   const quickActions = [
-    { title: t('actions.symptomChecker'), icon: Activity, url: '/symptoms', gradient: 'from-blue-500 to-cyan-500', desc: 'AI-powered analysis' },
-    { title: t('actions.medicineLookup'), icon: Pill, url: '/medicines', gradient: 'from-emerald-500 to-teal-500', desc: 'Search 10,000+ drugs' },
-    { title: t('actions.bookAppointment'), icon: Calendar, url: '/telemedicine', gradient: 'from-violet-500 to-purple-500', desc: 'Video consultation' },
-    { title: t('actions.drugInteractions'), icon: AlertTriangle, url: '/interactions', gradient: 'from-amber-500 to-orange-500', desc: 'Safety checker' },
-    { title: t('actions.aiConsultation'), icon: MessageSquare, url: '/consultation', gradient: 'from-pink-500 to-rose-500', desc: 'Chat with AI doctor' },
-    { title: t('actions.emergency'), icon: AlertCircle, url: '/emergency', gradient: 'from-red-500 to-rose-500', desc: 'SOS & first aid' },
+    { title: t('actions.symptomChecker'), icon: Activity, url: '/symptoms', gradient: 'from-emerald-500 to-teal-500', desc: 'AI-powered analysis' },
+    { title: t('actions.medicineLookup'), icon: Pill, url: '/medicines', gradient: 'from-green-500 to-emerald-500', desc: 'Search 10,000+ drugs' },
+    { title: t('actions.bookAppointment'), icon: Calendar, url: '/telemedicine', gradient: 'from-teal-500 to-green-500', desc: 'Video consultation' },
+    { title: t('actions.drugInteractions'), icon: AlertTriangle, url: '/interactions', gradient: 'from-lime-500 to-green-500', desc: 'Safety checker' },
+    { title: t('actions.aiConsultation'), icon: MessageSquare, url: '/consultation', gradient: 'from-emerald-400 to-green-500', desc: 'Chat with AI doctor' },
+    { title: t('actions.emergency'), icon: AlertCircle, url: '/emergency', gradient: 'from-green-600 to-emerald-600', desc: 'SOS & first aid' },
   ];
 
   const stats = [
-    { label: t('dashboard.adherenceRate'), value: '87%', icon: Heart, trend: '+3%', up: true, gradient: 'from-emerald-500 to-teal-500', ring: 87 },
-    { label: t('dashboard.activeReminders'), value: '5', icon: Bell, trend: `2 ${t('dashboard.today')}`, up: true, gradient: 'from-blue-500 to-cyan-500', ring: 60 },
-    { label: t('dashboard.riskScore'), value: riskScore.toString(), icon: Activity, trend: '-5', up: false, gradient: riskScore < 40 ? 'from-emerald-500 to-teal-500' : 'from-amber-500 to-orange-500', ring: riskScore },
-    { label: t('dashboard.prescriptions'), value: '3', icon: FileText, trend: `1 ${t('dashboard.active')}`, up: true, gradient: 'from-violet-500 to-purple-500', ring: 45 },
+    { label: t('dashboard.adherenceRate'), value: '87%', icon: Heart, trend: '+3%', up: true, gradient: 'from-emerald-500 to-green-500', ring: 87 },
+    { label: t('dashboard.activeReminders'), value: '5', icon: Bell, trend: `2 ${t('dashboard.today')}`, up: true, gradient: 'from-teal-500 to-emerald-500', ring: 60 },
+    { label: t('dashboard.riskScore'), value: riskScore.toString(), icon: Activity, trend: '-5', up: false, gradient: 'from-green-500 to-lime-500', ring: riskScore },
+    { label: t('dashboard.prescriptions'), value: '3', icon: FileText, trend: `1 ${t('dashboard.active')}`, up: true, gradient: 'from-emerald-500 to-teal-500', ring: 45 },
   ];
 
   const healthGoals = [
-    { label: 'Steps Today', value: 7240, target: 10000, icon: Flame, gradient: 'from-orange-500 to-red-500' },
-    { label: 'Water Intake', value: 6, target: 8, icon: Target, gradient: 'from-cyan-500 to-blue-500' },
-    { label: 'Sleep Hours', value: 7.2, target: 8, icon: Clock, gradient: 'from-indigo-500 to-violet-500' },
-    { label: 'Streak', value: 12, target: 30, icon: Trophy, gradient: 'from-amber-500 to-yellow-500' },
+    { label: 'Steps Today', value: 7240, target: 10000, icon: Flame, gradient: 'from-green-500 to-emerald-500' },
+    { label: 'Water Intake', value: 6, target: 8, icon: Target, gradient: 'from-teal-500 to-green-500' },
+    { label: 'Sleep Hours', value: 7.2, target: 8, icon: Clock, gradient: 'from-emerald-500 to-teal-500' },
+    { label: 'Streak', value: 12, target: 30, icon: Trophy, gradient: 'from-lime-500 to-green-500' },
   ];
 
   return (
@@ -98,43 +98,38 @@ const Dashboard = () => {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="relative overflow-hidden rounded-3xl"
       >
-        {/* Background layers */}
         <div className="absolute inset-0" style={{
-          background: 'linear-gradient(135deg, #0c1222 0%, #1a1145 30%, #1e3a5f 60%, #0f2027 100%)',
+          background: 'linear-gradient(135deg, #052e16 0%, #064e3b 30%, #065f46 60%, #0d3b2e 100%)',
         }} />
-        
-        {/* Animated mesh gradient */}
+
         <motion.div
           animate={{ rotate: [0, 360] }}
           transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           className="absolute -top-1/2 -right-1/2 w-full h-full"
-          style={{ background: 'conic-gradient(from 0deg, transparent, rgba(59,130,246,0.08), transparent, rgba(168,85,247,0.08), transparent)' }}
+          style={{ background: 'conic-gradient(from 0deg, transparent, rgba(16,185,129,0.1), transparent, rgba(52,211,153,0.08), transparent)' }}
         />
 
-        {/* Floating orbs */}
         <motion.div
           animate={{ y: [-15, 15, -15], x: [-8, 8, -8], scale: [1, 1.1, 1] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute top-[-60px] right-[10%] w-[300px] h-[300px] rounded-full blur-[100px]"
-          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)' }}
         />
         <motion.div
           animate={{ y: [12, -18, 12], x: [6, -10, 6] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute bottom-[-60px] left-[5%] w-[250px] h-[250px] rounded-full blur-[90px]"
-          style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.25), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.25), transparent 70%)' }}
         />
         <motion.div
           animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full blur-[70px]"
-          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(132,204,22,0.2), transparent 70%)' }}
         />
 
-        {/* Dot pattern */}
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        
-        {/* Horizontal light beam */}
+
         <motion.div
           animate={{ x: ['-100%', '200%'] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 3 }}
@@ -145,7 +140,7 @@ const Dashboard = () => {
         <div className="relative z-10 p-7 md:p-10">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
             <div className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/[0.1] backdrop-blur-md rounded-full px-4 py-1.5 mb-5">
-              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-white/60 text-[11px] font-semibold tracking-wide">All Systems Live</span>
             </div>
           </motion.div>
@@ -158,11 +153,11 @@ const Dashboard = () => {
           >
             {t('dashboard.welcome')},{' '}
             <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-green-300 via-emerald-300 to-teal-300 bg-clip-text text-transparent">
                 {profile?.name || 'User'}
               </span>
               <motion.span
-                className="absolute -bottom-1 left-0 right-0 h-[3px] rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400"
+                className="absolute -bottom-1 left-0 right-0 h-[3px] rounded-full bg-gradient-to-r from-green-300 via-emerald-300 to-teal-300"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.8, duration: 0.6 }}
@@ -182,7 +177,6 @@ const Dashboard = () => {
             {t('dashboard.subtitle')}
           </motion.p>
 
-          {/* Stats pills - matching Health Hub */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -190,9 +184,9 @@ const Dashboard = () => {
             className="flex flex-wrap gap-3 mt-7"
           >
             {[
-              { value: '87%', label: 'Adherence', icon: Heart, gradient: 'from-emerald-400 to-teal-500' },
-              { value: '5', label: 'Reminders', icon: Bell, gradient: 'from-cyan-400 to-blue-500' },
-              { value: 'Low', label: 'Risk', icon: Shield, gradient: 'from-violet-400 to-purple-500' },
+              { value: '87%', label: 'Adherence', icon: Heart, gradient: 'from-green-400 to-emerald-500' },
+              { value: '5', label: 'Reminders', icon: Bell, gradient: 'from-emerald-400 to-teal-500' },
+              { value: 'Low', label: 'Risk', icon: Shield, gradient: 'from-teal-400 to-green-500' },
             ].map((s) => (
               <motion.div
                 key={s.label}
@@ -210,7 +204,6 @@ const Dashboard = () => {
             ))}
           </motion.div>
 
-          {/* Hero action buttons */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -218,9 +211,9 @@ const Dashboard = () => {
             className="flex flex-wrap gap-3 mt-5"
           >
             {[
-              { label: t('dashboard.symptomCheck'), icon: Activity, url: '/symptoms', gradient: 'from-blue-500 to-cyan-500' },
-              { label: t('dashboard.bookDoctor'), icon: Calendar, url: '/telemedicine', gradient: 'from-violet-500 to-purple-500' },
-              { label: t('dashboard.viewPrescriptions'), icon: FileText, url: '/prescriptions', gradient: 'from-emerald-500 to-teal-500' },
+              { label: t('dashboard.symptomCheck'), icon: Activity, url: '/symptoms', gradient: 'from-emerald-500 to-green-500' },
+              { label: t('dashboard.bookDoctor'), icon: Calendar, url: '/telemedicine', gradient: 'from-teal-500 to-emerald-500' },
+              { label: t('dashboard.viewPrescriptions'), icon: FileText, url: '/prescriptions', gradient: 'from-green-500 to-lime-500' },
             ].map((btn, i) => (
               <motion.div key={btn.url} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 + i * 0.08 }}>
                 <Button
@@ -241,12 +234,7 @@ const Dashboard = () => {
         {healthGoals.map((goal, i) => {
           const pct = Math.round((goal.value / goal.target) * 100);
           return (
-            <motion.div
-              key={goal.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.06 }}
-            >
+            <motion.div key={goal.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
               <Card className="group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden border-border/50">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -275,14 +263,8 @@ const Dashboard = () => {
       {/* ═══ STAT CARDS ═══ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.15 + i * 0.07, duration: 0.45 }}
-          >
+          <motion.div key={stat.label} initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.45 }}>
             <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border-border/50 relative">
-              {/* Subtle background glow on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500`} />
               <div className={`h-1 w-full bg-gradient-to-r ${stat.gradient}`} />
               <CardContent className="p-4 relative">
@@ -305,13 +287,12 @@ const Dashboard = () => {
 
       {/* ═══ CHARTS ROW ═══ */}
       <div className="grid lg:grid-cols-3 gap-4">
-        {/* Adherence chart */}
         <Card className="lg:col-span-2 overflow-hidden border-border/50">
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-cyan-500" />
+          <div className="h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-500" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
                   <TrendingUp className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -337,24 +318,24 @@ const Dashboard = () => {
               <AreaChart data={adherenceData}>
                 <defs>
                   <linearGradient id="adherenceG" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.1} />
-                    <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="50%" stopColor="#34d399" stopOpacity={0.1} />
+                    <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="day" axisLine={false} tickLine={false} fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <YAxis domain={[60, 100]} axisLine={false} tickLine={false} fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))', boxShadow: '0 12px 32px rgba(0,0,0,0.12)', fontSize: '11px', fontWeight: 600 }}
-                  cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                  cursor={{ stroke: '#10b981', strokeWidth: 1, strokeDasharray: '4 4' }}
                 />
                 <Area type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeWidth={1} strokeDasharray="4 4" fill="none" dot={false} />
-                <Area type="monotone" dataKey="adherence" stroke="#3b82f6" fill="url(#adherenceG)" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: 'hsl(var(--card))' }} activeDot={{ r: 6, strokeWidth: 3, stroke: 'hsl(var(--card))' }} />
+                <Area type="monotone" dataKey="adherence" stroke="#10b981" fill="url(#adherenceG)" strokeWidth={2.5} dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: 'hsl(var(--card))' }} activeDot={{ r: 6, strokeWidth: 3, stroke: 'hsl(var(--card))' }} />
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex items-center gap-4 mt-2 px-1">
               <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <div className="h-2 w-2 rounded-full bg-blue-500" /> Actual
+                <div className="h-2 w-2 rounded-full bg-emerald-500" /> Actual
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                 <div className="h-[1px] w-4 border-t border-dashed border-muted-foreground" /> Target
@@ -365,10 +346,10 @@ const Dashboard = () => {
 
         {/* Risk score */}
         <Card className="overflow-hidden border-border/50">
-          <div className="h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+          <div className="h-1 w-full bg-gradient-to-r from-green-500 to-emerald-500" />
           <CardHeader className="pb-1">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
                 <Heart className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -381,21 +362,11 @@ const Dashboard = () => {
             <div className="relative h-40 w-40">
               <svg viewBox="0 0 100 100" className="transform -rotate-90">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="4" opacity="0.2" />
-                {/* Background track marks */}
-                {[...Array(20)].map((_, i) => (
-                  <circle
-                    key={i}
-                    cx="50" cy="50" r="42" fill="none"
-                    stroke="hsl(var(--muted))" strokeWidth="4" opacity="0.05"
-                    strokeDasharray="2 11.2"
-                    strokeDashoffset={-i * 13.2}
-                  />
-                ))}
                 <defs>
                   <linearGradient id="riskGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="50%" stopColor="#14b8a6" />
-                    <stop offset="100%" stopColor="#06b6d4" />
+                    <stop offset="0%" stopColor="#22c55e" />
+                    <stop offset="50%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#14b8a6" />
                   </linearGradient>
                 </defs>
                 <motion.circle
@@ -406,8 +377,7 @@ const Dashboard = () => {
                   initial={{ strokeDasharray: '0 263.9' }}
                   animate={{ strokeDasharray: `${(riskScore / 100) * 263.9} 263.9` }}
                   transition={{ delay: 0.5, duration: 1.2, ease: 'easeOut' }}
-                  className="drop-shadow-sm"
-                  style={{ filter: 'drop-shadow(0 0 6px rgba(16,185,129,0.3))' }}
+                  style={{ filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.4))' }}
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -434,12 +404,11 @@ const Dashboard = () => {
 
       {/* ═══ QUICK ACTIONS + ACTIVITY ═══ */}
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Quick Actions */}
         <Card className="overflow-hidden border-border/50">
-          <div className="h-1 w-full bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
+          <div className="h-1 w-full bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500" />
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center shadow-lg">
                 <Zap className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -475,13 +444,12 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
         <Card className="overflow-hidden border-border/50">
-          <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
+          <div className="h-1 w-full bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500" />
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
                   <Clock className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -514,7 +482,7 @@ const Dashboard = () => {
                   {item.status === 'completed' ? (
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                   ) : (
-                    <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse shrink-0" />
                   )}
                 </motion.div>
               ))}
@@ -525,11 +493,11 @@ const Dashboard = () => {
 
       {/* ═══ SYMPTOM CHART ═══ */}
       <Card className="overflow-hidden border-border/50">
-        <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
+        <div className="h-1 w-full bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500" />
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center shadow-lg">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-teal-500 to-green-500 flex items-center justify-center shadow-lg">
                 <BarChart3 className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -545,9 +513,9 @@ const Dashboard = () => {
             <BarChart data={symptomData} layout="vertical">
               <defs>
                 <linearGradient id="barGrad2" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#f59e0b" />
-                  <stop offset="50%" stopColor="#f97316" />
-                  <stop offset="100%" stopColor="#ef4444" />
+                  <stop offset="0%" stopColor="#22c55e" />
+                  <stop offset="50%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#14b8a6" />
                 </linearGradient>
               </defs>
               <XAxis type="number" axisLine={false} tickLine={false} fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
@@ -565,25 +533,21 @@ const Dashboard = () => {
           className="cursor-pointer group overflow-hidden hover:shadow-2xl transition-all duration-400 border-border/50 relative"
           onClick={() => navigate('/coming-soon')}
         >
-          {/* Rainbow top border */}
-          <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-violet-500 via-pink-500 via-amber-500 to-emerald-500" />
-          
-          {/* Subtle background shimmer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/[0.02] via-violet-500/[0.03] to-pink-500/[0.02] group-hover:from-blue-500/[0.05] group-hover:via-violet-500/[0.06] group-hover:to-pink-500/[0.05] transition-all duration-500" />
-          
+          <div className="h-1.5 w-full bg-gradient-to-r from-green-500 via-emerald-500 via-teal-500 to-lime-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/[0.02] via-emerald-500/[0.03] to-teal-500/[0.02] group-hover:from-green-500/[0.05] group-hover:via-emerald-500/[0.06] group-hover:to-teal-500/[0.05] transition-all duration-500" />
           <CardContent className="p-6 md:p-7 relative">
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
                 <motion.div
                   whileHover={{ rotate: [0, -5, 5, 0] }}
-                  className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300"
+                  className="h-16 w-16 rounded-2xl bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 flex items-center justify-center shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300"
                 >
                   <Rocket className="h-7 w-7 text-white" />
                 </motion.div>
                 <motion.div
                   animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute -top-1.5 -right-1.5 h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg"
+                  className="absolute -top-1.5 -right-1.5 h-6 w-6 rounded-full bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center shadow-lg"
                 >
                   <Star className="h-3 w-3 text-white" />
                 </motion.div>
@@ -591,10 +555,9 @@ const Dashboard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-base font-heading font-extrabold text-foreground">Explore All {additionalFeatures.length} Features</p>
-                  <Badge className="bg-gradient-to-r from-violet-500 to-pink-500 text-white border-0 text-[9px] font-bold px-2">NEW</Badge>
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 text-[9px] font-bold px-2">NEW</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground">AI diagnostics, telehealth, wellness, genomics, finance & more</p>
-                {/* Mini feature icon strip */}
                 <div className="flex items-center gap-1 mt-2.5">
                   {additionalFeatures.slice(0, 6).map((f, i) => (
                     <div key={i} className={`h-6 w-6 rounded-md bg-gradient-to-br ${f.color} flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity`}>
@@ -605,7 +568,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <motion.div
-                className="hidden sm:flex items-center gap-2 text-sm font-bold text-primary"
+                className="hidden sm:flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400"
                 whileHover={{ x: 4 }}
               >
                 View all <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
