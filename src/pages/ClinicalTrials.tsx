@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Microscope, MapPin, CheckCircle2, Clock, ExternalLink, Filter, Search, Heart, Calendar, Users, Building, FileText, Star, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Microscope, MapPin, CheckCircle2, Clock, ExternalLink, Filter, Search, Heart, Calendar, Users, Building, FileText, Star, Bookmark, BookmarkCheck, Navigation, MapIcon, Phone, Mail, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Trial {
@@ -14,7 +14,10 @@ interface Trial {
   title: string;
   sponsor: string;
   location: string;
-  distance: string;
+  address: string;
+  lat: number;
+  lng: number;
+  distance?: string;
   phase: string;
   status: string;
   match: number;
@@ -27,6 +30,9 @@ interface Trial {
   endDate: string;
   participants: number;
   contactEmail: string;
+  contactPhone: string;
+  website: string;
+  openingHours: { day: string; open: string; close: string }[];
 }
 
 const allTrials: Trial[] = [
@@ -35,7 +41,9 @@ const allTrials: Trial[] = [
     title: 'Phase III Diabetes Management Trial', 
     sponsor: 'HealthCorp Pharma', 
     location: 'Mumbai, India', 
-    distance: '5 km', 
+    address: 'Kokilaben Dhirubhai Ambani Hospital, Andheri West, Mumbai 400053',
+    lat: 19.1334,
+    lng: 72.8262,
     phase: 'Phase III', 
     status: 'Recruiting', 
     match: 95, 
@@ -47,14 +55,27 @@ const allTrials: Trial[] = [
     startDate: '2024-03-01',
     endDate: '2025-03-01',
     participants: 500,
-    contactEmail: 'diabetes-trial@healthcorp.com'
+    contactEmail: 'diabetes-trial@healthcorp.com',
+    contactPhone: '+91 22 3069 6969',
+    website: 'https://healthcorp-trials.com',
+    openingHours: [
+      { day: 'Monday', open: '09:00', close: '18:00' },
+      { day: 'Tuesday', open: '09:00', close: '18:00' },
+      { day: 'Wednesday', open: '09:00', close: '18:00' },
+      { day: 'Thursday', open: '09:00', close: '18:00' },
+      { day: 'Friday', open: '09:00', close: '17:00' },
+      { day: 'Saturday', open: '10:00', close: '14:00' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
   { 
     id: '2',
     title: 'Cardiovascular Risk Reduction Study', 
     sponsor: 'CardioResearch Ltd', 
     location: 'Chennai, India', 
-    distance: '12 km', 
+    address: 'Apollo Hospitals, Greams Road, Chennai 600006',
+    lat: 13.0569,
+    lng: 80.2425,
     phase: 'Phase II', 
     status: 'Recruiting', 
     match: 82, 
@@ -66,14 +87,27 @@ const allTrials: Trial[] = [
     startDate: '2024-04-15',
     endDate: '2024-10-15',
     participants: 300,
-    contactEmail: 'cardio-study@cardioresearch.com'
+    contactEmail: 'cardio-study@cardioresearch.com',
+    contactPhone: '+91 44 2829 3333',
+    website: 'https://cardioresearch-trials.com',
+    openingHours: [
+      { day: 'Monday', open: '08:00', close: '20:00' },
+      { day: 'Tuesday', open: '08:00', close: '20:00' },
+      { day: 'Wednesday', open: '08:00', close: '20:00' },
+      { day: 'Thursday', open: '08:00', close: '20:00' },
+      { day: 'Friday', open: '08:00', close: '18:00' },
+      { day: 'Saturday', open: '09:00', close: '13:00' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
   { 
     id: '3',
     title: 'Novel Antibiotic Efficacy Trial', 
     sponsor: 'BioMed Sciences', 
     location: 'Bangalore, India', 
-    distance: '280 km', 
+    address: 'Manipal Hospital, HAL Airport Road, Bangalore 560017',
+    lat: 12.9592,
+    lng: 77.6480,
     phase: 'Phase I', 
     status: 'Enrolling', 
     match: 68, 
@@ -85,14 +119,27 @@ const allTrials: Trial[] = [
     startDate: '2024-05-01',
     endDate: '2024-07-01',
     participants: 60,
-    contactEmail: 'antibiotic-trial@biomed.com'
+    contactEmail: 'antibiotic-trial@biomed.com',
+    contactPhone: '+91 80 2502 4444',
+    website: 'https://biomed-sciences.com',
+    openingHours: [
+      { day: 'Monday', open: '09:00', close: '17:00' },
+      { day: 'Tuesday', open: '09:00', close: '17:00' },
+      { day: 'Wednesday', open: '09:00', close: '17:00' },
+      { day: 'Thursday', open: '09:00', close: '17:00' },
+      { day: 'Friday', open: '09:00', close: '17:00' },
+      { day: 'Saturday', open: 'Closed', close: 'Closed' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
   { 
     id: '4',
     title: 'Mental Health CBT Digital Therapy', 
     sponsor: 'MindWell Inc', 
     location: 'Remote / Online', 
-    distance: 'Remote', 
+    address: 'Virtual - No physical location required',
+    lat: 0,
+    lng: 0,
     phase: 'Phase II', 
     status: 'Recruiting', 
     match: 91, 
@@ -104,14 +151,27 @@ const allTrials: Trial[] = [
     startDate: '2024-02-01',
     endDate: '2024-05-01',
     participants: 1000,
-    contactEmail: 'cbt-study@mindwell.com'
+    contactEmail: 'cbt-study@mindwell.com',
+    contactPhone: '+91 1800 123 4567',
+    website: 'https://mindwell-therapy.com',
+    openingHours: [
+      { day: 'Monday', open: '00:00', close: '23:59' },
+      { day: 'Tuesday', open: '00:00', close: '23:59' },
+      { day: 'Wednesday', open: '00:00', close: '23:59' },
+      { day: 'Thursday', open: '00:00', close: '23:59' },
+      { day: 'Friday', open: '00:00', close: '23:59' },
+      { day: 'Saturday', open: '00:00', close: '23:59' },
+      { day: 'Sunday', open: '00:00', close: '23:59' },
+    ]
   },
   { 
     id: '5',
     title: 'Oncology Immunotherapy Trial', 
     sponsor: 'OncoGen Therapeutics', 
     location: 'Delhi, India', 
-    distance: '45 km', 
+    address: 'AIIMS, Ansari Nagar, New Delhi 110029',
+    lat: 28.5672,
+    lng: 77.2100,
     phase: 'Phase III', 
     status: 'Active', 
     match: 72, 
@@ -123,14 +183,27 @@ const allTrials: Trial[] = [
     startDate: '2023-06-01',
     endDate: '2025-06-01',
     participants: 800,
-    contactEmail: 'lung-trial@oncogen.com'
+    contactEmail: 'lung-trial@oncogen.com',
+    contactPhone: '+91 11 2658 8500',
+    website: 'https://oncogen-therapeutics.com',
+    openingHours: [
+      { day: 'Monday', open: '08:00', close: '16:00' },
+      { day: 'Tuesday', open: '08:00', close: '16:00' },
+      { day: 'Wednesday', open: '08:00', close: '16:00' },
+      { day: 'Thursday', open: '08:00', close: '16:00' },
+      { day: 'Friday', open: '08:00', close: '16:00' },
+      { day: 'Saturday', open: 'Closed', close: 'Closed' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
   { 
     id: '6',
     title: 'Pediatric Asthma Inhaler Study', 
     sponsor: 'RespiCare Pharma', 
     location: 'Pune, India', 
-    distance: '120 km', 
+    address: 'Jehangir Hospital, Sassoon Road, Pune 411001',
+    lat: 18.5314,
+    lng: 73.8446,
     phase: 'Phase II', 
     status: 'Recruiting', 
     match: 58, 
@@ -142,9 +215,57 @@ const allTrials: Trial[] = [
     startDate: '2024-03-15',
     endDate: '2024-07-15',
     participants: 200,
-    contactEmail: 'asthma-kids@respircare.com'
+    contactEmail: 'asthma-kids@respircare.com',
+    contactPhone: '+91 20 6681 9999',
+    website: 'https://respircare-pharma.com',
+    openingHours: [
+      { day: 'Monday', open: '09:00', close: '18:00' },
+      { day: 'Tuesday', open: '09:00', close: '18:00' },
+      { day: 'Wednesday', open: '09:00', close: '18:00' },
+      { day: 'Thursday', open: '09:00', close: '18:00' },
+      { day: 'Friday', open: '09:00', close: '17:00' },
+      { day: 'Saturday', open: '10:00', close: '14:00' },
+      { day: 'Sunday', open: 'Closed', close: 'Closed' },
+    ]
   },
 ];
+
+// Helper functions
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+const isOpenNow = (hours: { day: string; open: string; close: string }[]): { isOpen: boolean; nextChange: string } => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const now = new Date();
+  const currentDay = days[now.getDay()];
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  const todayHours = hours.find(h => h.day === currentDay);
+  if (!todayHours || todayHours.open === 'Closed') {
+    return { isOpen: false, nextChange: 'Opens tomorrow' };
+  }
+  
+  const [openH, openM] = todayHours.open.split(':').map(Number);
+  const [closeH, closeM] = todayHours.close.split(':').map(Number);
+  const openTime = openH * 60 + openM;
+  const closeTime = closeH * 60 + closeM;
+  
+  if (currentTime >= openTime && currentTime < closeTime) {
+    return { isOpen: true, nextChange: `Closes at ${todayHours.close}` };
+  } else if (currentTime < openTime) {
+    return { isOpen: false, nextChange: `Opens at ${todayHours.open}` };
+  } else {
+    return { isOpen: false, nextChange: 'Opens tomorrow' };
+  }
+};
 
 const ClinicalTrials = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -155,11 +276,72 @@ const ClinicalTrials = () => {
   const [savedTrials, setSavedTrials] = useState<string[]>([]);
   const [appliedTrials, setAppliedTrials] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('browse');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [trialsWithDistance, setTrialsWithDistance] = useState<Trial[]>(allTrials);
 
-  const conditions = useMemo(() => [...new Set(allTrials.map(t => t.condition))], []);
+  // Get user's real-time location
+  const getUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+    
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        
+        // Calculate distances for all trials
+        const updatedTrials = allTrials.map(trial => {
+          if (trial.lat === 0 && trial.lng === 0) {
+            return { ...trial, distance: 'Remote' };
+          }
+          const dist = calculateDistance(latitude, longitude, trial.lat, trial.lng);
+          return { ...trial, distance: dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km` };
+        });
+        
+        setTrialsWithDistance(updatedTrials);
+        setLocationLoading(false);
+        toast.success('Location updated! Distances calculated based on your position.');
+      },
+      (error) => {
+        setLocationLoading(false);
+        toast.error('Unable to get your location. Using default distances.');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  useEffect(() => {
+    getUserLocation();
+  }, [getUserLocation]);
+
+  const openInMaps = (trial: Trial) => {
+    if (trial.lat === 0 && trial.lng === 0) {
+      toast.info('This is a remote trial with no physical location');
+      return;
+    }
+    const url = `https://www.google.com/maps/search/?api=1&query=${trial.lat},${trial.lng}`;
+    window.open(url, '_blank');
+  };
+
+  const getDirections = (trial: Trial) => {
+    if (trial.lat === 0 && trial.lng === 0) {
+      toast.info('This is a remote trial with no physical location');
+      return;
+    }
+    const url = userLocation 
+      ? `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${trial.lat},${trial.lng}`
+      : `https://www.google.com/maps/dir/?api=1&destination=${trial.lat},${trial.lng}`;
+    window.open(url, '_blank');
+  };
+
+  const conditions = useMemo(() => [...new Set(trialsWithDistance.map(t => t.condition))], [trialsWithDistance]);
 
   const filteredTrials = useMemo(() => {
-    return allTrials.filter(trial => {
+    return trialsWithDistance.filter(trial => {
       const matchesSearch = trial.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            trial.condition.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            trial.sponsor.toLowerCase().includes(searchQuery.toLowerCase());
@@ -168,9 +350,9 @@ const ClinicalTrials = () => {
       const matchesCondition = conditionFilter === 'all' || trial.condition === conditionFilter;
       return matchesSearch && matchesPhase && matchesStatus && matchesCondition;
     }).sort((a, b) => b.match - a.match);
-  }, [searchQuery, phaseFilter, statusFilter, conditionFilter]);
+  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, trialsWithDistance]);
 
-  const savedTrialsList = useMemo(() => allTrials.filter(t => savedTrials.includes(t.id)), [savedTrials]);
+  const savedTrialsList = useMemo(() => trialsWithDistance.filter(t => savedTrials.includes(t.id)), [savedTrials, trialsWithDistance]);
 
   const toggleSaveTrial = (trialId: string) => {
     setSavedTrials(prev => {
@@ -196,8 +378,8 @@ const ClinicalTrials = () => {
     setSelectedTrial(null);
   };
 
-  const recruitingCount = allTrials.filter(t => t.status === 'Recruiting').length;
-  const bestMatch = Math.max(...allTrials.map(t => t.match));
+  const recruitingCount = trialsWithDistance.filter(t => t.status === 'Recruiting').length;
+  const bestMatch = Math.max(...trialsWithDistance.map(t => t.match));
 
   return (
     <div className="space-y-6">
@@ -284,6 +466,16 @@ const ClinicalTrials = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={getUserLocation}
+                disabled={locationLoading}
+                className="gap-2"
+              >
+                <Navigation className={`h-4 w-4 ${locationLoading ? 'animate-pulse' : ''}`} />
+                {locationLoading ? 'Locating...' : 'Update Location'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -296,47 +488,65 @@ const ClinicalTrials = () => {
                     <Microscope className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No trials match your search criteria</p>
                   </div>
-                ) : filteredTrials.map((t) => (
-                  <div key={t.id} className="p-4 rounded-xl border hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-sm">{t.title}</h4>
-                        <p className="text-xs text-muted-foreground">{t.sponsor}</p>
+                ) : filteredTrials.map((t) => {
+                  const openStatus = isOpenNow(t.openingHours);
+                  return (
+                    <div key={t.id} className="p-4 rounded-xl border hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm">{t.title}</h4>
+                          <p className="text-xs text-muted-foreground">{t.sponsor}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => toggleSaveTrial(t.id)}
+                          >
+                            {savedTrials.includes(t.id) ? (
+                              <BookmarkCheck className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Badge className={t.match >= 90 ? 'bg-success/10 text-success' : t.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{t.match}% Match</Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => toggleSaveTrial(t.id)}
-                        >
-                          {savedTrials.includes(t.id) ? (
-                            <BookmarkCheck className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Bookmark className="h-4 w-4" />
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant="secondary">{t.phase}</Badge>
+                        <Badge variant="outline">{t.condition}</Badge>
+                        <Badge className={openStatus.isOpen ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}>
+                          <Clock className="h-3 w-3 mr-1" />
+                          {openStatus.isOpen ? 'Open' : 'Closed'} · {openStatus.nextChange}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{t.address}</span>
+                        <span className="shrink-0 font-medium text-foreground">({t.distance})</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={t.status === 'Recruiting' ? 'default' : 'secondary'}>{t.status}</Badge>
+                          {appliedTrials.includes(t.id) && (
+                            <Badge className="bg-success/10 text-success">Applied</Badge>
                           )}
-                        </Button>
-                        <Badge className={t.match >= 90 ? 'bg-success/10 text-success' : t.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{t.match}% Match</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {t.lat !== 0 && (
+                            <Button size="sm" variant="ghost" onClick={() => openInMaps(t)}>
+                              <MapIcon className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button size="sm" variant="outline" onClick={() => setSelectedTrial(t)}>
+                            <ExternalLink className="h-3 w-3 mr-1" /> Details
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge variant="secondary">{t.phase}</Badge>
-                      <Badge variant="outline">{t.condition}</Badge>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" />{t.location} ({t.distance})</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={t.status === 'Recruiting' ? 'default' : 'secondary'}>{t.status}</Badge>
-                        {appliedTrials.includes(t.id) && (
-                          <Badge className="bg-success/10 text-success">Applied</Badge>
-                        )}
-                      </div>
-                      <Button size="sm" variant="outline" onClick={() => setSelectedTrial(t)}>
-                        <ExternalLink className="h-3 w-3 mr-1" /> View Details
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -400,11 +610,55 @@ const ClinicalTrials = () => {
                   <Badge variant="secondary">{selectedTrial.phase}</Badge>
                   <Badge variant={selectedTrial.status === 'Recruiting' ? 'default' : 'secondary'}>{selectedTrial.status}</Badge>
                   <Badge className={selectedTrial.match >= 90 ? 'bg-success/10 text-success' : selectedTrial.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{selectedTrial.match}% Match</Badge>
+                  {(() => {
+                    const openStatus = isOpenNow(selectedTrial.openingHours);
+                    return (
+                      <Badge className={openStatus.isOpen ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}>
+                        {openStatus.isOpen ? 'Open Now' : 'Closed'} · {openStatus.nextChange}
+                      </Badge>
+                    );
+                  })()}
                 </div>
 
                 <div>
                   <h4 className="font-semibold text-sm mb-2">Description</h4>
                   <p className="text-sm text-muted-foreground">{selectedTrial.description}</p>
+                </div>
+
+                {/* Location & Map Section */}
+                <div className="p-4 rounded-xl bg-muted/30 border space-y-3">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" /> Location & Directions
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedTrial.address}</p>
+                  <p className="text-xs text-muted-foreground">Distance: <span className="font-medium text-foreground">{selectedTrial.distance}</span></p>
+                  {selectedTrial.lat !== 0 && (
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => openInMaps(selectedTrial)} className="gap-2">
+                        <MapIcon className="h-4 w-4" /> View on Map
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => getDirections(selectedTrial)} className="gap-2">
+                        <Navigation className="h-4 w-4" /> Get Directions
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Opening Hours */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" /> Opening Hours
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedTrial.openingHours.map((h, idx) => (
+                      <div key={idx} className="flex justify-between text-sm py-1 px-2 rounded bg-muted/30">
+                        <span className="font-medium">{h.day}</span>
+                        <span className="text-muted-foreground">
+                          {h.open === 'Closed' ? 'Closed' : h.open === '00:00' && h.close === '23:59' ? '24 Hours' : `${h.open} - ${h.close}`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -422,15 +676,31 @@ const ClinicalTrials = () => {
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-2 text-sm font-medium mb-1">
-                      <MapPin className="h-4 w-4 text-primary" /> Location
-                    </div>
-                    <p className="text-sm text-muted-foreground">{selectedTrial.location}</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-2 text-sm font-medium mb-1">
                       <Star className="h-4 w-4 text-primary" /> Compensation
                     </div>
                     <p className="text-sm text-muted-foreground">{selectedTrial.compensation}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-1">
+                      <Calendar className="h-4 w-4 text-primary" /> Trial Period
+                    </div>
+                    <p className="text-sm text-muted-foreground">{selectedTrial.startDate} to {selectedTrial.endDate}</p>
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Contact Information</h4>
+                  <div className="space-y-2">
+                    <a href={`tel:${selectedTrial.contactPhone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Phone className="h-4 w-4 text-primary" /> {selectedTrial.contactPhone}
+                    </a>
+                    <a href={`mailto:${selectedTrial.contactEmail}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Mail className="h-4 w-4 text-primary" /> {selectedTrial.contactEmail}
+                    </a>
+                    <a href={selectedTrial.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Globe className="h-4 w-4 text-primary" /> {selectedTrial.website}
+                    </a>
                   </div>
                 </div>
 
