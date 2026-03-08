@@ -10,6 +10,23 @@ import { AlertTriangle, Search, Pill, X, Loader2, Sparkles, Heart } from 'lucide
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import medPills from '@/assets/medicine-pills.png';
+import medAntibiotic from '@/assets/med-antibiotic.png';
+import medPainRelief from '@/assets/med-pain-relief.png';
+import medCardiac from '@/assets/med-cardiac.png';
+import medDiabetes from '@/assets/med-diabetes.png';
+import medGastro from '@/assets/med-gastro.png';
+import medAllergy from '@/assets/med-allergy.png';
+
+const categoryImages: Record<string, string> = {
+  'Antibiotic': medAntibiotic,
+  'Pain Relief': medPainRelief,
+  'Cardiac': medCardiac,
+  'Diabetes': medDiabetes,
+  'Gastrointestinal': medGastro,
+  'Allergy': medAllergy,
+};
+
 interface Medicine {
   id: string;
   name: string;
@@ -40,6 +57,11 @@ const pregnancyColor = (safety: string | null) => {
   if (lower.includes('contraindicated') || lower.includes('category x') || lower.includes('category d') || lower.includes('avoid')) return 'bg-destructive/10 text-destructive';
   if (lower.includes('caution') || lower.includes('category c') || lower.includes('only if')) return 'bg-warning/10 text-warning';
   return 'bg-success/10 text-success';
+};
+
+const getMedicineImage = (category: string | null): string => {
+  if (category && categoryImages[category]) return categoryImages[category];
+  return medPills;
 };
 
 const MedicineLookup = () => {
@@ -128,9 +150,9 @@ const MedicineLookup = () => {
               onClick={() => openDetail(m)}
             >
               <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="h-10 w-10 rounded-xl gradient-success flex items-center justify-center shadow-md">
-                    <Pill className="h-5 w-5 text-white" />
+                <div className="flex items-start justify-between mb-3">
+                  <div className="h-14 w-14 rounded-xl bg-muted/50 flex items-center justify-center overflow-hidden p-1">
+                    <img src={getMedicineImage(m.category)} alt={m.category || 'Medicine'} className="h-full w-full object-contain" />
                   </div>
                   <Badge variant="secondary" className="text-xs rounded-full">{m.category}</Badge>
                 </div>
@@ -160,9 +182,14 @@ const MedicineLookup = () => {
             >
               <div className="p-5 space-y-4">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="font-heading font-bold text-xl">{selected.name}</h2>
-                    <p className="text-sm text-muted-foreground">{selected.brand} • {selected.strength}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-16 w-16 rounded-xl bg-muted/50 flex items-center justify-center overflow-hidden p-1">
+                      <img src={getMedicineImage(selected.category)} alt={selected.category || 'Medicine'} className="h-full w-full object-contain" />
+                    </div>
+                    <div>
+                      <h2 className="font-heading font-bold text-xl">{selected.name}</h2>
+                      <p className="text-sm text-muted-foreground">{selected.brand} • {selected.strength}</p>
+                    </div>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => setSelected(null)}>
                     <X className="h-4 w-4" />
