@@ -170,12 +170,15 @@ const VoiceAssistant = () => {
               <VolumeX className="h-3.5 w-3.5" /> Stop
             </Button>
           )}
-          <div className="flex items-center gap-2">
-            <Switch id="auto-read" checked={autoRead} onCheckedChange={setAutoRead} />
-            <Label htmlFor="auto-read" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-              <Volume2 className="h-3.5 w-3.5" /> Auto-read
-            </Label>
-          </div>
+          <Button
+            variant={autoRead ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setAutoRead(!autoRead)}
+            className={`gap-1.5 text-xs rounded-full px-4 ${autoRead ? 'bg-primary text-primary-foreground shadow-sm' : ''}`}
+          >
+            {autoRead ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            Auto-Read {autoRead ? 'ON' : 'OFF'}
+          </Button>
         </div>
       </div>
 
