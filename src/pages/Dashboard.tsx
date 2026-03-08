@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Activity, Pill, Calendar, AlertTriangle, MessageSquare, AlertCircle,
-  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles
+  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
+  Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
+  Shield, Plane, Building2, RefreshCw, Globe2, Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
