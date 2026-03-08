@@ -252,7 +252,12 @@ const MedicineLookup = () => {
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
                             <h3 className="font-heading font-bold text-sm truncate">{m.name}</h3>
-                            <p className="text-xs text-muted-foreground truncate">{m.brand}</p>
+                            {m.brand && (
+                              <div className="flex items-center gap-1 mt-0.5">
+                                <span className="text-[10px] font-semibold text-primary/70 uppercase tracking-wide">Brand:</span>
+                                <p className="text-xs font-medium text-foreground/80 truncate">{m.brand}</p>
+                              </div>
+                            )}
                           </div>
                           <button
                             onClick={e => { e.stopPropagation(); toggleMyMedicine(m.id); }}
@@ -261,11 +266,13 @@ const MedicineLookup = () => {
                             <Heart className={`h-4 w-4 transition-all ${myMedicines.includes(m.id) ? 'fill-destructive text-destructive scale-110' : 'text-muted-foreground'}`} />
                           </button>
                         </div>
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center flex-wrap gap-1.5 mt-2">
                           <Badge className={`text-[10px] px-2 py-0.5 rounded-md border ${categoryColors[m.category || ''] || 'bg-muted text-muted-foreground'}`}>
                             {m.category}
                           </Badge>
-                          <span className="text-[10px] text-muted-foreground">{m.strength}</span>
+                          <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md">
+                            {m.strength}
+                          </Badge>
                         </div>
                         {m.price != null && (
                           <p className="text-sm font-bold mt-2 text-primary">₹{m.price}</p>
