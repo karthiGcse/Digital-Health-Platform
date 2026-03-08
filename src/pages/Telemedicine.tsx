@@ -64,6 +64,10 @@ const Telemedicine = () => {
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [activeTab, setActiveTab] = useState('doctors');
+  const [nearbyLocation, setNearbyLocation] = useState('');
+  const [nearbyFacilities, setNearbyFacilities] = useState<NearbyFacility[]>([]);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbySearched, setNearbySearched] = useState(false);
 
   const filtered = doctors.filter(d => {
     const matchSearch = d.name.toLowerCase().includes(search.toLowerCase()) || d.specialty.toLowerCase().includes(search.toLowerCase()) || d.symptoms.some(s => s.toLowerCase().includes(search.toLowerCase()));
