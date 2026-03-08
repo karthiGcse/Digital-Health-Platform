@@ -35,14 +35,43 @@ interface Device {
 }
 
 const availableDevices = [
-  { name: 'Apple Watch', models: ['Series 9', 'Series 8', 'Ultra 2', 'SE'], icon: '⌚', brand: 'Apple', type: 'Smartwatch' },
-  { name: 'Samsung Galaxy Watch', models: ['6 Classic', '6', '5 Pro', 'FE'], icon: '⌚', brand: 'Samsung', type: 'Smartwatch' },
-  { name: 'Fitbit', models: ['Charge 6', 'Sense 2', 'Versa 4', 'Inspire 3'], icon: '📱', brand: 'Fitbit', type: 'Fitness Tracker' },
-  { name: 'Garmin', models: ['Venu 3', 'Forerunner 965', 'Fenix 7', 'Vivosmart 5'], icon: '⌚', brand: 'Garmin', type: 'Smartwatch' },
-  { name: 'Oura Ring', models: ['Gen 3', 'Gen 3 Horizon'], icon: '💍', brand: 'Oura', type: 'Sleep Tracker' },
-  { name: 'Xiaomi Mi Band', models: ['8 Pro', '8', '7 Pro'], icon: '📱', brand: 'Xiaomi', type: 'Fitness Tracker' },
+  // Smartwatches
+  { name: 'Apple Watch', models: ['Series 10', 'Series 9', 'Ultra 2', 'SE (3rd Gen)'], icon: '⌚', brand: 'Apple', type: 'Smartwatch' },
+  { name: 'Samsung Galaxy Watch', models: ['7 Ultra', '7', '6 Classic', 'FE'], icon: '⌚', brand: 'Samsung', type: 'Smartwatch' },
+  { name: 'Google Pixel Watch', models: ['3', '2', '1'], icon: '⌚', brand: 'Google', type: 'Smartwatch' },
+  { name: 'OnePlus Watch', models: ['2', '2R'], icon: '⌚', brand: 'OnePlus', type: 'Smartwatch' },
+  { name: 'Huawei Watch', models: ['GT 5 Pro', 'GT 5', 'Ultimate', 'Fit 3'], icon: '⌚', brand: 'Huawei', type: 'Smartwatch' },
+  { name: 'Amazfit', models: ['T-Rex 3', 'GTR 4', 'GTS 4', 'Bip 5'], icon: '⌚', brand: 'Amazfit', type: 'Smartwatch' },
+  { name: 'Fossil Gen', models: ['6', '5E', '5 LTE'], icon: '⌚', brand: 'Fossil', type: 'Smartwatch' },
+  { name: 'TicWatch', models: ['Pro 5 Enduro', 'Pro 5', 'E3'], icon: '⌚', brand: 'Mobvoi', type: 'Smartwatch' },
+  { name: 'Noise', models: ['ColorFit Ultra 3', 'ColorFit Pro 5', 'Evolve 2'], icon: '⌚', brand: 'Noise', type: 'Smartwatch' },
+  { name: 'boAt Watch', models: ['Primia', 'Iris', 'Xtend Plus'], icon: '⌚', brand: 'boAt', type: 'Smartwatch' },
+  { name: 'Fire-Boltt', models: ['Phoenix Ultra', 'Invincible Plus', 'Ring 3'], icon: '⌚', brand: 'Fire-Boltt', type: 'Smartwatch' },
+  // Fitness Trackers
+  { name: 'Fitbit', models: ['Charge 6', 'Sense 2', 'Versa 4', 'Inspire 3', 'Luxe'], icon: '📱', brand: 'Fitbit', type: 'Fitness Tracker' },
+  { name: 'Xiaomi Band', models: ['9 Pro', '9', '8 Pro', '8'], icon: '📱', brand: 'Xiaomi', type: 'Fitness Tracker' },
+  { name: 'Honor Band', models: ['9', '7', '6'], icon: '📱', brand: 'Honor', type: 'Fitness Tracker' },
+  { name: 'Samsung Galaxy Fit', models: ['3', '2'], icon: '📱', brand: 'Samsung', type: 'Fitness Tracker' },
+  // Sports / GPS Watches
+  { name: 'Garmin', models: ['Fenix 8', 'Forerunner 965', 'Venu 3', 'Vivosmart 5', 'Enduro 3', 'Instinct 2X'], icon: '⌚', brand: 'Garmin', type: 'Sports Watch' },
+  { name: 'Polar', models: ['Vantage V3', 'Grit X2 Pro', 'Ignite 3', 'Pacer Pro', 'Unite'], icon: '⌚', brand: 'Polar', type: 'Sports Watch' },
+  { name: 'Suunto', models: ['Race S', 'Race', 'Vertical', '9 Peak Pro', '5 Peak'], icon: '⌚', brand: 'Suunto', type: 'Sports Watch' },
+  { name: 'COROS', models: ['PACE 3', 'VERTIX 2S', 'APEX 2 Pro', 'DURA'], icon: '⌚', brand: 'COROS', type: 'Sports Watch' },
+  // Performance & Recovery
   { name: 'Whoop', models: ['4.0', '3.0'], icon: '📱', brand: 'Whoop', type: 'Performance Tracker' },
-  { name: 'Polar', models: ['Vantage V3', 'Ignite 3', 'Pacer Pro'], icon: '⌚', brand: 'Polar', type: 'Sports Watch' },
+  { name: 'Oura Ring', models: ['Gen 4', 'Gen 3 Horizon', 'Gen 3 Heritage'], icon: '💍', brand: 'Oura', type: 'Sleep Tracker' },
+  { name: 'Ultrahuman Ring', models: ['Air', 'Rare'], icon: '💍', brand: 'Ultrahuman', type: 'Health Ring' },
+  { name: 'Samsung Galaxy Ring', models: ['Galaxy Ring'], icon: '💍', brand: 'Samsung', type: 'Health Ring' },
+  // Medical / Health Monitors
+  { name: 'Withings', models: ['ScanWatch 2', 'ScanWatch Light', 'Steel HR'], icon: '⌚', brand: 'Withings', type: 'Health Monitor' },
+  { name: 'Omron HeartGuide', models: ['HeartGuide'], icon: '⌚', brand: 'Omron', type: 'BP Monitor Watch' },
+  { name: 'Biostrap', models: ['EVO', 'Luna'], icon: '📱', brand: 'Biostrap', type: 'Clinical Wearable' },
+  // Kids Smartwatches
+  { name: 'Xplora', models: ['X6 Play', 'XGO3', 'X5 Play'], icon: '⌚', brand: 'Xplora', type: 'Kids Smartwatch' },
+  { name: 'Gabb Watch', models: ['3', '2'], icon: '⌚', brand: 'Gabb', type: 'Kids Smartwatch' },
+  // Luxury Smartwatches
+  { name: 'TAG Heuer Connected', models: ['Calibre E4 45mm', 'Calibre E4 42mm'], icon: '⌚', brand: 'TAG Heuer', type: 'Luxury Smartwatch' },
+  { name: 'Montblanc Summit', models: ['Summit 3', 'Summit Lite'], icon: '⌚', brand: 'Montblanc', type: 'Luxury Smartwatch' },
 ];
 
 const vitals = [
