@@ -48,6 +48,7 @@ import BloodDonation from "@/pages/BloodDonation";
 import Epigenetics from "@/pages/Epigenetics";
 import HealthWallet from "@/pages/HealthWallet";
 import HearingHealth from "@/pages/HearingHealth";
+import NotificationSettings from "@/pages/NotificationSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
