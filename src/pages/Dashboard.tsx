@@ -23,6 +23,21 @@ const symptomData = [
   { name: 'Fever', count: 1 }, { name: 'Nausea', count: 1 },
 ];
 
+const additionalFeatures = [
+  { icon: Scan, title: 'AI Image Diagnosis', desc: 'Upload medical images for AI analysis', route: '/image-diagnosis', gradient: 'gradient-health' },
+  { icon: Brain, title: 'Mental Health AI', desc: '24/7 emotional support & therapy', route: '/mental-health', gradient: 'gradient-cool' },
+  { icon: Users, title: 'Family Health Hub', desc: 'Manage family health in one place', route: '/family-health', gradient: 'gradient-warm' },
+  { icon: Globe, title: 'Voice Assistant', desc: 'Multilingual health assistant', route: '/voice-assistant', gradient: 'gradient-success' },
+  { icon: Dna, title: 'Genetic Profiling', desc: 'Personalized genetic health insights', route: '/genetic-profiling', gradient: 'gradient-health' },
+  { icon: Watch, title: 'Wearable Integration', desc: 'Connect fitness trackers & smartwatches', route: '/wearables', gradient: 'gradient-cool' },
+  { icon: FlaskConical, title: 'Home Lab Booking', desc: 'Book lab tests from home', route: '/lab-booking', gradient: 'gradient-success' },
+  { icon: Shield, title: 'Blockchain Records', desc: 'Secure tamper-proof health records', route: '/blockchain-records', gradient: 'gradient-danger' },
+  { icon: Plane, title: 'Drone Delivery', desc: 'Emergency medicine via drones', route: '/drone-delivery', gradient: 'gradient-warm' },
+  { icon: Building2, title: 'Hospital Queue', desc: 'Real-time queue tracking & booking', route: '/hospital-queue', gradient: 'gradient-cool' },
+  { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
+  { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
+];
+
 const Dashboard = () => {
   const { profile } = useAuth();
   const { t } = useLanguage();
