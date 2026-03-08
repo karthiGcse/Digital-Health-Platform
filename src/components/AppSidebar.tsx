@@ -2,7 +2,8 @@ import { useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Activity, Pill, AlertTriangle, FileText, Bell, Video, MapPin,
   MessageSquare, BarChart3, FileBarChart, AlertCircle, Rocket, Package, Stethoscope,
-  BookOpen, Users, Settings, LogOut, Heart, ChevronLeft, Scan, Brain, Globe
+  BookOpen, Users, Settings, LogOut, Heart, ChevronLeft, Scan, Brain, Globe,
+  Dna, Watch, FlaskConical, Shield, Plane, Building2, RefreshCw, Globe2
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth, AppRole } from '@/contexts/AuthContext';
@@ -49,6 +50,14 @@ const navByRole: Record<AppRole, NavItem[]> = {
     { title: 'Mental Health', url: '/mental-health', icon: Brain },
     { title: 'Family Health', url: '/family-health', icon: Users },
     { title: 'Voice Assistant', url: '/voice-assistant', icon: Globe },
+    { title: 'Genetic Profiling', url: '/genetic-profiling', icon: Dna },
+    { title: 'Wearable Devices', url: '/wearables', icon: Watch },
+    { title: 'Home Lab Tests', url: '/lab-booking', icon: FlaskConical },
+    { title: 'Blockchain Records', url: '/blockchain-records', icon: Shield },
+    { title: 'Drone Delivery', url: '/drone-delivery', icon: Plane },
+    { title: 'Hospital Queue', url: '/hospital-queue', icon: Building2 },
+    { title: 'Auto Refill', url: '/auto-refill', icon: RefreshCw },
+    { title: 'Global Telemedicine', url: '/global-telemedicine', icon: Globe2 },
     { title: 'Health Analytics', url: '/analytics', icon: BarChart3 },
     { title: 'AI Reports', url: '/reports', icon: FileBarChart },
     { title: 'Emergency', url: '/emergency', icon: AlertCircle },
