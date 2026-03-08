@@ -1,4 +1,4 @@
-import { Bell, Globe, User } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -6,8 +6,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+import NotificationDropdown from '@/components/NotificationDropdown';
 
 interface TopBarProps {
   title: string;
@@ -42,10 +42,7 @@ const TopBar = ({ title }: TopBarProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-4 w-4 text-muted-foreground" />
-          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full gradient-danger text-white text-[10px] flex items-center justify-center font-bold shadow-sm">3</span>
-        </Button>
+        <NotificationDropdown />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
