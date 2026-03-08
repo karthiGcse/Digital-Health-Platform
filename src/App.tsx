@@ -33,6 +33,7 @@ import DroneDelivery from "@/pages/DroneDelivery";
 import HospitalQueue from "@/pages/HospitalQueue";
 import AutoRefill from "@/pages/AutoRefill";
 import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
+import PharmacyInventory from "@/pages/PharmacyInventory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
