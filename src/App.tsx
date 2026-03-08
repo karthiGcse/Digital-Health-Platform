@@ -40,7 +40,6 @@ import PharmacyInventory from "@/pages/PharmacyInventory";
 import Radiology from "@/pages/Radiology";
 import Vaccination from "@/pages/Vaccination";
 import Nutrition from "@/pages/Nutrition";
-import Physiotherapy from "@/pages/Physiotherapy";
 
 import CardiacRisk from "@/pages/CardiacRisk";
 import Insurance from "@/pages/Insurance";
