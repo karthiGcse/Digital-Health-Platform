@@ -4,10 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import {
   ShieldCheck, Scale, FileText, CheckCircle2, TrendingDown, Heart, Users,
   Baby, Stethoscope, AlertCircle, Calculator, Clock, ArrowRight, Star,
-  Zap, Eye, Phone, Upload, IndianRupee, Activity, Shield, Sparkles
+  Zap, Eye, Phone, Upload, IndianRupee, Activity, Shield, Sparkles, X
 } from 'lucide-react';
 
 const plans = [
@@ -36,18 +40,87 @@ const coverageAnalysis = [
 ];
 
 const quickTools = [
-  { title: 'Premium Calculator', desc: 'Estimate your ideal premium', icon: Calculator, color: 'stat-icon-blue' },
-  { title: 'Claim Status Tracker', desc: 'Track existing claims live', icon: Clock, color: 'stat-icon-green' },
-  { title: 'Policy Comparison', desc: 'Side-by-side plan analysis', icon: Scale, color: 'stat-icon-purple' },
-  { title: 'Network Hospitals', desc: 'Find cashless hospitals nearby', icon: Shield, color: 'stat-icon-orange' },
+  { title: 'Premium Calculator', desc: 'Estimate your ideal premium', icon: Calculator, color: 'stat-icon-blue', tab: 'calculator' },
+  { title: 'Claim Status Tracker', desc: 'Track existing claims live', icon: Clock, color: 'stat-icon-green', tab: 'claims' },
+  { title: 'Policy Comparison', desc: 'Side-by-side plan analysis', icon: Scale, color: 'stat-icon-purple', tab: 'plans' },
+  { title: 'Network Hospitals', desc: 'Find cashless hospitals nearby', icon: Shield, color: 'stat-icon-orange', tab: 'hospitals' },
+];
+
+const networkHospitals = [
+  { name: 'Apollo Hospital', location: 'Chennai', beds: 500, cashless: true, distance: '2.3 km' },
+  { name: 'Max Super Speciality', location: 'Delhi', beds: 800, cashless: true, distance: '4.1 km' },
+  { name: 'Fortis Healthcare', location: 'Mumbai', beds: 650, cashless: true, distance: '5.7 km' },
+  { name: 'Manipal Hospital', location: 'Bangalore', beds: 400, cashless: true, distance: '3.8 km' },
+  { name: 'AIIMS', location: 'Delhi', beds: 2500, cashless: false, distance: '8.2 km' },
 ];
 
 const Insurance = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [activeTab, setActiveTab] = useState('plans');
+  const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showHospitals, setShowHospitals] = useState(false);
+  const [calcAge, setCalcAge] = useState(30);
+  const [calcMembers, setCalcMembers] = useState(1);
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   const filteredPlans = selectedCategory === 'all'
     ? plans
     : plans.filter(p => p.category === selectedCategory);
+
+  const estimatedPremium = Math.round((calcAge * 25 + calcMembers * 400 + 300) * (calcAge > 50 ? 1.8 : 1));
+
+  const handleSelectPlan = async (plan: typeof plans[0]) => {
+    setSelectedPlan(plan);
+    toast({
+      title: '✅ Plan Selected',
+      description: `${plan.name} (${plan.premium}) has been added to your shortlist.`,
+    });
+    if (user) {
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: '🛡️ Insurance Plan Selected',
+        message: `You selected "${plan.name}" by ${plan.provider} with coverage ${plan.coverage}.`,
+        type: 'success',
+        link: '/insurance',
+      });
+    }
+  };
+
+  const handleCallProvider = (plan: typeof plans[0]) => {
+    toast({
+      title: '📞 Calling Provider',
+      description: `Connecting you to ${plan.provider} support line...`,
+    });
+  };
+
+  const handleToolClick = (tab: string) => {
+    if (tab === 'calculator') {
+      setShowCalculator(true);
+    } else if (tab === 'hospitals') {
+      setShowHospitals(true);
+    } else {
+      setActiveTab(tab);
+      toast({ title: `Switched to ${tab === 'plans' ? 'Plan Comparison' : 'Claim Tracker'}` });
+    }
+  };
+
+  const handleRecommendation = async (title: string, saving: string) => {
+    toast({
+      title: `💡 ${title}`,
+      description: `Recommendation applied! ${saving}`,
+    });
+    if (user) {
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: `💡 Insurance Recommendation: ${title}`,
+        message: `You applied the recommendation "${title}". ${saving}.`,
+        type: 'info',
+        link: '/insurance',
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -73,7 +146,7 @@ const Insurance = () => {
       {/* Quick Tools */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {quickTools.map((tool, i) => (
-          <Card key={i} className="card-hover cursor-pointer group">
+          <Card key={i} className="card-hover cursor-pointer group" onClick={() => handleToolClick(tool.tab)}>
             <CardContent className="p-4 text-center space-y-2">
               <div className={`${tool.color} mx-auto`}><tool.icon className="h-5 w-5" /></div>
               <p className="font-medium text-sm">{tool.title}</p>
@@ -83,7 +156,7 @@ const Insurance = () => {
         ))}
       </div>
 
-      <Tabs defaultValue="plans" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="w-full md:w-auto">
           <TabsTrigger value="plans">Plan Comparison</TabsTrigger>
           <TabsTrigger value="coverage">Coverage Analysis</TabsTrigger>
@@ -114,42 +187,57 @@ const Insurance = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            {filteredPlans.map((p, i) => (
-              <Card key={i} className={`card-hover ${i === 0 && selectedCategory === 'all' ? 'border-primary ring-1 ring-primary/20' : ''}`}>
-                {i === 0 && selectedCategory === 'all' && (
-                  <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground border-0">
-                    <Sparkles className="h-3 w-3 mr-1" />Best Match
-                  </Badge>
-                )}
-                <CardContent className="p-5 space-y-3 relative">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-heading font-semibold">{p.name}</h4>
-                      <p className="text-xs text-muted-foreground">{p.provider}</p>
+            {filteredPlans.map((p, i) => {
+              const isSelected = selectedPlan?.name === p.name;
+              return (
+                <Card key={i} className={`card-hover ${isSelected ? 'border-success ring-1 ring-success/20' : i === 0 && selectedCategory === 'all' ? 'border-primary ring-1 ring-primary/20' : ''}`}>
+                  {i === 0 && selectedCategory === 'all' && !isSelected && (
+                    <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground border-0">
+                      <Sparkles className="h-3 w-3 mr-1" />Best Match
+                    </Badge>
+                  )}
+                  {isSelected && (
+                    <Badge className="absolute -top-2 left-4 bg-success text-success-foreground border-0">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />Selected
+                    </Badge>
+                  )}
+                  <CardContent className="p-5 space-y-3 relative">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-heading font-semibold">{p.name}</h4>
+                        <p className="text-xs text-muted-foreground">{p.provider}</p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">{p.score}% match</Badge>
                     </div>
-                    <Badge variant="secondary" className="text-xs">{p.score}% match</Badge>
-                  </div>
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-2xl font-heading font-bold">{p.premium}</span>
-                    <span className="text-sm text-muted-foreground">Cover: {p.coverage}</span>
-                  </div>
-                  <Progress value={p.score} className="h-1.5" />
-                  <ul className="space-y-1">
-                    {p.highlights.map((h, j) => (
-                      <li key={j} className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle2 className="h-3 w-3 text-success shrink-0" />{h}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex gap-2">
-                    <Button className="flex-1" variant={i === 0 && selectedCategory === 'all' ? 'default' : 'outline'} size="sm">
-                      Select Plan
-                    </Button>
-                    <Button variant="ghost" size="sm"><Phone className="h-4 w-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-2xl font-heading font-bold">{p.premium}</span>
+                      <span className="text-sm text-muted-foreground">Cover: {p.coverage}</span>
+                    </div>
+                    <Progress value={p.score} className="h-1.5" />
+                    <ul className="space-y-1">
+                      {p.highlights.map((h, j) => (
+                        <li key={j} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                          <CheckCircle2 className="h-3 w-3 text-success shrink-0" />{h}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1"
+                        variant={isSelected ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleSelectPlan(p)}
+                      >
+                        {isSelected ? '✓ Selected' : 'Select Plan'}
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleCallProvider(p)}>
+                        <Phone className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </TabsContent>
 
@@ -208,7 +296,9 @@ const Insurance = () => {
                     <p className="text-xs text-muted-foreground">{rec.desc}</p>
                     <Badge variant="secondary" className="mt-1 text-[10px]">{rec.saving}</Badge>
                   </div>
-                  <Button variant="ghost" size="sm"><ArrowRight className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleRecommendation(rec.title, rec.saving)}>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </CardContent>
@@ -277,6 +367,69 @@ const Insurance = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Premium Calculator Dialog */}
+      <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Calculator className="h-5 w-5 text-primary" />Premium Calculator</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Your Age</label>
+              <input
+                type="range" min={18} max={80} value={calcAge}
+                onChange={e => setCalcAge(Number(e.target.value))}
+                className="w-full mt-1"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>18</span><span className="font-semibold text-foreground">{calcAge} years</span><span>80</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Family Members</label>
+              <input
+                type="range" min={1} max={6} value={calcMembers}
+                onChange={e => setCalcMembers(Number(e.target.value))}
+                className="w-full mt-1"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>1</span><span className="font-semibold text-foreground">{calcMembers} members</span><span>6</span>
+              </div>
+            </div>
+            <div className="p-4 rounded-xl bg-primary/10 text-center space-y-1">
+              <p className="text-xs text-muted-foreground">Estimated Monthly Premium</p>
+              <p className="text-3xl font-heading font-bold text-primary">₹{estimatedPremium.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Coverage: ₹{(estimatedPremium * 80).toLocaleString()} approx.</p>
+            </div>
+            <Button className="w-full" onClick={() => { setShowCalculator(false); setActiveTab('plans'); toast({ title: '📊 Showing matching plans for your profile' }); }}>
+              View Matching Plans
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Network Hospitals Dialog */}
+      <Dialog open={showHospitals} onOpenChange={setShowHospitals}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" />Network Hospitals</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {networkHospitals.map((h, i) => (
+              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
+                <div>
+                  <p className="text-sm font-medium">{h.name}</p>
+                  <p className="text-xs text-muted-foreground">{h.location} • {h.beds} beds • {h.distance}</p>
+                </div>
+                <Badge variant={h.cashless ? 'default' : 'secondary'} className="text-[10px]">
+                  {h.cashless ? 'Cashless' : 'Reimbursement'}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
