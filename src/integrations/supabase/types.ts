@@ -239,6 +239,75 @@ export type Database = {
         }
         Relationships: []
       }
+      pharmacy_inventory: {
+        Row: {
+          alternative_group: string | null
+          batch_number: string | null
+          brand: string | null
+          category: string
+          created_at: string
+          expiry_date: string | null
+          generic_name: string
+          id: string
+          is_prescription_required: boolean | null
+          last_restocked_at: string | null
+          medicine_name: string
+          mrp: number | null
+          price: number | null
+          rack_location: string | null
+          status: string
+          stock_quantity: number
+          strength: string | null
+          supplier: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          alternative_group?: string | null
+          batch_number?: string | null
+          brand?: string | null
+          category?: string
+          created_at?: string
+          expiry_date?: string | null
+          generic_name?: string
+          id?: string
+          is_prescription_required?: boolean | null
+          last_restocked_at?: string | null
+          medicine_name: string
+          mrp?: number | null
+          price?: number | null
+          rack_location?: string | null
+          status?: string
+          stock_quantity?: number
+          strength?: string | null
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          alternative_group?: string | null
+          batch_number?: string | null
+          brand?: string | null
+          category?: string
+          created_at?: string
+          expiry_date?: string | null
+          generic_name?: string
+          id?: string
+          is_prescription_required?: boolean | null
+          last_restocked_at?: string | null
+          medicine_name?: string
+          mrp?: number | null
+          price?: number | null
+          rack_location?: string | null
+          status?: string
+          stock_quantity?: number
+          strength?: string | null
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prescriptions: {
         Row: {
           clinic_name: string | null
