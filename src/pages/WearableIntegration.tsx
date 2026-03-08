@@ -1,16 +1,59 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Watch, Heart, Footprints, Flame, Moon, Droplets, Activity, Wifi, WifiOff, Plus, Bluetooth, BluetoothSearching, Smartphone, Trash2, RefreshCw, Loader2, Check } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Watch, Heart, Footprints, Flame, Moon, Droplets, Activity, Wifi, WifiOff, Plus, Bluetooth, BluetoothSearching, Smartphone, Trash2, RefreshCw, Loader2, Check, Radio, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+
+// Known Bluetooth service UUIDs for wearables
+const BLUETOOTH_SERVICES = {
+  heartRate: 0x180D,
+  battery: 0x180F,
+  deviceInfo: 0x180A,
+  genericAccess: 0x1800,
+  bloodPressure: 0x1810,
+  glucose: 0x1808,
+  healthThermometer: 0x1809,
+  bodyComposition: 0x181B,
+  weight: 0x181D,
+  runningSpeed: 0x1814,
+  cycling: 0x1816,
+};
+
+interface BluetoothFoundDevice {
+  device: BluetoothDevice;
+  name: string;
+  rssi?: number;
+}
+
+function isBluetoothSupported(): boolean {
+  return typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+}
+
+function classifyBluetoothDevice(name: string): { type: string; brand: string; icon: string } {
+  const n = name.toLowerCase();
+  if (n.includes('apple watch') || n.includes('watch')) return { type: 'Smartwatch', brand: 'Detected', icon: '⌚' };
+  if (n.includes('galaxy') || n.includes('samsung')) return { type: 'Smartwatch', brand: 'Samsung', icon: '⌚' };
+  if (n.includes('fitbit')) return { type: 'Fitness Tracker', brand: 'Fitbit', icon: '📱' };
+  if (n.includes('garmin')) return { type: 'Sports Watch', brand: 'Garmin', icon: '⌚' };
+  if (n.includes('mi band') || n.includes('xiaomi')) return { type: 'Fitness Tracker', brand: 'Xiaomi', icon: '📱' };
+  if (n.includes('huawei')) return { type: 'Smartwatch', brand: 'Huawei', icon: '⌚' };
+  if (n.includes('amazfit')) return { type: 'Smartwatch', brand: 'Amazfit', icon: '⌚' };
+  if (n.includes('polar')) return { type: 'Sports Watch', brand: 'Polar', icon: '⌚' };
+  if (n.includes('oura')) return { type: 'Sleep Tracker', brand: 'Oura', icon: '💍' };
+  if (n.includes('whoop')) return { type: 'Performance Tracker', brand: 'Whoop', icon: '📱' };
+  if (n.includes('band') || n.includes('tracker')) return { type: 'Fitness Tracker', brand: 'Detected', icon: '📱' };
+  if (n.includes('ring')) return { type: 'Health Ring', brand: 'Detected', icon: '💍' };
+  return { type: 'Wearable', brand: 'Detected', icon: '⌚' };
+}
 
 const heartRateData = Array.from({ length: 24 }, (_, i) => ({
   time: `${i}:00`,
