@@ -1,4 +1,4 @@
-import { Bell, Globe, User } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -6,8 +6,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+import NotificationDropdown from '@/components/NotificationDropdown';
 
 interface TopBarProps {
   title: string;
