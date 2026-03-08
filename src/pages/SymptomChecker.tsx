@@ -156,7 +156,7 @@ const SymptomChecker = () => {
     setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke('claude-symptom-analysis', {
-        body: { symptoms, age: parseInt(age), gender, duration },
+        body: { symptoms, age: parseInt(age), gender, duration, patientType },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
