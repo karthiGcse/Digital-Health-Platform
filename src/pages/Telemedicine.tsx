@@ -275,6 +275,103 @@ const Telemedicine = () => {
           )}
         </TabsContent>
 
+        {/* ─── Nearby Hospitals & Pharmacies Tab ─── */}
+        <TabsContent value="nearby" className="space-y-4">
+          <Card className="card-hover border-0 shadow-colored">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin className="h-5 w-5 text-primary" />
+                <h3 className="font-heading font-semibold">Find Nearby Hospitals & Pharmacies</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">Locate healthcare facilities near you and connect via audio/video call</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Enter location (city, area, or pin code)" className="pl-10 rounded-xl" value={nearbyLocation} onChange={e => setNearbyLocation(e.target.value)} />
+                </div>
+                <Button variant="outline" size="icon" onClick={detectLocation} title="Detect my location" className="rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30">
+                  <Navigation className="h-4 w-4" />
+                </Button>
+                <Button onClick={searchNearby} disabled={nearbyLoading} className="gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
+                  {nearbyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Sparkles className="h-4 w-4 mr-2" /> Find Nearby</>}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {nearbySearched && !nearbyLoading && nearbyFacilities.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Building2 className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p>No facilities found. Try a different location.</p>
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <AnimatePresence>
+              {nearbyFacilities.map((f, i) => {
+                const gradient = f.type === 'hospital' ? 'gradient-cool' : f.type === 'pharmacy' ? 'gradient-success' : 'gradient-warm';
+                return (
+                  <motion.div key={`${f.name}-${i}`} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                    <Card className="card-hover h-full">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className={`h-11 w-11 rounded-xl flex items-center justify-center text-lg ${gradient} shadow-md`}>
+                            <span className="text-white">{typeIcons[f.type] || '🏢'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {f.emergency_available && <Badge variant="destructive" className="text-[10px] rounded-full">24/7</Badge>}
+                            <Badge variant={f.open_now ? 'default' : 'secondary'} className={`text-xs rounded-full ${f.open_now ? 'bg-success text-success-foreground' : ''}`}>
+                              {f.open_now ? '● Open' : 'Closed'}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <h3 className="font-semibold mb-1">{f.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-2 flex items-start gap-1">
+                          <MapPin className="h-3 w-3 shrink-0 mt-0.5" />{f.address}
+                        </p>
+
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                          <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning fill-warning" />{f.rating}</span>
+                          <span className="flex items-center gap-1"><Navigation className="h-3 w-3" />{f.distance_km} km</span>
+                          {f.hours && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{f.hours}</span>}
+                        </div>
+
+                        {f.specialties && f.specialties.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {f.specialties.slice(0, 3).map(s => <Badge key={s} variant="outline" className="text-[10px] px-1.5 rounded-full">{s}</Badge>)}
+                          </div>
+                        )}
+
+                        <div className="mt-auto space-y-2">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30" onClick={() => startFacilityCall(f, 'video')} disabled={!f.open_now}>
+                              <Video className="h-3.5 w-3.5 mr-1" /> Video Call
+                            </Button>
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-success/10 hover:text-success hover:border-success/30" onClick={() => startFacilityCall(f, 'audio')} disabled={!f.open_now}>
+                              <Phone className="h-3.5 w-3.5 mr-1" /> Audio Call
+                            </Button>
+                          </div>
+                          <div className="flex gap-2">
+                            {f.whatsapp && (
+                              <Button size="sm" className="flex-1 rounded-xl bg-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,40%)] text-white border-0" onClick={() => openWhatsAppCall(f.whatsapp!, f.name, 'video')}>
+                                <MessageCircle className="h-3.5 w-3.5 mr-1" /> WhatsApp
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(f.name + ' ' + f.address)}`)}>
+                              <MapPin className="h-3.5 w-3.5 mr-1" /> Directions
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        </TabsContent>
+
         {/* ─── Pharmacy Tab ─── */}
         <TabsContent value="pharmacy" className="space-y-4">
           <div className="rounded-2xl bg-success/5 border border-success/20 p-4 mb-2">
