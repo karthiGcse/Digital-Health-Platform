@@ -182,7 +182,7 @@ const Dashboard = () => {
             {t('dashboard.subtitle')}
           </motion.p>
 
-          {/* Hero action buttons */}
+          {/* Stats pills - matching Health Hub */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -190,11 +190,39 @@ const Dashboard = () => {
             className="flex flex-wrap gap-3 mt-7"
           >
             {[
+              { value: '87%', label: 'Adherence', icon: Heart, gradient: 'from-emerald-400 to-teal-500' },
+              { value: '5', label: 'Reminders', icon: Bell, gradient: 'from-cyan-400 to-blue-500' },
+              { value: 'Low', label: 'Risk', icon: Shield, gradient: 'from-violet-400 to-purple-500' },
+            ].map((s) => (
+              <motion.div
+                key={s.label}
+                whileHover={{ scale: 1.05, y: -2 }}
+                className="flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl px-4 py-2.5 cursor-default"
+              >
+                <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-lg`}>
+                  <s.icon className="h-3.5 w-3.5 text-white" />
+                </div>
+                <div>
+                  <p className="text-lg font-extrabold text-white leading-none">{s.value}</p>
+                  <p className="text-[8px] text-white/30 uppercase tracking-[0.2em] font-bold mt-0.5">{s.label}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Hero action buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-wrap gap-3 mt-5"
+          >
+            {[
               { label: t('dashboard.symptomCheck'), icon: Activity, url: '/symptoms', gradient: 'from-blue-500 to-cyan-500' },
               { label: t('dashboard.bookDoctor'), icon: Calendar, url: '/telemedicine', gradient: 'from-violet-500 to-purple-500' },
               { label: t('dashboard.viewPrescriptions'), icon: FileText, url: '/prescriptions', gradient: 'from-emerald-500 to-teal-500' },
             ].map((btn, i) => (
-              <motion.div key={btn.url} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 + i * 0.08 }}>
+              <motion.div key={btn.url} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 + i * 0.08 }}>
                 <Button
                   size="sm"
                   className={`bg-gradient-to-r ${btn.gradient} hover:opacity-90 text-white border-0 gap-2 text-xs h-10 rounded-xl shadow-lg hover:shadow-xl`}
