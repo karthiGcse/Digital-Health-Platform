@@ -41,6 +41,87 @@ export type Database = {
         }
         Relationships: []
       }
+      family_members: {
+        Row: {
+          allergies: string | null
+          avatar_color: string | null
+          blood_group: string | null
+          conditions: string | null
+          created_at: string
+          date_of_birth: string | null
+          gender: string | null
+          id: string
+          name: string
+          notes: string | null
+          relationship: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allergies?: string | null
+          avatar_color?: string | null
+          blood_group?: string | null
+          conditions?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          relationship?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allergies?: string | null
+          avatar_color?: string | null
+          blood_group?: string | null
+          conditions?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          relationship?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      image_diagnoses: {
+        Row: {
+          condition_type: string | null
+          confidence: string | null
+          created_at: string
+          diagnosis: string | null
+          id: string
+          image_url: string | null
+          recommendations: Json | null
+          user_id: string
+        }
+        Insert: {
+          condition_type?: string | null
+          confidence?: string | null
+          created_at?: string
+          diagnosis?: string | null
+          id?: string
+          image_url?: string | null
+          recommendations?: Json | null
+          user_id: string
+        }
+        Update: {
+          condition_type?: string | null
+          confidence?: string | null
+          created_at?: string
+          diagnosis?: string | null
+          id?: string
+          image_url?: string | null
+          recommendations?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       medicine_votes: {
         Row: {
           created_at: string
@@ -110,6 +191,39 @@ export type Database = {
           side_effects?: string | null
           storage?: string | null
           strength?: string | null
+        }
+        Relationships: []
+      }
+      mood_logs: {
+        Row: {
+          activities: string | null
+          created_at: string
+          id: string
+          mood: string
+          mood_score: number
+          notes: string | null
+          triggers: string | null
+          user_id: string
+        }
+        Insert: {
+          activities?: string | null
+          created_at?: string
+          id?: string
+          mood: string
+          mood_score?: number
+          notes?: string | null
+          triggers?: string | null
+          user_id: string
+        }
+        Update: {
+          activities?: string | null
+          created_at?: string
+          id?: string
+          mood?: string
+          mood_score?: number
+          notes?: string | null
+          triggers?: string | null
+          user_id?: string
         }
         Relationships: []
       }
