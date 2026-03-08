@@ -29,7 +29,7 @@ const BLUETOOTH_SERVICES = {
 };
 
 interface BluetoothFoundDevice {
-  device: BluetoothDevice;
+  device: any; // Web Bluetooth API device
   name: string;
   rssi?: number;
 }
