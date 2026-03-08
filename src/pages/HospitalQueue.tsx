@@ -118,8 +118,8 @@ const HospitalQueue = () => {
         department: bookingDept.name,
         appointment_date: format(selectedDate, 'yyyy-MM-dd'),
         appointment_time: selectedTime,
-        queue_position: queueData.queue + 1,
-        estimated_wait: queueData.wait,
+        queue_position: Math.max(1, Math.round(queueData.queue + 1)),
+        estimated_wait: Math.max(0, Math.round(queueData.wait)),
         status: 'confirmed',
         notes,
       });
