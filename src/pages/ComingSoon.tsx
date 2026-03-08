@@ -62,8 +62,6 @@ const categories = [
     features: [
       { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans', route: '/nutrition', from: '#10B981', to: '#34D399' },
       
-      { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', from: '#14B8A6', to: '#10B981' },
-      { icon: Syringe, title: 'Vaccination', desc: 'Smart vaccine scheduler', route: '/vaccination', from: '#F59E0B', to: '#F97316' },
       { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient match', route: '/blood-donation', from: '#EF4444', to: '#EC4899' },
       { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart risk assessment', route: '/cardiac-risk', from: '#DC2626', to: '#EF4444' },
     ],
