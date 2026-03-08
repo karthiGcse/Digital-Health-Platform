@@ -116,7 +116,15 @@ const ComingSoon = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="min-h-screen -m-4 md:-m-6 p-4 md:p-6 relative">
+      {/* Page background */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.15),transparent_50%)]" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_right,rgba(236,72,153,0.12),transparent_50%)]" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_left,rgba(16,185,129,0.08),transparent_40%)]" />
+      <div className="fixed inset-0 -z-10 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+
+      <div className="space-y-10 pb-10">
       {/* Stunning Hero */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
