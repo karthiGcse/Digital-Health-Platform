@@ -48,6 +48,7 @@ import BloodDonation from "@/pages/BloodDonation";
 import Epigenetics from "@/pages/Epigenetics";
 import HealthWallet from "@/pages/HealthWallet";
 import HearingHealth from "@/pages/HearingHealth";
+import NotificationSettings from "@/pages/NotificationSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
@@ -103,6 +104,7 @@ const App = () => (
               <Route path="/epigenetics" element={<Epigenetics />} />
               <Route path="/health-wallet" element={<HealthWallet />} />
               <Route path="/hearing-health" element={<HearingHealth />} />
+              <Route path="/notification-settings" element={<NotificationSettings />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
