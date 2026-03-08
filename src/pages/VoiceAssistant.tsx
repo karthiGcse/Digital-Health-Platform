@@ -1,11 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mic, MicOff, Send, Globe, Loader2, Volume2, MessageSquare } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Mic, MicOff, Send, Globe, Loader2, Volume2, VolumeX, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -45,13 +47,42 @@ const VoiceAssistant = () => {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [autoRead, setAutoRead] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  const getLangCode = useCallback((lang: string) => {
+    const map: Record<string, string> = {
+      en: 'en-US', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', bn: 'bn-IN',
+      mr: 'mr-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN',
+      ur: 'ur-PK', es: 'es-ES', fr: 'fr-FR', ar: 'ar-SA',
+    };
+    return map[lang] || 'en-US';
+  }, []);
+
+  const speakText = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[#*_`~>\-|]/g, '').replace(/\[.*?\]\(.*?\)/g, '');
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = getLangCode(language);
+    utterance.rate = 0.95;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }, [language, getLangCode]);
+
+  const stopSpeaking = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
 
   const sendMessage = async (text?: string) => {
     const msg = text || input.trim();
     if (!msg) return;
     setInput('');
+    stopSpeaking();
     const userMsg: Message = { role: 'user', content: msg };
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
@@ -65,6 +96,9 @@ const VoiceAssistant = () => {
       const assistantMsg: Message = { role: 'assistant', content: data.response };
       setMessages(prev => [...prev, assistantMsg]);
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+      if (autoRead && data.response) {
+        speakText(data.response);
+      }
     } catch (e: any) {
       toast.error(e.message || 'Failed to get response');
     } finally {
@@ -81,7 +115,7 @@ const VoiceAssistant = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) { toast.error('Speech recognition not supported in this browser'); return; }
     const recognition = new SpeechRecognition();
-    recognition.lang = language === 'en' ? 'en-US' : `${language}-IN`;
+    recognition.lang = getLangCode(language);
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onresult = (event: any) => {
@@ -96,16 +130,6 @@ const VoiceAssistant = () => {
     setIsListening(true);
   };
 
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language === 'en' ? 'en-US' : `${language}-IN`;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-    }
-  };
 
   const phrases = quickPhrases[language] || quickPhrases.en;
 
@@ -140,6 +164,19 @@ const VoiceAssistant = () => {
         <Badge variant="secondary" className="self-start gap-1.5 px-3 py-1.5">
           <Globe className="h-3 w-3" /> {languages.find(l => l.code === language)?.name}
         </Badge>
+        <div className="flex items-center gap-2 ml-auto">
+          {isSpeaking && (
+            <Button variant="outline" size="sm" onClick={stopSpeaking} className="gap-1.5 text-xs">
+              <VolumeX className="h-3.5 w-3.5" /> Stop
+            </Button>
+          )}
+          <div className="flex items-center gap-2">
+            <Switch id="auto-read" checked={autoRead} onCheckedChange={setAutoRead} />
+            <Label htmlFor="auto-read" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+              <Volume2 className="h-3.5 w-3.5" /> Auto-read
+            </Label>
+          </div>
+        </div>
       </div>
 
       {/* Quick Phrases */}
