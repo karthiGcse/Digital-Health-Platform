@@ -7,12 +7,13 @@ import {
   Activity, Pill, Calendar, AlertTriangle, MessageSquare, AlertCircle,
   TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
   Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
-  Shield, Plane, Building2, RefreshCw, Globe2, Users, Syringe, Apple,
-  Dumbbell, HeartPulse, ShieldCheck, CircleDot, Move3D, Ear,
-  Wallet, Stethoscope
+  Shield, Plane, Building2, RefreshCw, Globe2, Users, Apple,
+  Dumbbell, HeartPulse, ShieldCheck, CircleDot, Ear,
+  Wallet, Stethoscope, ArrowRight, ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { motion } from 'framer-motion';
 
 const adherenceData = [
   { day: 'Mon', adherence: 85 }, { day: 'Tue', adherence: 90 }, { day: 'Wed', adherence: 78 },
@@ -26,30 +27,27 @@ const symptomData = [
 ];
 
 const additionalFeatures = [
-  { icon: Scan, title: 'AI Image Diagnosis', desc: 'Upload medical images for AI analysis', route: '/image-diagnosis', gradient: 'gradient-health' },
-  { icon: Brain, title: 'Mental Health AI', desc: '24/7 emotional support & therapy', route: '/mental-health', gradient: 'gradient-cool' },
-  { icon: Users, title: 'Family Health Hub', desc: 'Manage family health in one place', route: '/family-health', gradient: 'gradient-warm' },
-  { icon: Globe, title: 'Voice Assistant', desc: 'Multilingual health assistant', route: '/voice-assistant', gradient: 'gradient-success' },
-  { icon: Dna, title: 'Genetic Profiling', desc: 'Personalized genetic health insights', route: '/genetic-profiling', gradient: 'gradient-health' },
-  { icon: Watch, title: 'Wearable Integration', desc: 'Connect fitness trackers & smartwatches', route: '/wearables', gradient: 'gradient-cool' },
-  { icon: FlaskConical, title: 'Home Lab Booking', desc: 'Book lab tests from home', route: '/lab-booking', gradient: 'gradient-success' },
-  { icon: Shield, title: 'Blockchain Records', desc: 'Secure tamper-proof health records', route: '/blockchain-records', gradient: 'gradient-danger' },
-  { icon: Plane, title: 'Drone Delivery', desc: 'Emergency medicine via drones', route: '/drone-delivery', gradient: 'gradient-warm' },
-  { icon: Building2, title: 'Hospital Queue', desc: 'Real-time queue tracking & booking', route: '/hospital-queue', gradient: 'gradient-cool' },
-  { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
-  { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
-  { icon: Stethoscope, title: 'AI Radiology', desc: 'CT scan, MRI & ultrasound AI analysis', route: '/radiology', gradient: 'gradient-cool' },
-  
-  { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
-  { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
-  
-  { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
-  { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance', gradient: 'gradient-health' },
-  { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation', gradient: 'gradient-danger' },
-  
-  { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics', gradient: 'gradient-health' },
-  { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet', gradient: 'gradient-health' },
-  { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health', gradient: 'gradient-warm' },
+  { icon: Scan, title: 'AI Image Diagnosis', desc: 'Upload medical images for AI analysis', route: '/image-diagnosis' },
+  { icon: Brain, title: 'Mental Health AI', desc: '24/7 emotional support & therapy', route: '/mental-health' },
+  { icon: Users, title: 'Family Health Hub', desc: 'Manage family health in one place', route: '/family-health' },
+  { icon: Globe, title: 'Voice Assistant', desc: 'Multilingual health assistant', route: '/voice-assistant' },
+  { icon: Dna, title: 'Genetic Profiling', desc: 'Personalized genetic health insights', route: '/genetic-profiling' },
+  { icon: Watch, title: 'Wearable Integration', desc: 'Connect fitness trackers & smartwatches', route: '/wearables' },
+  { icon: FlaskConical, title: 'Home Lab Booking', desc: 'Book lab tests from home', route: '/lab-booking' },
+  { icon: Shield, title: 'Blockchain Records', desc: 'Secure tamper-proof health records', route: '/blockchain-records' },
+  { icon: Plane, title: 'Drone Delivery', desc: 'Emergency medicine via drones', route: '/drone-delivery' },
+  { icon: Building2, title: 'Hospital Queue', desc: 'Real-time queue tracking & booking', route: '/hospital-queue' },
+  { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill' },
+  { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine' },
+  { icon: Stethoscope, title: 'AI Radiology', desc: 'CT scan, MRI & ultrasound AI analysis', route: '/radiology' },
+  { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition' },
+  { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy' },
+  { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk' },
+  { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance' },
+  { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation' },
+  { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics' },
+  { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet' },
+  { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health' },
 ];
 
 const Dashboard = () => {
@@ -59,86 +57,103 @@ const Dashboard = () => {
   const riskScore = 32;
 
   const recentActivity = [
-    { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, iconClass: 'stat-icon-green' },
-    { icon: Activity, text: t('activity.symptomCheck'), time: `5 ${t('time.hoursAgo')}`, iconClass: 'stat-icon-blue' },
-    { icon: FileText, text: t('activity.prescriptionUpload'), time: `1 ${t('time.dayAgo')}`, iconClass: 'stat-icon-purple' },
-    { icon: MessageSquare, text: t('activity.aiSession'), time: `2 ${t('time.daysAgo')}`, iconClass: 'stat-icon-orange' },
+    { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, color: 'text-emerald-500 bg-emerald-500/10' },
+    { icon: Activity, text: t('activity.symptomCheck'), time: `5 ${t('time.hoursAgo')}`, color: 'text-blue-500 bg-blue-500/10' },
+    { icon: FileText, text: t('activity.prescriptionUpload'), time: `1 ${t('time.dayAgo')}`, color: 'text-violet-500 bg-violet-500/10' },
+    { icon: MessageSquare, text: t('activity.aiSession'), time: `2 ${t('time.daysAgo')}`, color: 'text-amber-500 bg-amber-500/10' },
   ];
 
   const quickActions = [
-    { title: t('actions.symptomChecker'), icon: Activity, url: '/symptoms', gradient: 'gradient-cool' },
-    { title: t('actions.medicineLookup'), icon: Pill, url: '/medicines', gradient: 'gradient-success' },
-    { title: t('actions.bookAppointment'), icon: Calendar, url: '/telemedicine', gradient: 'gradient-health' },
-    { title: t('actions.drugInteractions'), icon: AlertTriangle, url: '/interactions', gradient: 'gradient-warm' },
-    { title: t('actions.aiConsultation'), icon: MessageSquare, url: '/consultation', gradient: 'gradient-health' },
-    { title: t('actions.emergency'), icon: AlertCircle, url: '/emergency', gradient: 'gradient-danger' },
+    { title: t('actions.symptomChecker'), icon: Activity, url: '/symptoms', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10' },
+    { title: t('actions.medicineLookup'), icon: Pill, url: '/medicines', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
+    { title: t('actions.bookAppointment'), icon: Calendar, url: '/telemedicine', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10' },
+    { title: t('actions.drugInteractions'), icon: AlertTriangle, url: '/interactions', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10' },
+    { title: t('actions.aiConsultation'), icon: MessageSquare, url: '/consultation', color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-500/10' },
+    { title: t('actions.emergency'), icon: AlertCircle, url: '/emergency', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10' },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Hero Banner */}
-      <div className="page-header gradient-health animate-gradient p-6 md:p-8">
+      {/* Hero Banner — clean, minimal */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/90 via-primary to-accent/80 p-6 md:p-8"
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/4" />
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="h-5 w-5 text-white/80" />
-            <span className="text-white/70 text-xs font-medium uppercase tracking-wider">{t('dashboard.title')}</span>
-          </div>
-          <h2 className="text-2xl md:text-3xl font-heading font-bold text-white">
+          <p className="text-primary-foreground/60 text-xs font-semibold uppercase tracking-widest mb-1">
+            {t('dashboard.title')}
+          </p>
+          <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary-foreground">
             {t('dashboard.welcome')}, {profile?.name || 'User'} 👋
           </h2>
-          <p className="mt-1 text-white/75 text-sm md:text-base">{t('dashboard.subtitle')}</p>
-          <div className="flex flex-wrap gap-2 mt-4">
-            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/symptoms')}>
-              <Activity className="h-3.5 w-3.5 mr-1" /> {t('dashboard.symptomCheck')}
-            </Button>
-            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/telemedicine')}>
-              <Calendar className="h-3.5 w-3.5 mr-1" /> {t('dashboard.bookDoctor')}
-            </Button>
-            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/20 backdrop-blur-sm" onClick={() => navigate('/prescriptions')}>
-              <FileText className="h-3.5 w-3.5 mr-1" /> {t('dashboard.viewPrescriptions')}
-            </Button>
+          <p className="mt-1.5 text-primary-foreground/65 text-sm max-w-lg">{t('dashboard.subtitle')}</p>
+          <div className="flex flex-wrap gap-2 mt-5">
+            {[
+              { label: t('dashboard.symptomCheck'), icon: Activity, url: '/symptoms' },
+              { label: t('dashboard.bookDoctor'), icon: Calendar, url: '/telemedicine' },
+              { label: t('dashboard.viewPrescriptions'), icon: FileText, url: '/prescriptions' },
+            ].map((btn) => (
+              <Button
+                key={btn.url}
+                size="sm"
+                variant="secondary"
+                className="bg-white/15 hover:bg-white/25 text-primary-foreground border-0 backdrop-blur-sm gap-1.5 text-xs"
+                onClick={() => navigate(btn.url)}
+              >
+                <btn.icon className="h-3.5 w-3.5" /> {btn.label}
+              </Button>
+            ))}
           </div>
         </div>
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 right-20 w-40 h-40 bg-white/5 rounded-full translate-y-1/2" />
-        <div className="absolute top-1/2 left-1/3 w-20 h-20 bg-white/5 rounded-full" />
-      </div>
+      </motion.div>
 
-      {/* Stat Cards */}
+      {/* Stat Cards — clean with subtle left accent */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: t('dashboard.adherenceRate'), value: '87%', icon: Heart, trend: '+3%', up: true, iconClass: 'stat-icon-green' },
-          { label: t('dashboard.activeReminders'), value: '5', icon: Bell, trend: `2 ${t('dashboard.today')}`, up: true, iconClass: 'stat-icon-blue' },
-          { label: t('dashboard.riskScore'), value: riskScore.toString(), icon: Activity, trend: '-5', up: false, iconClass: riskScore < 40 ? 'stat-icon-green' : 'stat-icon-orange' },
-          { label: t('dashboard.prescriptions'), value: '3', icon: FileText, trend: `1 ${t('dashboard.active')}`, up: true, iconClass: 'stat-icon-purple' },
-        ].map((stat) => (
-          <Card key={stat.label} className="card-hover">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className={stat.iconClass}>
-                  <stat.icon className="h-5 w-5" />
+          { label: t('dashboard.adherenceRate'), value: '87%', icon: Heart, trend: '+3%', up: true, accent: 'border-l-emerald-500' },
+          { label: t('dashboard.activeReminders'), value: '5', icon: Bell, trend: `2 ${t('dashboard.today')}`, up: true, accent: 'border-l-blue-500' },
+          { label: t('dashboard.riskScore'), value: riskScore.toString(), icon: Activity, trend: '-5', up: false, accent: riskScore < 40 ? 'border-l-emerald-500' : 'border-l-amber-500' },
+          { label: t('dashboard.prescriptions'), value: '3', icon: FileText, trend: `1 ${t('dashboard.active')}`, up: true, accent: 'border-l-violet-500' },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08, duration: 0.4 }}
+          >
+            <Card className={`border-l-[3px] ${stat.accent} hover:shadow-md transition-shadow duration-300`}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  <span className={`flex items-center gap-0.5 text-[11px] font-semibold ${stat.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                    {stat.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {stat.trend}
+                  </span>
                 </div>
-                <div className={`flex items-center gap-0.5 text-xs font-semibold ${stat.up ? 'text-success' : 'text-warning'}`}>
-                  {stat.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {stat.trend}
-                </div>
-              </div>
-              <p className="text-2xl font-heading font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-            </CardContent>
-          </Card>
+                <p className="text-2xl font-heading font-bold text-foreground">{stat.value}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{stat.label}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Adherence Chart */}
-        <Card className="lg:col-span-2 card-hover">
+        <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="stat-icon-blue h-8 w-8">
-                <TrendingUp className="h-4 w-4" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
+                <CardTitle className="text-sm font-semibold">{t('dashboard.medicationAdherence')}</CardTitle>
               </div>
-              <CardTitle className="text-base">{t('dashboard.medicationAdherence')}</CardTitle>
+              <Badge variant="secondary" className="text-[10px]">This Week</Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -146,96 +161,105 @@ const Dashboard = () => {
               <AreaChart data={adherenceData}>
                 <defs>
                   <linearGradient id="adherenceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(217, 91%, 53%)" stopOpacity={0.4} />
-                    <stop offset="50%" stopColor="hsl(271, 81%, 56%)" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="hsl(271, 81%, 56%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} fontSize={12} />
-                <YAxis domain={[0, 100]} axisLine={false} tickLine={false} fontSize={12} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }} />
-                <Area type="monotone" dataKey="adherence" stroke="hsl(217, 91%, 53%)" fill="url(#adherenceGradient)" strokeWidth={2.5} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} fontSize={11} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                <YAxis domain={[0, 100]} axisLine={false} tickLine={false} fontSize={11} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: '10px',
+                    border: '1px solid hsl(var(--border))',
+                    background: 'hsl(var(--card))',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    fontSize: '12px',
+                  }}
+                />
+                <Area type="monotone" dataKey="adherence" stroke="hsl(var(--primary))" fill="url(#adherenceGradient)" strokeWidth={2} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Risk Score */}
-        <Card className="card-hover">
+        {/* Risk Score — clean ring */}
+        <Card>
           <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="stat-icon-green h-8 w-8">
-                <Heart className="h-4 w-4" />
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Heart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <CardTitle className="text-base">{t('dashboard.healthRiskScore')}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t('dashboard.healthRiskScore')}</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center">
+          <CardContent className="flex flex-col items-center justify-center pt-2">
             <div className="relative h-32 w-32">
               <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#riskGradient)" strokeWidth="8"
-                  strokeDasharray={`${(riskScore / 100) * 251.3} 251.3`} strokeLinecap="round" />
-                <defs>
-                  <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="hsl(152, 76%, 42%)" />
-                    <stop offset="100%" stopColor="hsl(170, 70%, 45%)" />
-                  </linearGradient>
-                </defs>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
+                <circle
+                  cx="50" cy="50" r="40" fill="none"
+                  stroke="hsl(var(--success))"
+                  strokeWidth="6"
+                  strokeDasharray={`${(riskScore / 100) * 251.3} 251.3`}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000"
+                />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-heading font-bold">{riskScore}</span>
-                <span className="text-xs text-muted-foreground">{t('dashboard.lowRisk')}</span>
+                <span className="text-3xl font-heading font-bold text-foreground">{riskScore}</span>
+                <span className="text-[10px] text-muted-foreground font-medium">{t('dashboard.lowRisk')}</span>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-success font-medium">
-              <TrendingDown className="h-3.5 w-3.5" /> {t('dashboard.improvedBy')}
+            <div className="flex items-center gap-1 mt-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <TrendingDown className="h-3 w-3" /> {t('dashboard.improvedBy')}
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Quick Actions */}
-        <Card className="card-hover">
+        {/* Quick Actions — clean icon buttons */}
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">{t('dashboard.quickActions')}</CardTitle>
+            <CardTitle className="text-sm font-semibold">{t('dashboard.quickActions')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               {quickActions.map((action) => (
                 <button
                   key={action.title}
-                  className={`${action.gradient} h-auto flex flex-col items-center gap-2 p-4 rounded-xl text-white hover:opacity-90 transition-all hover:scale-[1.02] shadow-md`}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl ${action.bg} hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left group`}
                   onClick={() => navigate(action.url)}
                 >
-                  <action.icon className="h-5 w-5" />
-                  <span className="text-xs font-semibold">{action.title}</span>
+                  <div className={`h-9 w-9 rounded-lg ${action.bg} flex items-center justify-center shrink-0`}>
+                    <action.icon className={`h-4 w-4 ${action.color}`} />
+                  </div>
+                  <span className={`text-xs font-semibold ${action.color}`}>{action.title}</span>
                 </button>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
-        <Card className="card-hover">
+        {/* Recent Activity — clean timeline */}
+        <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">{t('dashboard.recentActivity')}</CardTitle>
-              <Button variant="link" size="sm" className="text-xs text-primary">{t('dashboard.viewAll')}</Button>
+              <CardTitle className="text-sm font-semibold">{t('dashboard.recentActivity')}</CardTitle>
+              <Button variant="ghost" size="sm" className="text-[11px] text-muted-foreground h-7 px-2">{t('dashboard.viewAll')}</Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {recentActivity.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className={`${item.iconClass} h-9 w-9 shrink-0`}>
-                    <item.icon className="h-4 w-4" />
+                <div key={i} className="flex items-center gap-3">
+                  <div className={`h-8 w-8 rounded-lg ${item.color} flex items-center justify-center shrink-0`}>
+                    <item.icon className="h-3.5 w-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.text}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {item.time}
+                    <p className="text-sm font-medium text-foreground truncate">{item.text}</p>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-2.5 w-2.5" /> {item.time}
                     </p>
                   </div>
                 </div>
@@ -245,70 +269,75 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Symptom Frequency */}
-      <Card className="card-hover">
+      {/* Symptom Frequency — refined */}
+      <Card>
         <CardHeader className="pb-2">
-          <div className="flex items-center gap-2">
-            <div className="stat-icon-orange h-8 w-8">
-              <Activity className="h-4 w-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Activity className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
-            <CardTitle className="text-base">{t('dashboard.symptomFrequency')}</CardTitle>
+            <CardTitle className="text-sm font-semibold">{t('dashboard.symptomFrequency')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={symptomData} layout="vertical">
-              <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="hsl(217, 91%, 53%)" />
-                  <stop offset="100%" stopColor="hsl(271, 81%, 56%)" />
-                </linearGradient>
-              </defs>
-              <XAxis type="number" axisLine={false} tickLine={false} fontSize={12} />
-              <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} fontSize={12} width={80} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)' }} />
-              <Bar dataKey="count" fill="url(#barGradient)" radius={[0, 8, 8, 0]} barSize={18} />
+              <XAxis type="number" axisLine={false} tickLine={false} fontSize={11} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+              <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} fontSize={11} width={80} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '10px',
+                  border: '1px solid hsl(var(--border))',
+                  background: 'hsl(var(--card))',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                  fontSize: '12px',
+                }}
+              />
+              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 6, 6, 0]} barSize={16} opacity={0.85} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Explore All Features CTA */}
-      <Card
-        className="card-hover cursor-pointer group overflow-hidden relative"
-        onClick={() => navigate('/coming-soon')}
+      {/* Explore All Features — refined CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
       >
-        <div className="absolute inset-0 gradient-health opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500" />
-        <CardContent className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Icon Grid Preview */}
-            <div className="grid grid-cols-5 gap-2 shrink-0">
-              {additionalFeatures.slice(0, 10).map((feature) => (
-                <div
-                  key={feature.route}
-                  className={`${feature.gradient} h-10 w-10 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300`}
-                >
-                  <feature.icon className="h-4 w-4 text-white" />
-                </div>
-              ))}
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-                <div className="stat-icon-purple h-8 w-8">
-                  <Rocket className="h-4 w-4" />
-                </div>
-                <CardTitle className="text-base">Explore All {additionalFeatures.length} Features</CardTitle>
+        <Card
+          className="cursor-pointer group overflow-hidden border-dashed hover:border-primary/30 transition-colors duration-300"
+          onClick={() => navigate('/coming-soon')}
+        >
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              {/* Compact icon grid */}
+              <div className="grid grid-cols-5 gap-1.5 shrink-0">
+                {additionalFeatures.slice(0, 10).map((feature) => (
+                  <div
+                    key={feature.route}
+                    className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-300"
+                  >
+                    <feature.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                  </div>
+                ))}
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                View the complete S47 Health ecosystem — AI diagnostics, telehealth, wellness, genomics & more organized in one unified dashboard.
-              </p>
-              <div className="flex items-center justify-center md:justify-start gap-1 mt-3 text-primary text-sm font-semibold group-hover:gap-2 transition-all">
-                Open Unified Dashboard <ExternalLink className="h-3.5 w-3.5" />
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                  <Rocket className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-bold text-foreground">Explore All {additionalFeatures.length} Features</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 max-w-md">
+                  View the complete S47 Health ecosystem — AI diagnostics, telehealth, wellness, genomics & more.
+                </p>
+                <div className="flex items-center justify-center md:justify-start gap-1 mt-3 text-primary text-xs font-semibold group-hover:gap-2 transition-all">
+                  Open Unified Dashboard <ArrowRight className="h-3 w-3" />
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
