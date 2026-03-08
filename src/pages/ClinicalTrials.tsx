@@ -610,11 +610,55 @@ const ClinicalTrials = () => {
                   <Badge variant="secondary">{selectedTrial.phase}</Badge>
                   <Badge variant={selectedTrial.status === 'Recruiting' ? 'default' : 'secondary'}>{selectedTrial.status}</Badge>
                   <Badge className={selectedTrial.match >= 90 ? 'bg-success/10 text-success' : selectedTrial.match >= 80 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}>{selectedTrial.match}% Match</Badge>
+                  {(() => {
+                    const openStatus = isOpenNow(selectedTrial.openingHours);
+                    return (
+                      <Badge className={openStatus.isOpen ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}>
+                        {openStatus.isOpen ? 'Open Now' : 'Closed'} · {openStatus.nextChange}
+                      </Badge>
+                    );
+                  })()}
                 </div>
 
                 <div>
                   <h4 className="font-semibold text-sm mb-2">Description</h4>
                   <p className="text-sm text-muted-foreground">{selectedTrial.description}</p>
+                </div>
+
+                {/* Location & Map Section */}
+                <div className="p-4 rounded-xl bg-muted/30 border space-y-3">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" /> Location & Directions
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedTrial.address}</p>
+                  <p className="text-xs text-muted-foreground">Distance: <span className="font-medium text-foreground">{selectedTrial.distance}</span></p>
+                  {selectedTrial.lat !== 0 && (
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => openInMaps(selectedTrial)} className="gap-2">
+                        <MapIcon className="h-4 w-4" /> View on Map
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => getDirections(selectedTrial)} className="gap-2">
+                        <Navigation className="h-4 w-4" /> Get Directions
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Opening Hours */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" /> Opening Hours
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedTrial.openingHours.map((h, idx) => (
+                      <div key={idx} className="flex justify-between text-sm py-1 px-2 rounded bg-muted/30">
+                        <span className="font-medium">{h.day}</span>
+                        <span className="text-muted-foreground">
+                          {h.open === 'Closed' ? 'Closed' : h.open === '00:00' && h.close === '23:59' ? '24 Hours' : `${h.open} - ${h.close}`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -632,15 +676,31 @@ const ClinicalTrials = () => {
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-2 text-sm font-medium mb-1">
-                      <MapPin className="h-4 w-4 text-primary" /> Location
-                    </div>
-                    <p className="text-sm text-muted-foreground">{selectedTrial.location}</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-2 text-sm font-medium mb-1">
                       <Star className="h-4 w-4 text-primary" /> Compensation
                     </div>
                     <p className="text-sm text-muted-foreground">{selectedTrial.compensation}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-1">
+                      <Calendar className="h-4 w-4 text-primary" /> Trial Period
+                    </div>
+                    <p className="text-sm text-muted-foreground">{selectedTrial.startDate} to {selectedTrial.endDate}</p>
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Contact Information</h4>
+                  <div className="space-y-2">
+                    <a href={`tel:${selectedTrial.contactPhone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Phone className="h-4 w-4 text-primary" /> {selectedTrial.contactPhone}
+                    </a>
+                    <a href={`mailto:${selectedTrial.contactEmail}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Mail className="h-4 w-4 text-primary" /> {selectedTrial.contactEmail}
+                    </a>
+                    <a href={selectedTrial.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <Globe className="h-4 w-4 text-primary" /> {selectedTrial.website}
+                    </a>
                   </div>
                 </div>
 
