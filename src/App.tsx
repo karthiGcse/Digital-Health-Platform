@@ -41,7 +41,7 @@ import Radiology from "@/pages/Radiology";
 import Vaccination from "@/pages/Vaccination";
 import Nutrition from "@/pages/Nutrition";
 import Physiotherapy from "@/pages/Physiotherapy";
-import ClinicalTrials from "@/pages/ClinicalTrials";
+
 import Pathology from "@/pages/Pathology";
 import CardiacRisk from "@/pages/CardiacRisk";
 import MaternalHealth from "@/pages/MaternalHealth";
@@ -113,7 +113,7 @@ const App = () => (
               <Route path="/vaccination" element={<Vaccination />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/physiotherapy" element={<Physiotherapy />} />
-              <Route path="/clinical-trials" element={<ClinicalTrials />} />
+              
               <Route path="/pathology" element={<Pathology />} />
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
               <Route path="/maternal-health" element={<MaternalHealth />} />
