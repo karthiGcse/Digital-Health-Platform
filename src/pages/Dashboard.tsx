@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Activity, Pill, Calendar, AlertTriangle, MessageSquare, AlertCircle,
-  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles
+  TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
+  Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
+  Shield, Plane, Building2, RefreshCw, Globe2, Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -19,6 +21,21 @@ const adherenceData = [
 const symptomData = [
   { name: 'Headache', count: 5 }, { name: 'Fatigue', count: 3 }, { name: 'Cough', count: 2 },
   { name: 'Fever', count: 1 }, { name: 'Nausea', count: 1 },
+];
+
+const additionalFeatures = [
+  { icon: Scan, title: 'AI Image Diagnosis', desc: 'Upload medical images for AI analysis', route: '/image-diagnosis', gradient: 'gradient-health' },
+  { icon: Brain, title: 'Mental Health AI', desc: '24/7 emotional support & therapy', route: '/mental-health', gradient: 'gradient-cool' },
+  { icon: Users, title: 'Family Health Hub', desc: 'Manage family health in one place', route: '/family-health', gradient: 'gradient-warm' },
+  { icon: Globe, title: 'Voice Assistant', desc: 'Multilingual health assistant', route: '/voice-assistant', gradient: 'gradient-success' },
+  { icon: Dna, title: 'Genetic Profiling', desc: 'Personalized genetic health insights', route: '/genetic-profiling', gradient: 'gradient-health' },
+  { icon: Watch, title: 'Wearable Integration', desc: 'Connect fitness trackers & smartwatches', route: '/wearables', gradient: 'gradient-cool' },
+  { icon: FlaskConical, title: 'Home Lab Booking', desc: 'Book lab tests from home', route: '/lab-booking', gradient: 'gradient-success' },
+  { icon: Shield, title: 'Blockchain Records', desc: 'Secure tamper-proof health records', route: '/blockchain-records', gradient: 'gradient-danger' },
+  { icon: Plane, title: 'Drone Delivery', desc: 'Emergency medicine via drones', route: '/drone-delivery', gradient: 'gradient-warm' },
+  { icon: Building2, title: 'Hospital Queue', desc: 'Real-time queue tracking & booking', route: '/hospital-queue', gradient: 'gradient-cool' },
+  { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
+  { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
 ];
 
 const Dashboard = () => {
@@ -239,6 +256,37 @@ const Dashboard = () => {
               <Bar dataKey="count" fill="url(#barGradient)" radius={[0, 8, 8, 0]} barSize={18} />
             </BarChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+      {/* Additional Features */}
+      <Card className="card-hover">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="stat-icon-purple h-8 w-8">
+                <Rocket className="h-4 w-4" />
+              </div>
+              <CardTitle className="text-base">Additional Features</CardTitle>
+            </div>
+            <Button variant="link" size="sm" className="text-xs text-primary gap-1" onClick={() => navigate('/coming-soon')}>
+              View Roadmap <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {additionalFeatures.map((feature) => (
+              <button
+                key={feature.route}
+                onClick={() => navigate(feature.route)}
+                className={`${feature.gradient} flex flex-col items-center gap-2 p-4 rounded-xl text-white hover:opacity-90 transition-all hover:scale-[1.02] shadow-md text-center`}
+              >
+                <feature.icon className="h-6 w-6" />
+                <span className="text-xs font-semibold leading-tight">{feature.title}</span>
+                <span className="text-[10px] text-white/70 leading-tight">{feature.desc}</span>
+              </button>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
