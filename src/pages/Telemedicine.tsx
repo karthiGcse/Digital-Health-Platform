@@ -1,18 +1,29 @@
 import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Video, Phone, Star, Clock, User, X, MessageCircle, Stethoscope, Building2, Mic, MicOff, VideoOff, PhoneOff } from 'lucide-react';
+import { Search, Video, Phone, Star, Clock, User, X, MessageCircle, Stethoscope, Building2, Mic, MicOff, VideoOff, PhoneOff, MapPin, Navigation, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Doctor {
   id: string; name: string; specialty: string; experience: string; rating: number;
   fee: number; available: boolean; languages: string[]; nextSlot: string; avatar: string;
   whatsapp: string; symptoms: string[];
+}
+
+interface Pharmacy {
+  id: string; name: string; location: string; available: boolean; whatsapp: string; avatar: string; rating: number;
+}
+
+interface NearbyFacility {
+  name: string; type: string; address: string; phone?: string; rating: number;
+  distance_km: number; open_now: boolean; hours?: string; specialties?: string[];
+  emergency_available?: boolean; whatsapp?: string;
 }
 
 interface Pharmacy {
@@ -53,6 +64,10 @@ const Telemedicine = () => {
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [activeTab, setActiveTab] = useState('doctors');
+  const [nearbyLocation, setNearbyLocation] = useState('');
+  const [nearbyFacilities, setNearbyFacilities] = useState<NearbyFacility[]>([]);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbySearched, setNearbySearched] = useState(false);
 
   const filtered = doctors.filter(d => {
     const matchSearch = d.name.toLowerCase().includes(search.toLowerCase()) || d.specialty.toLowerCase().includes(search.toLowerCase()) || d.symptoms.some(s => s.toLowerCase().includes(search.toLowerCase()));
@@ -83,12 +98,55 @@ const Telemedicine = () => {
 
   const formatTime = (secs: number) => `${Math.floor(secs / 60).toString().padStart(2, '0')}:${(secs % 60).toString().padStart(2, '0')}`;
 
+  const detectLocation = () => {
+    if (!navigator.geolocation) { toast.error('Geolocation not supported'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setNearbyLocation(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`); toast.success('Location detected'); },
+      () => toast.error('Location access denied')
+    );
+  };
+
+  const searchNearby = async () => {
+    if (!nearbyLocation.trim()) { toast.error('Enter your location first'); return; }
+    setNearbyLoading(true); setNearbySearched(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('nearby-services', {
+        body: { location: nearbyLocation, query: 'hospitals and pharmacies with telemedicine' },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      const enriched = (data.facilities || []).map((f: NearbyFacility) => ({
+        ...f,
+        whatsapp: f.phone ? `+91${f.phone.replace(/\D/g, '').slice(-10)}` : undefined,
+      }));
+      setNearbyFacilities(enriched);
+    } catch (e: any) { toast.error(e.message || 'Search failed'); }
+    finally { setNearbyLoading(false); }
+  };
+
+  const startFacilityCall = (facility: NearbyFacility, type: 'video' | 'audio') => {
+    if (!facility.open_now) { toast.error(`${facility.name} is currently closed`); return; }
+    const fakeDoctor: Doctor = {
+      id: facility.name, name: facility.name, specialty: facility.type,
+      experience: '', rating: facility.rating, fee: 0, available: true,
+      languages: [], nextSlot: '', avatar: facility.name.slice(0, 2).toUpperCase(),
+      whatsapp: facility.whatsapp || '', symptoms: [],
+    };
+    setCallDoctor(fakeDoctor); setCallType(type); setInCall(true); setCallDuration(0); setMicOn(true); setCamOn(true);
+    toast.success(`Connecting ${type} call with ${facility.name}...`);
+    const interval = setInterval(() => setCallDuration(prev => prev + 1), 1000);
+    (window as any).__callInterval = interval;
+  };
+
+  const typeIcons: Record<string, string> = { hospital: '🏥', pharmacy: '💊', clinic: '🩺', lab: '🔬', emergency: '🚨' };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full grid grid-cols-3 mb-4">
+        <TabsList className="w-full grid grid-cols-4 mb-4">
           <TabsTrigger value="doctors" className="text-xs sm:text-sm"><Stethoscope className="h-4 w-4 mr-1.5" />Doctors</TabsTrigger>
           <TabsTrigger value="symptoms" className="text-xs sm:text-sm"><Search className="h-4 w-4 mr-1.5" />By Symptom</TabsTrigger>
+          <TabsTrigger value="nearby" className="text-xs sm:text-sm"><MapPin className="h-4 w-4 mr-1.5" />Nearby</TabsTrigger>
           <TabsTrigger value="pharmacy" className="text-xs sm:text-sm"><Building2 className="h-4 w-4 mr-1.5" />Pharmacy</TabsTrigger>
         </TabsList>
 
@@ -215,6 +273,103 @@ const Telemedicine = () => {
               <p>Select a symptom above to find matching specialists</p>
             </div>
           )}
+        </TabsContent>
+
+        {/* ─── Nearby Hospitals & Pharmacies Tab ─── */}
+        <TabsContent value="nearby" className="space-y-4">
+          <Card className="card-hover border-0 shadow-colored">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin className="h-5 w-5 text-primary" />
+                <h3 className="font-heading font-semibold">Find Nearby Hospitals & Pharmacies</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">Locate healthcare facilities near you and connect via audio/video call</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Enter location (city, area, or pin code)" className="pl-10 rounded-xl" value={nearbyLocation} onChange={e => setNearbyLocation(e.target.value)} />
+                </div>
+                <Button variant="outline" size="icon" onClick={detectLocation} title="Detect my location" className="rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30">
+                  <Navigation className="h-4 w-4" />
+                </Button>
+                <Button onClick={searchNearby} disabled={nearbyLoading} className="gradient-health text-white border-0 shadow-glow hover:opacity-90 rounded-xl">
+                  {nearbyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Sparkles className="h-4 w-4 mr-2" /> Find Nearby</>}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {nearbySearched && !nearbyLoading && nearbyFacilities.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Building2 className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p>No facilities found. Try a different location.</p>
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <AnimatePresence>
+              {nearbyFacilities.map((f, i) => {
+                const gradient = f.type === 'hospital' ? 'gradient-cool' : f.type === 'pharmacy' ? 'gradient-success' : 'gradient-warm';
+                return (
+                  <motion.div key={`${f.name}-${i}`} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                    <Card className="card-hover h-full">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className={`h-11 w-11 rounded-xl flex items-center justify-center text-lg ${gradient} shadow-md`}>
+                            <span className="text-white">{typeIcons[f.type] || '🏢'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {f.emergency_available && <Badge variant="destructive" className="text-[10px] rounded-full">24/7</Badge>}
+                            <Badge variant={f.open_now ? 'default' : 'secondary'} className={`text-xs rounded-full ${f.open_now ? 'bg-success text-success-foreground' : ''}`}>
+                              {f.open_now ? '● Open' : 'Closed'}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <h3 className="font-semibold mb-1">{f.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-2 flex items-start gap-1">
+                          <MapPin className="h-3 w-3 shrink-0 mt-0.5" />{f.address}
+                        </p>
+
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                          <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning fill-warning" />{f.rating}</span>
+                          <span className="flex items-center gap-1"><Navigation className="h-3 w-3" />{f.distance_km} km</span>
+                          {f.hours && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{f.hours}</span>}
+                        </div>
+
+                        {f.specialties && f.specialties.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {f.specialties.slice(0, 3).map(s => <Badge key={s} variant="outline" className="text-[10px] px-1.5 rounded-full">{s}</Badge>)}
+                          </div>
+                        )}
+
+                        <div className="mt-auto space-y-2">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30" onClick={() => startFacilityCall(f, 'video')} disabled={!f.open_now}>
+                              <Video className="h-3.5 w-3.5 mr-1" /> Video Call
+                            </Button>
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-success/10 hover:text-success hover:border-success/30" onClick={() => startFacilityCall(f, 'audio')} disabled={!f.open_now}>
+                              <Phone className="h-3.5 w-3.5 mr-1" /> Audio Call
+                            </Button>
+                          </div>
+                          <div className="flex gap-2">
+                            {f.whatsapp && (
+                              <Button size="sm" className="flex-1 rounded-xl bg-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,40%)] text-white border-0" onClick={() => openWhatsAppCall(f.whatsapp!, f.name, 'video')}>
+                                <MessageCircle className="h-3.5 w-3.5 mr-1" /> WhatsApp
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" className="flex-1 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(f.name + ' ' + f.address)}`)}>
+                              <MapPin className="h-3.5 w-3.5 mr-1" /> Directions
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </TabsContent>
 
         {/* ─── Pharmacy Tab ─── */}
