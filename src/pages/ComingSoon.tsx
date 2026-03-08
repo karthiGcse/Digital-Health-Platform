@@ -241,7 +241,7 @@ const ComingSoon = () => {
             {category.features.map((feature) => (
               <motion.div key={feature.route} variants={itemVariants}>
                 <Card
-                  className="group cursor-pointer relative overflow-hidden border border-border/50 hover:border-transparent transition-all duration-500 h-full hover:shadow-xl hover:shadow-primary/5"
+                  className="group cursor-pointer relative overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 transition-all duration-500 h-full hover:shadow-xl hover:shadow-primary/10"
                   onClick={() => navigate(feature.route)}
                 >
                   {/* Hover glow */}
