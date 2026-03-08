@@ -38,7 +38,7 @@ import AutoRefill from "@/pages/AutoRefill";
 import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
 import PharmacyInventory from "@/pages/PharmacyInventory";
 import Radiology from "@/pages/Radiology";
-import Vaccination from "@/pages/Vaccination";
+
 import Nutrition from "@/pages/Nutrition";
 
 import CardiacRisk from "@/pages/CardiacRisk";
