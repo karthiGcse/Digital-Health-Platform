@@ -114,6 +114,7 @@ interface HistoryItem {
 
 const SymptomChecker = () => {
   const { user } = useAuth();
+  const [patientType, setPatientType] = useState<PatientType>('adult');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [symptoms, setSymptoms] = useState('');
@@ -123,6 +124,7 @@ const SymptomChecker = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('General');
+  const symptomCategories = getSymptomCategories(patientType);
   const addSymptom = (s: string) => {
     setSymptoms(prev => prev ? `${prev}, ${s}` : s);
   };
