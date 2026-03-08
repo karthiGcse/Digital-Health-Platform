@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Smartphone, Mail, MessageSquare, Pill, Calendar,
   HeartPulse, Megaphone, Moon, Save, RefreshCw, Settings2, Shield
