@@ -7,11 +7,19 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock } from 'lucide-react';
+import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock, Baby, User, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const symptomCategories: Record<string, string[]> = {
+type PatientType = 'child' | 'adult' | 'pregnant';
+
+const patientTypeConfig: Record<PatientType, { label: string; icon: typeof Baby; description: string; ageRange: string }> = {
+  child: { label: 'Child (0-12)', icon: Baby, description: 'Pediatric symptom assessment with child-safe guidelines', ageRange: '0-12' },
+  adult: { label: 'Adult (13+)', icon: User, description: 'Standard adult symptom assessment', ageRange: '13+' },
+  pregnant: { label: 'Pregnant', icon: Heart, description: 'Pregnancy-safe assessment with OB/GYN guidance', ageRange: '18-45' },
+};
+
+const baseSymptomCategories: Record<string, string[]> = {
   'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness', 'Dehydration', 'Body Ache', 'Swollen Lymph Nodes'],
   'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness', 'Tingling', 'Tremors', 'Fainting', 'Migraine', 'Light Sensitivity'],
   'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion', 'Coughing Blood', 'Difficulty Breathing', 'Hoarseness'],
@@ -25,7 +33,6 @@ const symptomCategories: Record<string, string[]> = {
   'Eyes': ['Eye Pain', 'Red Eyes', 'Watery Eyes', 'Dry Eyes', 'Double Vision', 'Eye Floaters', 'Swollen Eyelids', 'Sensitivity to Light'],
   'Hormonal': ['Excessive Thirst', 'Unexplained Weight Gain', 'Hot Flashes', 'Irregular Periods', 'Excessive Hunger', 'Cold Intolerance', 'Heat Intolerance', 'Mood Changes'],
   'Allergies': ['Sneezing Fits', 'Watery Eyes', 'Hives', 'Swollen Face', 'Throat Swelling', 'Anaphylaxis', 'Food Intolerance', 'Drug Reaction'],
-  'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'],
   'Dental': ['Toothache', 'Bleeding Gums', 'Bad Breath', 'Jaw Stiffness', 'Tooth Sensitivity', 'Mouth Ulcers', 'Swollen Gums'],
   'Reproductive': ['Pelvic Pain', 'Abnormal Discharge', 'Erectile Dysfunction', 'Painful Intercourse', 'Infertility Concerns', 'Breast Pain', 'Menstrual Cramps', 'Heavy Periods'],
   'Liver & Kidney': ['Jaundice', 'Dark Urine', 'Pale Stools', 'Abdominal Swelling', 'Flank Pain', 'Swollen Ankles', 'Metallic Taste', 'Foamy Urine'],
@@ -33,6 +40,58 @@ const symptomCategories: Record<string, string[]> = {
   'Blood & Immune': ['Easy Bruising', 'Prolonged Bleeding', 'Frequent Infections', 'Pale Skin', 'Chronic Fatigue', 'Swollen Spleen', 'Blood Clots', 'Autoimmune Flares'],
   'Nutrition': ['Vitamin Deficiency', 'Iron Deficiency', 'Calcium Deficiency', 'Protein Deficiency', 'Electrolyte Imbalance', 'Malnutrition Signs', 'Obesity Concerns'],
   'Sleep': ['Snoring', 'Sleep Apnea', 'Restless Legs', 'Sleepwalking', 'Excessive Daytime Sleepiness', 'Night Terrors', 'Difficulty Falling Asleep', 'Early Waking'],
+};
+
+const childOnlyCategories: Record<string, string[]> = {
+  'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting', 'Colic', 'Cradle Cap', 'Thumb Sucking Issues'],
+  'Child Growth': ['Slow Weight Gain', 'Short Stature', 'Delayed Milestones', 'Speech Delay', 'Walking Delay', 'Poor Coordination', 'Learning Difficulty'],
+  'Child Infections': ['Hand Foot Mouth', 'Chickenpox', 'Measles', 'Mumps', 'Whooping Cough', 'Croup', 'RSV Symptoms', 'Pinworms'],
+};
+
+const pregnancyOnlyCategories: Record<string, string[]> = {
+  'Pregnancy General': ['Morning Sickness', 'Fatigue', 'Frequent Urination', 'Food Cravings', 'Food Aversions', 'Mood Changes', 'Breast Tenderness', 'Constipation'],
+  'Pregnancy Warning': ['Vaginal Bleeding', 'Severe Headache', 'Vision Changes', 'Severe Abdominal Pain', 'Reduced Fetal Movement', 'Leaking Fluid', 'High Blood Pressure', 'Swollen Hands/Face'],
+  'Pregnancy Trimester': ['First Trimester Nausea', 'Second Trimester Back Pain', 'Third Trimester Braxton Hicks', 'Pelvic Pressure', 'Swollen Feet', 'Heartburn', 'Shortness of Breath', 'Insomnia'],
+  'Labor Signs': ['Regular Contractions', 'Water Breaking', 'Bloody Show', 'Lower Back Pain', 'Nesting Urge', 'Diarrhea Before Labor', 'Cervical Pressure', 'Loss of Mucus Plug'],
+  'Postpartum': ['Postpartum Bleeding', 'Breast Engorgement', 'Postpartum Depression', 'Difficulty Breastfeeding', 'Perineal Pain', 'Hair Loss', 'Fatigue', 'Mood Swings'],
+};
+
+// Categories to exclude per patient type
+const excludedCategories: Record<PatientType, string[]> = {
+  child: ['Reproductive', 'Hormonal', 'Sleep'],
+  adult: [],
+  pregnant: [],
+};
+
+const getSymptomCategories = (patientType: PatientType): Record<string, string[]> => {
+  const filtered = Object.fromEntries(
+    Object.entries(baseSymptomCategories).filter(([key]) => !excludedCategories[patientType].includes(key))
+  );
+
+  if (patientType === 'child') return { ...filtered, ...childOnlyCategories };
+  if (patientType === 'pregnant') return { ...filtered, ...pregnancyOnlyCategories };
+  return { ...filtered, 'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'] };
+};
+
+const emergencyRules: Record<PatientType, string[]> = {
+  child: [
+    '⚠️ For children under 3 months with fever above 100.4°F (38°C), seek immediate medical care.',
+    '⚠️ Signs of dehydration in children (no tears, dry mouth, no wet diapers for 6+ hrs) require urgent attention.',
+    '⚠️ Any seizure in a child requires emergency evaluation.',
+    '⚠️ Difficulty breathing, blue lips, or persistent vomiting — call emergency immediately.',
+  ],
+  adult: [
+    '⚠️ Chest pain with shortness of breath may indicate a cardiac emergency — call 112 immediately.',
+    '⚠️ Sudden weakness on one side, slurred speech, or vision loss may indicate stroke — act FAST.',
+    '⚠️ Severe allergic reactions (anaphylaxis) with throat swelling require epinephrine and emergency care.',
+  ],
+  pregnant: [
+    '⚠️ Vaginal bleeding at any stage of pregnancy requires immediate medical evaluation.',
+    '⚠️ Severe headache with vision changes may indicate preeclampsia — seek urgent care.',
+    '⚠️ Reduced fetal movement after 28 weeks — contact your OB/GYN immediately.',
+    '⚠️ Leaking fluid or regular contractions before 37 weeks may indicate preterm labor.',
+    '⚠️ Many medications are unsafe during pregnancy — never self-medicate without doctor advice.',
+  ],
 };
 
 interface AnalysisResult {
@@ -55,6 +114,7 @@ interface HistoryItem {
 
 const SymptomChecker = () => {
   const { user } = useAuth();
+  const [patientType, setPatientType] = useState<PatientType>('adult');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [symptoms, setSymptoms] = useState('');
@@ -64,6 +124,7 @@ const SymptomChecker = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('General');
+  const symptomCategories = getSymptomCategories(patientType);
   const addSymptom = (s: string) => {
     setSymptoms(prev => prev ? `${prev}, ${s}` : s);
   };
@@ -95,7 +156,7 @@ const SymptomChecker = () => {
     setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke('claude-symptom-analysis', {
-        body: { symptoms, age: parseInt(age), gender, duration },
+        body: { symptoms, age: parseInt(age), gender, duration, patientType },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
@@ -143,6 +204,52 @@ const SymptomChecker = () => {
         </p>
       </div>
 
+      {/* Patient Type Selector */}
+      <div className="grid grid-cols-3 gap-3">
+        {(Object.entries(patientTypeConfig) as [PatientType, typeof patientTypeConfig[PatientType]][]).map(([type, config]) => {
+          const Icon = config.icon;
+          return (
+            <button
+              key={type}
+              onClick={() => { setPatientType(type); setSelectedCategory('General'); }}
+              className={`relative p-4 rounded-2xl border-2 transition-all text-left ${
+                patientType === type
+                  ? 'border-primary bg-primary/5 shadow-md'
+                  : 'border-border hover:border-primary/30 hover:bg-muted/50'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                  patientType === type ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="font-medium text-sm">{config.label}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{config.description}</p>
+              {patientType === type && (
+                <div className="absolute top-2 right-2 h-3 w-3 rounded-full bg-primary" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Emergency Rules for selected patient type */}
+      <Card className="border-destructive/20 bg-destructive/5">
+        <CardContent className="p-4">
+          <h4 className="font-heading font-semibold text-sm text-destructive mb-2 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Important Rules — {patientTypeConfig[patientType].label}
+          </h4>
+          <ul className="space-y-1.5">
+            {emergencyRules[patientType].map((rule, i) => (
+              <li key={i} className="text-xs text-destructive/80">{rule}</li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Input Form */}
         <div className="lg:col-span-2 space-y-4">
@@ -151,6 +258,7 @@ const SymptomChecker = () => {
               <div className="flex items-center gap-2">
                 <div className="stat-icon-blue h-8 w-8"><Activity className="h-4 w-4" /></div>
                 <CardTitle className="text-lg">Describe Your Symptoms</CardTitle>
+                <Badge variant="outline" className="ml-auto text-xs">{patientTypeConfig[patientType].label}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
