@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,8 @@ import { Watch, Heart, Footprints, Flame, Moon, Droplets, Activity, Wifi, WifiOf
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { toast } from '@/components/ui/sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const heartRateData = Array.from({ length: 24 }, (_, i) => ({
   time: `${i}:00`,
@@ -27,16 +29,10 @@ interface Device {
   brand: string;
   connected: boolean;
   battery: number;
-  lastSync: string;
+  last_sync: string;
   icon: string;
-  syncEnabled: boolean;
+  sync_enabled: boolean;
 }
-
-const initialDevices: Device[] = [
-  { id: '1', name: 'Apple Watch Series 9', type: 'Smartwatch', brand: 'Apple', connected: true, battery: 72, lastSync: '2 min ago', icon: '⌚', syncEnabled: true },
-  { id: '2', name: 'Fitbit Charge 6', type: 'Fitness Tracker', brand: 'Fitbit', connected: false, battery: 45, lastSync: '3 hours ago', icon: '📱', syncEnabled: false },
-  { id: '3', name: 'Oura Ring Gen 3', type: 'Sleep Tracker', brand: 'Oura', connected: true, battery: 88, lastSync: '10 min ago', icon: '💍', syncEnabled: true },
-];
 
 const availableDevices = [
   { name: 'Apple Watch', models: ['Series 9', 'Series 8', 'Ultra 2', 'SE'], icon: '⌚', brand: 'Apple', type: 'Smartwatch' },
@@ -58,9 +54,24 @@ const vitals = [
   { label: 'Stress Level', value: 'Low', icon: Activity, trend: '↓ Improving', color: 'text-success', bg: 'bg-success/10' },
 ];
 
+function formatLastSync(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+}
+
 const WearableIntegration = () => {
+  const { user } = useAuth();
   const [selectedDevice, setSelectedDevice] = useState(0);
-  const [devices, setDevices] = useState<Device[]>(initialDevices);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showPairingDialog, setShowPairingDialog] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState<string | null>(null);
@@ -68,6 +79,36 @@ const WearableIntegration = () => {
   const [pairingStep, setPairingStep] = useState<'scanning' | 'found' | 'pairing' | 'success'>('scanning');
   const [selectedModel, setSelectedModel] = useState('');
   const [syncingDeviceId, setSyncingDeviceId] = useState<string | null>(null);
+
+  // Fetch devices from DB
+  useEffect(() => {
+    if (!user) return;
+    const fetchDevices = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('wearable_devices')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error) {
+        console.error('Error fetching devices:', error);
+        toast.error('Failed to load devices');
+      } else {
+        setDevices((data || []).map(d => ({
+          id: d.id,
+          name: d.name,
+          type: d.type,
+          brand: d.brand,
+          connected: d.connected,
+          battery: d.battery,
+          last_sync: d.last_sync,
+          icon: d.icon,
+          sync_enabled: d.sync_enabled,
+        })));
+      }
+      setLoading(false);
+    };
+    fetchDevices();
+  }, [user]);
 
   const handleAddDevice = () => {
     setShowAddDialog(true);
@@ -85,55 +126,84 @@ const WearableIntegration = () => {
     setShowPairingDialog(true);
     setPairingStep('scanning');
 
-    // Simulate pairing flow
     setTimeout(() => setPairingStep('found'), 2000);
     setTimeout(() => setPairingStep('pairing'), 3500);
-    setTimeout(() => {
+    setTimeout(async () => {
       setPairingStep('success');
-      const newDevice: Device = {
-        id: Date.now().toString(),
-        name: `${selectedBrand!.name} ${model}`,
-        type: selectedBrand!.type,
-        brand: selectedBrand!.brand,
+      if (!user || !selectedBrand) return;
+      const newDevice = {
+        user_id: user.id,
+        name: `${selectedBrand.name} ${model}`,
+        type: selectedBrand.type,
+        brand: selectedBrand.brand,
+        icon: selectedBrand.icon,
         connected: true,
         battery: Math.floor(Math.random() * 40) + 60,
-        lastSync: 'Just now',
-        icon: selectedBrand!.icon,
-        syncEnabled: true,
+        last_sync: new Date().toISOString(),
+        sync_enabled: true,
       };
-      setDevices(prev => [...prev, newDevice]);
-      toast.success(`${selectedBrand!.name} ${model} connected successfully!`);
+      const { data, error } = await supabase.from('wearable_devices').insert(newDevice).select().single();
+      if (error) {
+        console.error('Error saving device:', error);
+        toast.error('Failed to save device');
+      } else if (data) {
+        setDevices(prev => [...prev, {
+          id: data.id,
+          name: data.name,
+          type: data.type,
+          brand: data.brand,
+          connected: data.connected,
+          battery: data.battery,
+          last_sync: data.last_sync,
+          icon: data.icon,
+          sync_enabled: data.sync_enabled,
+        }]);
+        toast.success(`${newDevice.name} connected successfully!`);
+      }
     }, 5500);
   };
 
-  const handleDisconnect = (deviceId: string) => {
-    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: false, syncEnabled: false } : d));
+  const handleDisconnect = async (deviceId: string) => {
+    const { error } = await supabase.from('wearable_devices').update({ connected: false, sync_enabled: false }).eq('id', deviceId);
+    if (error) { toast.error('Failed to disconnect'); return; }
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: false, sync_enabled: false } : d));
     setShowDeviceSettings(null);
     toast.info('Device disconnected');
   };
 
-  const handleReconnect = (deviceId: string) => {
-    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: true, syncEnabled: true, lastSync: 'Just now' } : d));
+  const handleReconnect = async (deviceId: string) => {
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('wearable_devices').update({ connected: true, sync_enabled: true, last_sync: now }).eq('id', deviceId);
+    if (error) { toast.error('Failed to reconnect'); return; }
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, connected: true, sync_enabled: true, last_sync: now } : d));
     toast.success('Device reconnected!');
   };
 
-  const handleRemoveDevice = (deviceId: string) => {
+  const handleRemoveDevice = async (deviceId: string) => {
+    const { error } = await supabase.from('wearable_devices').delete().eq('id', deviceId);
+    if (error) { toast.error('Failed to remove device'); return; }
     setDevices(prev => prev.filter(d => d.id !== deviceId));
     setShowDeviceSettings(null);
     toast.info('Device removed');
   };
 
-  const handleSyncDevice = (deviceId: string) => {
+  const handleSyncDevice = async (deviceId: string) => {
     setSyncingDeviceId(deviceId);
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('wearable_devices').update({ last_sync: now }).eq('id', deviceId);
     setTimeout(() => {
-      setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, lastSync: 'Just now' } : d));
+      if (error) { toast.error('Sync failed'); } else {
+        setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, last_sync: now } : d));
+        toast.success('Data synced successfully!');
+      }
       setSyncingDeviceId(null);
-      toast.success('Data synced successfully!');
     }, 2000);
   };
 
-  const handleToggleSync = (deviceId: string, enabled: boolean) => {
-    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, syncEnabled: enabled } : d));
+  const handleToggleSync = async (deviceId: string, enabled: boolean) => {
+    const { error } = await supabase.from('wearable_devices').update({ sync_enabled: enabled }).eq('id', deviceId);
+    if (error) { toast.error('Failed to update setting'); return; }
+    setDevices(prev => prev.map(d => d.id === deviceId ? { ...d, sync_enabled: enabled } : d));
   };
 
   return (
@@ -157,104 +227,75 @@ const WearableIntegration = () => {
         </Button>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence>
-          {devices.map((d, i) => (
-            <motion.div
-              key={d.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <Card className={`rounded-card cursor-pointer transition-all hover:shadow-md ${selectedDevice === i ? 'ring-2 ring-primary' : ''}`} onClick={() => setSelectedDevice(i)}>
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{d.icon}</span>
-                      <Watch className="h-4 w-4 text-primary" />
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <AnimatePresence>
+            {devices.map((d, i) => (
+              <motion.div key={d.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ delay: i * 0.1 }}>
+                <Card className={`rounded-card cursor-pointer transition-all hover:shadow-md ${selectedDevice === i ? 'ring-2 ring-primary' : ''}`} onClick={() => setSelectedDevice(i)}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{d.icon}</span>
+                        <Watch className="h-4 w-4 text-primary" />
+                      </div>
+                      {d.connected
+                        ? <Badge className="bg-success/10 text-success border-0 text-xs gap-1"><Wifi className="h-3 w-3" /> Connected</Badge>
+                        : <Badge variant="outline" className="text-muted-foreground text-xs gap-1"><WifiOff className="h-3 w-3" /> Offline</Badge>
+                      }
                     </div>
-                    {d.connected
-                      ? <Badge className="bg-success/10 text-success border-0 text-xs gap-1"><Wifi className="h-3 w-3" /> Connected</Badge>
-                      : <Badge variant="outline" className="text-muted-foreground text-xs gap-1"><WifiOff className="h-3 w-3" /> Offline</Badge>
-                    }
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">{d.name}</h4>
-                    <p className="text-xs text-muted-foreground">{d.type}</p>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>🔋 {d.battery}%</span>
-                    <span>Synced {d.lastSync}</span>
-                  </div>
-                  <Progress value={d.battery} className="h-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">{d.name}</h4>
+                      <p className="text-xs text-muted-foreground">{d.type}</p>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>🔋 {d.battery}%</span>
+                      <span>Synced {formatLastSync(d.last_sync)}</span>
+                    </div>
+                    <Progress value={d.battery} className="h-1" />
+                    <div className="flex gap-2 pt-1">
+                      {d.connected ? (
+                        <>
+                          <Button variant="outline" size="sm" className="flex-1 text-xs h-8 gap-1" onClick={(e) => { e.stopPropagation(); handleSyncDevice(d.id); }} disabled={syncingDeviceId === d.id}>
+                            {syncingDeviceId === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                            {syncingDeviceId === d.id ? 'Syncing...' : 'Sync'}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-xs h-8" onClick={(e) => { e.stopPropagation(); setShowDeviceSettings(d.id); }}>Settings</Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="default" size="sm" className="flex-1 text-xs h-8 gap-1" onClick={(e) => { e.stopPropagation(); handleReconnect(d.id); }}>
+                            <Bluetooth className="h-3 w-3" /> Reconnect
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-xs h-8 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); handleRemoveDevice(d.id); }}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
-                  {/* Device action buttons */}
-                  <div className="flex gap-2 pt-1">
-                    {d.connected ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 text-xs h-8 gap-1"
-                          onClick={(e) => { e.stopPropagation(); handleSyncDevice(d.id); }}
-                          disabled={syncingDeviceId === d.id}
-                        >
-                          {syncingDeviceId === d.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                          {syncingDeviceId === d.id ? 'Syncing...' : 'Sync'}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-8"
-                          onClick={(e) => { e.stopPropagation(); setShowDeviceSettings(d.id); }}
-                        >
-                          Settings
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="flex-1 text-xs h-8 gap-1"
-                          onClick={(e) => { e.stopPropagation(); handleReconnect(d.id); }}
-                        >
-                          <Bluetooth className="h-3 w-3" /> Reconnect
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-8 text-destructive hover:text-destructive"
-                          onClick={(e) => { e.stopPropagation(); handleRemoveDevice(d.id); }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {/* Add device card */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          <Card
-            className="rounded-card border-dashed border-2 border-muted-foreground/20 cursor-pointer hover:border-primary/40 hover:bg-accent/30 transition-all h-full flex items-center justify-center min-h-[180px]"
-            onClick={handleAddDevice}
-          >
-            <CardContent className="p-4 text-center space-y-2">
-              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Plus className="h-6 w-6 text-primary" />
-              </div>
-              <p className="text-sm font-medium text-muted-foreground">Add New Device</p>
-              <p className="text-xs text-muted-foreground/70">Connect via Bluetooth</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+            <Card className="rounded-card border-dashed border-2 border-muted-foreground/20 cursor-pointer hover:border-primary/40 hover:bg-accent/30 transition-all h-full flex items-center justify-center min-h-[180px]" onClick={handleAddDevice}>
+              <CardContent className="p-4 text-center space-y-2">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Plus className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Add New Device</p>
+                <p className="text-xs text-muted-foreground/70">Connect via Bluetooth</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      )}
 
       {/* Vitals */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -334,15 +375,10 @@ const WearableIntegration = () => {
               {selectedBrand ? 'Choose your device model to start pairing.' : 'Select your device brand to get started.'}
             </DialogDescription>
           </DialogHeader>
-
           {!selectedBrand ? (
             <div className="grid grid-cols-2 gap-3 py-2">
               {availableDevices.map((device) => (
-                <Card
-                  key={device.name}
-                  className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all"
-                  onClick={() => handleSelectBrand(device)}
-                >
+                <Card key={device.name} className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all" onClick={() => handleSelectBrand(device)}>
                   <CardContent className="p-4 text-center space-y-2">
                     <span className="text-3xl">{device.icon}</span>
                     <p className="text-sm font-medium">{device.name}</p>
@@ -353,15 +389,9 @@ const WearableIntegration = () => {
             </div>
           ) : (
             <div className="space-y-2 py-2">
-              <Button variant="ghost" size="sm" className="text-xs mb-2" onClick={() => setSelectedBrand(null)}>
-                ← Back to brands
-              </Button>
+              <Button variant="ghost" size="sm" className="text-xs mb-2" onClick={() => setSelectedBrand(null)}>← Back to brands</Button>
               {selectedBrand.models.map((model) => (
-                <Card
-                  key={model}
-                  className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all"
-                  onClick={() => handleStartPairing(model)}
-                >
+                <Card key={model} className="rounded-card cursor-pointer hover:ring-2 hover:ring-primary/50 hover:bg-accent/30 transition-all" onClick={() => handleStartPairing(model)}>
                   <CardContent className="p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{selectedBrand.icon}</span>
@@ -380,7 +410,7 @@ const WearableIntegration = () => {
       </Dialog>
 
       {/* Pairing Dialog */}
-      <Dialog open={showPairingDialog} onOpenChange={(open) => { if (!open && pairingStep === 'success') setShowPairingDialog(false); else if (!open) { setShowPairingDialog(false); } }}>
+      <Dialog open={showPairingDialog} onOpenChange={(open) => { if (!open) setShowPairingDialog(false); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-center">
@@ -390,7 +420,6 @@ const WearableIntegration = () => {
               {pairingStep === 'success' && 'Connected!'}
             </DialogTitle>
           </DialogHeader>
-
           <div className="flex flex-col items-center py-8 space-y-4">
             <AnimatePresence mode="wait">
               {pairingStep === 'scanning' && (
@@ -431,7 +460,6 @@ const WearableIntegration = () => {
               )}
             </AnimatePresence>
           </div>
-
           {pairingStep === 'success' && (
             <DialogFooter>
               <Button className="w-full" onClick={() => setShowPairingDialog(false)}>Done</Button>
@@ -445,42 +473,27 @@ const WearableIntegration = () => {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Device Settings</DialogTitle>
-            <DialogDescription>
-              {devices.find(d => d.id === showDeviceSettings)?.name}
-            </DialogDescription>
+            <DialogDescription>{devices.find(d => d.id === showDeviceSettings)?.name}</DialogDescription>
           </DialogHeader>
-
           {showDeviceSettings && (() => {
             const device = devices.find(d => d.id === showDeviceSettings);
             if (!device) return null;
             return (
               <div className="space-y-4 py-2">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Auto Sync</p>
-                    <p className="text-xs text-muted-foreground">Automatically sync health data</p>
-                  </div>
-                  <Switch checked={device.syncEnabled} onCheckedChange={(checked) => handleToggleSync(device.id, checked)} />
+                  <div><p className="text-sm font-medium">Auto Sync</p><p className="text-xs text-muted-foreground">Automatically sync health data</p></div>
+                  <Switch checked={device.sync_enabled} onCheckedChange={(checked) => handleToggleSync(device.id, checked)} />
                 </div>
-
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Battery</p>
-                    <p className="text-xs text-muted-foreground">{device.battery}% remaining</p>
-                  </div>
+                  <div><p className="text-sm font-medium">Battery</p><p className="text-xs text-muted-foreground">{device.battery}% remaining</p></div>
                   <Progress value={device.battery} className="w-20 h-2" />
                 </div>
-
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Last Synced</p>
-                    <p className="text-xs text-muted-foreground">{device.lastSync}</p>
-                  </div>
+                  <div><p className="text-sm font-medium">Last Synced</p><p className="text-xs text-muted-foreground">{formatLastSync(device.last_sync)}</p></div>
                   <Button variant="outline" size="sm" className="text-xs gap-1" onClick={() => { handleSyncDevice(device.id); setShowDeviceSettings(null); }}>
                     <RefreshCw className="h-3 w-3" /> Sync Now
                   </Button>
                 </div>
-
                 <div className="border-t pt-4 space-y-2">
                   <Button variant="outline" className="w-full text-sm" onClick={() => handleDisconnect(device.id)}>
                     <WifiOff className="h-4 w-4 mr-2" /> Disconnect
