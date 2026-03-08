@@ -8,9 +8,8 @@ import {
   TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
   Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
   Shield, Plane, Building2, RefreshCw, Globe2, Users, Syringe, Apple,
-  Dumbbell, Microscope, TestTube, HeartPulse, Baby, Smile, ShieldCheck,
-  Moon, Bone, PersonStanding, Glasses, Droplets, Move3D, Ear, Wind,
-  Star, Wallet, CircleDot, ThermometerSun, UsersRound, Stethoscope
+  Dumbbell, HeartPulse, ShieldCheck, CircleDot, Move3D, Ear,
+  Wallet, Stethoscope
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -44,29 +43,13 @@ const additionalFeatures = [
   { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
   { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
   
-  { icon: TestTube, title: 'Pathology Analyzer', desc: 'AI lab report analysis', route: '/pathology', gradient: 'gradient-warm' },
   { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
-  { icon: Baby, title: 'Maternal Health', desc: 'Pregnancy & child tracking', route: '/maternal-health', gradient: 'gradient-success' },
-  { icon: Smile, title: 'Dental Health AI', desc: 'Teeth & gum scanning', route: '/dental-health', gradient: 'gradient-cool' },
   { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance', gradient: 'gradient-health' },
-  { icon: Moon, title: 'Sleep Tracker', desc: 'AI sleep quality insights', route: '/sleep-health', gradient: 'gradient-cool' },
-  { icon: Bone, title: 'Orthopedic AI', desc: 'Bone & joint assessment', route: '/orthopedic', gradient: 'gradient-warm' },
-  { icon: PersonStanding, title: 'Fall Detection', desc: 'Senior emergency alerts', route: '/fall-detection', gradient: 'gradient-danger' },
-  { icon: Glasses, title: 'AR Surgery', desc: 'Augmented reality planning', route: '/ar-surgery', gradient: 'gradient-health' },
-  { icon: Droplets, title: 'Skincare AI', desc: 'Personalized skin routines', route: '/skincare', gradient: 'gradient-cool' },
   { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation', gradient: 'gradient-danger' },
   { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', gradient: 'gradient-success' },
-  { icon: Building2, title: 'Bed Availability', desc: 'Real-time hospital beds', route: '/bed-availability', gradient: 'gradient-warm' },
   { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics', gradient: 'gradient-health' },
-  { icon: Stethoscope, title: 'AI Second Opinion', desc: 'Multi-specialist consensus', route: '/second-opinion', gradient: 'gradient-cool' },
-  { icon: ThermometerSun, title: 'Fever Tracker', desc: 'Infection pattern detection', route: '/fever-tracker', gradient: 'gradient-warm' },
-  { icon: Star, title: 'Doctor Reviews', desc: 'Verified patient feedback', route: '/doctor-reviews', gradient: 'gradient-success' },
   { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet', gradient: 'gradient-health' },
-  { icon: Microscope, title: 'Microbiome', desc: 'Gut health AI analysis', route: '/microbiome', gradient: 'gradient-cool' },
   { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health', gradient: 'gradient-warm' },
-  { icon: Wind, title: 'Respiratory AI', desc: 'Lung health monitoring', route: '/respiratory', gradient: 'gradient-danger' },
-  { icon: TestTube, title: 'Pharmacogenomics', desc: 'Genetic drug response', route: '/pharmacogenomics', gradient: 'gradient-health' },
-  { icon: UsersRound, title: 'Peer Support', desc: 'Health support groups', route: '/peer-support', gradient: 'gradient-success' },
 ];
 
 const Dashboard = () => {
