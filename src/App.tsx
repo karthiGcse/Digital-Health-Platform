@@ -44,7 +44,7 @@ import Nutrition from "@/pages/Nutrition";
 import CardiacRisk from "@/pages/CardiacRisk";
 import Insurance from "@/pages/Insurance";
 import BloodDonation from "@/pages/BloodDonation";
-import Yoga from "@/pages/Yoga";
+
 import Epigenetics from "@/pages/Epigenetics";
 import HealthWallet from "@/pages/HealthWallet";
 import HearingHealth from "@/pages/HearingHealth";
