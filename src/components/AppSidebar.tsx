@@ -63,7 +63,7 @@ const navByRole: Record<AppRole, NavItem[]> = {
     { titleKey: 'nav.autoRefill', url: '/auto-refill', icon: RefreshCw },
     { titleKey: 'nav.globalTelemedicine', url: '/global-telemedicine', icon: Globe2 },
     { titleKey: 'nav.radiology', url: '/radiology', icon: Stethoscope },
-    { titleKey: 'nav.vaccination', url: '/vaccination', icon: Syringe },
+    
     { titleKey: 'nav.nutrition', url: '/nutrition', icon: Apple },
     
     { titleKey: 'nav.cardiacRisk', url: '/cardiac-risk', icon: HeartPulse },
