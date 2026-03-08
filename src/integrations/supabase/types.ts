@@ -91,34 +91,46 @@ export type Database = {
       }
       image_diagnoses: {
         Row: {
+          condition_name: string | null
           condition_type: string | null
           confidence: string | null
           created_at: string
           diagnosis: string | null
           id: string
           image_url: string | null
+          possible_conditions: Json | null
           recommendations: Json | null
+          urgency: string | null
           user_id: string
+          when_to_see_doctor: string | null
         }
         Insert: {
+          condition_name?: string | null
           condition_type?: string | null
           confidence?: string | null
           created_at?: string
           diagnosis?: string | null
           id?: string
           image_url?: string | null
+          possible_conditions?: Json | null
           recommendations?: Json | null
+          urgency?: string | null
           user_id: string
+          when_to_see_doctor?: string | null
         }
         Update: {
+          condition_name?: string | null
           condition_type?: string | null
           confidence?: string | null
           created_at?: string
           diagnosis?: string | null
           id?: string
           image_url?: string | null
+          possible_conditions?: Json | null
           recommendations?: Json | null
+          urgency?: string | null
           user_id?: string
+          when_to_see_doctor?: string | null
         }
         Relationships: []
       }
