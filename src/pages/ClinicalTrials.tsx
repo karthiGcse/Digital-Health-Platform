@@ -483,6 +483,18 @@ const ClinicalTrials = () => {
                     <SelectItem value="Active">Active</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={distanceFilter} onValueChange={setDistanceFilter}>
+                  <SelectTrigger className="w-full md:w-36"><SelectValue placeholder="Distance" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Distance</SelectItem>
+                    <SelectItem value="10">Within 10 km</SelectItem>
+                    <SelectItem value="25">Within 25 km</SelectItem>
+                    <SelectItem value="50">Within 50 km</SelectItem>
+                    <SelectItem value="100">Within 100 km</SelectItem>
+                    <SelectItem value="500">Within 500 km</SelectItem>
+                    <SelectItem value="remote">Remote Only</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button 
                 variant="outline" 
