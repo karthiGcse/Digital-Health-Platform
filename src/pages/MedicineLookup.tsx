@@ -10,22 +10,19 @@ import { AlertTriangle, Search, Pill, X, Loader2, Sparkles, Heart } from 'lucide
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import medPills from '@/assets/medicine-pills.png';
-import medAntibiotic from '@/assets/med-antibiotic.png';
-import medPainRelief from '@/assets/med-pain-relief.png';
-import medCardiac from '@/assets/med-cardiac.png';
-import medDiabetes from '@/assets/med-diabetes.png';
-import medGastro from '@/assets/med-gastro.png';
-import medAllergy from '@/assets/med-allergy.png';
+import pillRoundWhite from '@/assets/pill-round-white.png';
+import pillCapsuleBlue from '@/assets/pill-capsule-blue.png';
+import pillCapsuleRed from '@/assets/pill-capsule-red.png';
+import pillRoundYellow from '@/assets/pill-round-yellow.png';
+import pillCapsuleGreen from '@/assets/pill-capsule-green.png';
+import pillRoundOrange from '@/assets/pill-round-orange.png';
+import pillCapsulePurple from '@/assets/pill-capsule-purple.png';
+import pillCapsuleBrown from '@/assets/pill-capsule-brown.png';
 
-const categoryImages: Record<string, string> = {
-  'Antibiotic': medAntibiotic,
-  'Pain Relief': medPainRelief,
-  'Cardiac': medCardiac,
-  'Diabetes': medDiabetes,
-  'Gastrointestinal': medGastro,
-  'Allergy': medAllergy,
-};
+const pillImages = [
+  pillRoundWhite, pillCapsuleBlue, pillCapsuleRed, pillRoundYellow,
+  pillCapsuleGreen, pillRoundOrange, pillCapsulePurple, pillCapsuleBrown,
+];
 
 interface Medicine {
   id: string;
