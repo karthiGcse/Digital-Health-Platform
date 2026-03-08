@@ -21,6 +21,10 @@ import AIConsultation from "@/pages/AIConsultation";
 import HealthAnalytics from "@/pages/HealthAnalytics";
 import AIReports from "@/pages/AIReports";
 import Emergency from "@/pages/Emergency";
+import ImageDiagnosis from "@/pages/ImageDiagnosis";
+import MentalHealth from "@/pages/MentalHealth";
+import FamilyHealthHub from "@/pages/FamilyHealthHub";
+import VoiceAssistant from "@/pages/VoiceAssistant";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
@@ -50,6 +54,10 @@ const App = () => (
               <Route path="/reports" element={<AIReports />} />
               <Route path="/emergency" element={<Emergency />} />
               <Route path="/inventory" element={<AIConsultation />} />
+              <Route path="/image-diagnosis" element={<ImageDiagnosis />} />
+              <Route path="/mental-health" element={<MentalHealth />} />
+              <Route path="/family-health" element={<FamilyHealthHub />} />
+              <Route path="/voice-assistant" element={<VoiceAssistant />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
