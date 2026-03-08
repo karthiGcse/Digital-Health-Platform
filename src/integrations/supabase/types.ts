@@ -89,6 +89,48 @@ export type Database = {
         }
         Relationships: []
       }
+      hospital_queue_bookings: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          department: string
+          estimated_wait: number | null
+          hospital_name: string
+          id: string
+          notes: string | null
+          queue_position: number | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          department: string
+          estimated_wait?: number | null
+          hospital_name: string
+          id?: string
+          notes?: string | null
+          queue_position?: number | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          department?: string
+          estimated_wait?: number | null
+          hospital_name?: string
+          id?: string
+          notes?: string | null
+          queue_position?: number | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       image_diagnoses: {
         Row: {
           condition_name: string | null
