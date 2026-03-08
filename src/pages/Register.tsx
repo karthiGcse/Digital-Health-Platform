@@ -15,6 +15,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<AppRole>('patient');
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -23,8 +24,8 @@ const Register = () => {
     setIsLoading(true);
     try {
       await signUp(email, password, name, role);
-      toast({ title: 'Account created!', description: 'Redirecting to dashboard...' });
-      navigate('/dashboard');
+      setEmailSent(true);
+      toast({ title: 'Verification email sent!', description: 'Please check your inbox to verify your account.' });
     } catch (err: any) {
       toast({ title: 'Registration failed', description: err.message, variant: 'destructive' });
     } finally {
