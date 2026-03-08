@@ -39,7 +39,7 @@ const additionalFeatures = [
   { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
   { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
   { icon: Stethoscope, title: 'AI Radiology', desc: 'CT scan, MRI & ultrasound AI analysis', route: '/radiology', gradient: 'gradient-cool' },
-  { icon: Syringe, title: 'Vaccination Scheduler', desc: 'Automated vaccine scheduling', route: '/vaccination', gradient: 'gradient-warm' },
+  
   { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
   { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
   
