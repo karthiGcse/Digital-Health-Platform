@@ -2,7 +2,8 @@ import { useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Activity, Pill, AlertTriangle, FileText, Bell, Video, MapPin,
   MessageSquare, BarChart3, FileBarChart, AlertCircle, Rocket, Package, Stethoscope,
-  BookOpen, Users, Settings, LogOut, Heart, ChevronLeft, Scan, Brain, Globe
+  BookOpen, Users, Settings, LogOut, Heart, ChevronLeft, Scan, Brain, Globe,
+  Dna, Watch, FlaskConical, Shield, Plane, Building2, RefreshCw, Globe2
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth, AppRole } from '@/contexts/AuthContext';
