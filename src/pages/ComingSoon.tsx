@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const features = [
+  // Launched features
   { id: '1', icon: '🧬', title: 'AI Genetic Health Profiling', tag: 'AI', eta: 'Launched ✅', progress: 100, desc: 'Personalized health insights based on genetic markers.', benefits: ['Tailored medication recommendations', 'Genetic risk assessment', 'Family health tree analysis'], launched: true, route: '/genetic-profiling' },
   { id: '2', icon: '⌚', title: 'Wearable Device Integration', tag: 'IoT', eta: 'Launched ✅', progress: 100, desc: 'Connect your fitness trackers and smartwatches.', benefits: ['Real-time vitals monitoring', 'Automatic health data sync', 'Smart alerts for anomalies'], launched: true, route: '/wearables' },
   { id: '3', icon: '🤖', title: 'AI Image Diagnosis', tag: 'AI Vision', eta: 'Launched ✅', progress: 100, desc: 'Upload medical images for AI-powered analysis.', benefits: ['Skin condition detection', 'X-ray preliminary analysis', 'Eye health screening'], launched: true, route: '/image-diagnosis' },
@@ -19,6 +20,18 @@ const features = [
   { id: '10', icon: '🏥', title: 'Hospital Queue Management', tag: 'Efficiency', eta: 'Launched ✅', progress: 100, desc: 'Real-time hospital queue tracking and booking.', benefits: ['Live wait times', 'Smart slot booking', 'Queue position alerts'], launched: true, route: '/hospital-queue' },
   { id: '11', icon: '💊', title: 'Auto Refill & Subscription', tag: 'Pharmacy', eta: 'Launched ✅', progress: 100, desc: 'Automatic medication refills on schedule.', benefits: ['Never miss a refill', 'Cost savings on bulk', 'Pharmacy comparison'], launched: true, route: '/auto-refill' },
   { id: '12', icon: '🌍', title: 'Global Telemedicine Network', tag: 'Global', eta: 'Launched ✅', progress: 100, desc: 'Connect with doctors worldwide for specialist consultations.', benefits: ['Access to global specialists', 'Multi-timezone scheduling', 'Translation support'], launched: true, route: '/global-telemedicine' },
+
+  // Upcoming features
+  { id: '13', icon: '🩻', title: 'AI Radiology Assistant', tag: 'AI Vision', eta: 'Q3 2026', progress: 72, desc: 'Advanced AI analysis of CT scans, MRIs, and ultrasounds.', benefits: ['3D scan visualization', 'Anomaly detection & highlighting', 'Radiologist second opinion'], launched: false },
+  { id: '14', icon: '💉', title: 'Smart Vaccination Scheduler', tag: 'Service', eta: 'Q3 2026', progress: 65, desc: 'Automated vaccination scheduling for all age groups.', benefits: ['Age-based vaccine calendar', 'Booster dose reminders', 'Travel vaccine advisor'], launched: false },
+  { id: '15', icon: '🍎', title: 'AI Nutrition & Diet Planner', tag: 'Wellness', eta: 'Q4 2026', progress: 48, desc: 'Personalized meal plans based on health conditions.', benefits: ['Condition-specific diets', 'Calorie & macro tracking', 'Grocery list generator'], launched: false },
+  { id: '16', icon: '🏋️', title: 'Physiotherapy & Rehab Coach', tag: 'Fitness', eta: 'Q4 2026', progress: 40, desc: 'AI-guided exercise programs for injury recovery.', benefits: ['Video exercise demos', 'Progress tracking', 'Pain level monitoring'], launched: false },
+  { id: '17', icon: '🔬', title: 'Clinical Trial Matcher', tag: 'Research', eta: 'Q1 2027', progress: 30, desc: 'Match patients with relevant clinical trials worldwide.', benefits: ['Eligibility screening', 'Trial location finder', 'Enrollment assistance'], launched: false },
+  { id: '18', icon: '🧪', title: 'AI Pathology Report Analyzer', tag: 'AI', eta: 'Q1 2027', progress: 25, desc: 'Automated analysis and simplification of lab reports.', benefits: ['Plain-language summaries', 'Trend analysis over time', 'Abnormal value alerts'], launched: false },
+  { id: '19', icon: '🫀', title: 'Cardiac Risk Predictor', tag: 'AI', eta: 'Q2 2027', progress: 18, desc: 'AI-powered heart disease risk assessment and monitoring.', benefits: ['10-year risk scoring', 'Lifestyle recommendations', 'ECG pattern analysis'], launched: false },
+  { id: '20', icon: '👶', title: 'Maternal & Child Health Tracker', tag: 'Family', eta: 'Q2 2027', progress: 15, desc: 'Pregnancy monitoring and baby milestone tracking.', benefits: ['Week-by-week pregnancy guide', 'Growth chart tracking', 'Pediatric symptom checker'], launched: false },
+  { id: '21', icon: '🦷', title: 'Dental Health AI Scanner', tag: 'AI Vision', eta: 'Q3 2027', progress: 10, desc: 'Scan teeth and gums for early detection of dental issues.', benefits: ['Cavity risk detection', 'Gum disease screening', 'Dental appointment booking'], launched: false },
+  { id: '22', icon: '🛡️', title: 'Health Insurance Optimizer', tag: 'Finance', eta: 'Q3 2027', progress: 8, desc: 'AI-powered insurance plan comparison and claim assistance.', benefits: ['Plan comparison tool', 'Claim auto-filing', 'Coverage gap analysis'], launched: false },
 ];
 
 const tagColors: Record<string, string> = {
@@ -28,6 +41,8 @@ const tagColors: Record<string, string> = {
   Logistics: 'bg-cyan-500/10 text-cyan-600', Wellness: 'bg-pink-500/10 text-pink-600',
   Family: 'bg-orange-500/10 text-orange-600', Efficiency: 'bg-teal-500/10 text-teal-600',
   Pharmacy: 'bg-emerald-500/10 text-emerald-600', Global: 'bg-sky-500/10 text-sky-600',
+  Fitness: 'bg-lime-500/10 text-lime-600', Research: 'bg-violet-500/10 text-violet-600',
+  Finance: 'bg-yellow-500/10 text-yellow-600',
 };
 
 const ComingSoon = () => {
