@@ -93,7 +93,7 @@ const App = () => (
               <Route path="/auto-refill" element={<AutoRefill />} />
               <Route path="/global-telemedicine" element={<GlobalTelemedicine />} />
               <Route path="/radiology" element={<Radiology />} />
-              <Route path="/vaccination" element={<Vaccination />} />
+              
               <Route path="/nutrition" element={<Nutrition />} />
               
               <Route path="/cardiac-risk" element={<CardiacRisk />} />
