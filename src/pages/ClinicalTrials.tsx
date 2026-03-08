@@ -322,8 +322,9 @@ const ClinicalTrials = () => {
   // Get user's real-time location
   const getUserLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      toast.info('Geolocation not supported. Please select your city manually.');
-      setShowCitySelector(true);
+      // Auto-select Mumbai as default
+      selectCity('Mumbai');
+      toast.info('GPS not available. Defaulted to Mumbai - you can change your city.');
       return;
     }
     
@@ -335,20 +336,32 @@ const ClinicalTrials = () => {
         setSelectedCity('Current Location');
         updateDistancesFromLocation(latitude, longitude);
         setLocationLoading(false);
-        toast.success('Location updated! Distances calculated based on your position.');
+        toast.success('GPS location detected! Distances calculated.');
       },
       (error) => {
         setLocationLoading(false);
-        setShowCitySelector(true);
-        toast.info('Location access denied. Please select your city below.');
+        // Auto-select Mumbai as default when GPS fails
+        const defaultCity = cities[0]; // Mumbai
+        setSelectedCity(defaultCity.name);
+        setUserLocation({ lat: defaultCity.lat, lng: defaultCity.lng });
+        updateDistancesFromLocation(defaultCity.lat, defaultCity.lng);
+        toast.info(`GPS blocked in preview. Defaulted to ${defaultCity.name} - select your city above.`);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 5000 }
     );
   }, [updateDistancesFromLocation]);
 
+  // Auto-set default city on mount (don't wait for GPS timeout)
   useEffect(() => {
+    // Set Mumbai as initial default immediately
+    const defaultCity = cities[0];
+    setSelectedCity(defaultCity.name);
+    setUserLocation({ lat: defaultCity.lat, lng: defaultCity.lng });
+    updateDistancesFromLocation(defaultCity.lat, defaultCity.lng);
+    
+    // Then try GPS (will update if successful)
     getUserLocation();
-  }, [getUserLocation]);
+  }, []);
 
   const openInMaps = (trial: Trial) => {
     if (trial.lat === 0 && trial.lng === 0) {
