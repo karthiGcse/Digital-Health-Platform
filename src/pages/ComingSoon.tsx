@@ -41,6 +41,8 @@ const tagColors: Record<string, string> = {
   Logistics: 'bg-cyan-500/10 text-cyan-600', Wellness: 'bg-pink-500/10 text-pink-600',
   Family: 'bg-orange-500/10 text-orange-600', Efficiency: 'bg-teal-500/10 text-teal-600',
   Pharmacy: 'bg-emerald-500/10 text-emerald-600', Global: 'bg-sky-500/10 text-sky-600',
+  Fitness: 'bg-lime-500/10 text-lime-600', Research: 'bg-violet-500/10 text-violet-600',
+  Finance: 'bg-yellow-500/10 text-yellow-600',
 };
 
 const ComingSoon = () => {
