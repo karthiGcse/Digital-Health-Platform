@@ -66,7 +66,7 @@ const navByRole: Record<AppRole, NavItem[]> = {
     { titleKey: 'nav.vaccination', url: '/vaccination', icon: Syringe },
     { titleKey: 'nav.nutrition', url: '/nutrition', icon: Apple },
     { titleKey: 'nav.physiotherapy', url: '/physiotherapy', icon: Dumbbell },
-    { titleKey: 'nav.clinicalTrials', url: '/clinical-trials', icon: Microscope },
+    
     { titleKey: 'nav.pathology', url: '/pathology', icon: TestTube },
     { titleKey: 'nav.cardiacRisk', url: '/cardiac-risk', icon: HeartPulse },
     { titleKey: 'nav.maternalHealth', url: '/maternal-health', icon: Baby },
