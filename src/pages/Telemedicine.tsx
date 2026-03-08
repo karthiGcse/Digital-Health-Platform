@@ -1,13 +1,14 @@
 import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Video, Phone, Star, Clock, User, X, MessageCircle, Stethoscope, Building2, Mic, MicOff, VideoOff, PhoneOff } from 'lucide-react';
+import { Search, Video, Phone, Star, Clock, User, X, MessageCircle, Stethoscope, Building2, Mic, MicOff, VideoOff, PhoneOff, MapPin, Navigation, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Doctor {
   id: string; name: string; specialty: string; experience: string; rating: number;
