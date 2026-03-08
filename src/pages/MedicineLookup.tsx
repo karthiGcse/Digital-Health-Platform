@@ -56,9 +56,12 @@ const pregnancyColor = (safety: string | null) => {
   return 'bg-success/10 text-success';
 };
 
-const getMedicineImage = (category: string | null): string => {
-  if (category && categoryImages[category]) return categoryImages[category];
-  return medPills;
+const getMedicineImage = (name: string): string => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return pillImages[Math.abs(hash) % pillImages.length];
 };
 
 const MedicineLookup = () => {
