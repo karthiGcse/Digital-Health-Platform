@@ -11,7 +11,18 @@ import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock } from 'lucide-r
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const commonSymptoms = ['Fever', 'Headache', 'Cough', 'Chest Pain', 'Nausea', 'Dizziness', 'Shortness of Breath', 'Fatigue'];
+const symptomCategories: Record<string, string[]> = {
+  'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness'],
+  'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness'],
+  'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion'],
+  'Cardiac': ['Chest Pain', 'Palpitations', 'Rapid Heartbeat', 'Swollen Legs', 'High Blood Pressure'],
+  'Digestive': ['Nausea', 'Vomiting', 'Diarrhea', 'Constipation', 'Abdominal Pain', 'Bloating', 'Heartburn', 'Blood in Stool'],
+  'Musculoskeletal': ['Joint Pain', 'Back Pain', 'Muscle Ache', 'Stiffness', 'Swelling', 'Cramps'],
+  'Skin': ['Rash', 'Itching', 'Hives', 'Bruising', 'Dry Skin', 'Skin Discoloration', 'Wound Not Healing'],
+  'Mental Health': ['Anxiety', 'Depression', 'Insomnia', 'Mood Swings', 'Panic Attacks', 'Stress'],
+  'Urinary': ['Painful Urination', 'Frequent Urination', 'Blood in Urine', 'Incontinence'],
+  'ENT': ['Ear Pain', 'Hearing Loss', 'Tinnitus', 'Nasal Congestion', 'Difficulty Swallowing'],
+};
 
 interface AnalysisResult {
   risk_score: number;
@@ -41,7 +52,7 @@ const SymptomChecker = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-
+  const [selectedCategory, setSelectedCategory] = useState('General');
   const addSymptom = (s: string) => {
     setSymptoms(prev => prev ? `${prev}, ${s}` : s);
   };
@@ -169,9 +180,14 @@ const SymptomChecker = () => {
               </div>
 
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Common symptoms (click to add):</p>
+                <p className="text-xs text-muted-foreground mb-2">Select category:</p>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {Object.keys(symptomCategories).map(cat => (
+                    <Button key={cat} variant={selectedCategory === cat ? 'default' : 'outline'} size="sm" className="text-xs rounded-full" onClick={() => setSelectedCategory(cat)}>{cat}</Button>
+                  ))}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {commonSymptoms.map(s => (
+                  {symptomCategories[selectedCategory].map(s => (
                     <Button key={s} variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all" onClick={() => addSymptom(s)}>{s}</Button>
                   ))}
                 </div>
