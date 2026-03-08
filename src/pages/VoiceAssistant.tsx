@@ -115,7 +115,7 @@ const VoiceAssistant = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) { toast.error('Speech recognition not supported in this browser'); return; }
     const recognition = new SpeechRecognition();
-    recognition.lang = language === 'en' ? 'en-US' : `${language}-IN`;
+    recognition.lang = getLangCode(language);
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onresult = (event: any) => {
