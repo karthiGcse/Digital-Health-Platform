@@ -280,11 +280,50 @@ const ClinicalTrials = () => {
   const [locationLoading, setLocationLoading] = useState(false);
   const [trialsWithDistance, setTrialsWithDistance] = useState<Trial[]>(allTrials);
   const [distanceFilter, setDistanceFilter] = useState('all');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [showCitySelector, setShowCitySelector] = useState(false);
+
+  // Predefined city locations
+  const cities = [
+    { name: 'Mumbai', lat: 19.0760, lng: 72.8777 },
+    { name: 'Delhi', lat: 28.6139, lng: 77.2090 },
+    { name: 'Bangalore', lat: 12.9716, lng: 77.5946 },
+    { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
+    { name: 'Kolkata', lat: 22.5726, lng: 88.3639 },
+    { name: 'Hyderabad', lat: 17.3850, lng: 78.4867 },
+    { name: 'Pune', lat: 18.5204, lng: 73.8567 },
+    { name: 'Ahmedabad', lat: 23.0225, lng: 72.5714 },
+    { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
+    { name: 'Lucknow', lat: 26.8467, lng: 80.9462 },
+  ];
+
+  const updateDistancesFromLocation = useCallback((lat: number, lng: number) => {
+    const updatedTrials = allTrials.map(trial => {
+      if (trial.lat === 0 && trial.lng === 0) {
+        return { ...trial, distance: 'Remote' };
+      }
+      const dist = calculateDistance(lat, lng, trial.lat, trial.lng);
+      return { ...trial, distance: dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km` };
+    });
+    setTrialsWithDistance(updatedTrials);
+  }, []);
+
+  const selectCity = (cityName: string) => {
+    const city = cities.find(c => c.name === cityName);
+    if (city) {
+      setSelectedCity(cityName);
+      setUserLocation({ lat: city.lat, lng: city.lng });
+      updateDistancesFromLocation(city.lat, city.lng);
+      setShowCitySelector(false);
+      toast.success(`Location set to ${cityName}. Distances updated.`);
+    }
+  };
 
   // Get user's real-time location
   const getUserLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
+      toast.info('Geolocation not supported. Please select your city manually.');
+      setShowCitySelector(true);
       return;
     }
     
@@ -293,27 +332,19 @@ const ClinicalTrials = () => {
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
-        
-        // Calculate distances for all trials
-        const updatedTrials = allTrials.map(trial => {
-          if (trial.lat === 0 && trial.lng === 0) {
-            return { ...trial, distance: 'Remote' };
-          }
-          const dist = calculateDistance(latitude, longitude, trial.lat, trial.lng);
-          return { ...trial, distance: dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km` };
-        });
-        
-        setTrialsWithDistance(updatedTrials);
+        setSelectedCity('Current Location');
+        updateDistancesFromLocation(latitude, longitude);
         setLocationLoading(false);
         toast.success('Location updated! Distances calculated based on your position.');
       },
       (error) => {
         setLocationLoading(false);
-        toast.error('Unable to get your location. Using default distances.');
+        setShowCitySelector(true);
+        toast.info('Location access denied. Please select your city below.');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
-  }, []);
+  }, [updateDistancesFromLocation]);
 
   useEffect(() => {
     getUserLocation();
