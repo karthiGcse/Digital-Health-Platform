@@ -7,7 +7,10 @@ import {
   Activity, Pill, Calendar, AlertTriangle, MessageSquare, AlertCircle,
   TrendingUp, TrendingDown, Heart, Clock, FileText, Bell, Sparkles,
   Rocket, ExternalLink, Scan, Brain, Globe, Dna, Watch, FlaskConical,
-  Shield, Plane, Building2, RefreshCw, Globe2, Users
+  Shield, Plane, Building2, RefreshCw, Globe2, Users, Syringe, Apple,
+  Dumbbell, Microscope, TestTube, HeartPulse, Baby, Smile, ShieldCheck,
+  Moon, Bone, PersonStanding, Glasses, Droplets, Move3D, Ear, Wind,
+  Star, Wallet, CircleDot, ThermometerSun, UsersRound, Stethoscope
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -36,6 +39,34 @@ const additionalFeatures = [
   { icon: Building2, title: 'Hospital Queue', desc: 'Real-time queue tracking & booking', route: '/hospital-queue', gradient: 'gradient-cool' },
   { icon: RefreshCw, title: 'Auto Refill', desc: 'Automatic medication refills', route: '/auto-refill', gradient: 'gradient-success' },
   { icon: Globe2, title: 'Global Telemedicine', desc: 'Connect with doctors worldwide', route: '/global-telemedicine', gradient: 'gradient-health' },
+  { icon: Stethoscope, title: 'AI Radiology', desc: 'CT scan, MRI & ultrasound AI analysis', route: '/radiology', gradient: 'gradient-cool' },
+  { icon: Syringe, title: 'Vaccination Scheduler', desc: 'Automated vaccine scheduling', route: '/vaccination', gradient: 'gradient-warm' },
+  { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans for your health', route: '/nutrition', gradient: 'gradient-success' },
+  { icon: Dumbbell, title: 'Physio & Rehab', desc: 'AI-guided exercise recovery', route: '/physiotherapy', gradient: 'gradient-health' },
+  { icon: Microscope, title: 'Clinical Trials', desc: 'Match with trials worldwide', route: '/clinical-trials', gradient: 'gradient-cool' },
+  { icon: TestTube, title: 'Pathology Analyzer', desc: 'AI lab report analysis', route: '/pathology', gradient: 'gradient-warm' },
+  { icon: HeartPulse, title: 'Cardiac Risk', desc: 'Heart disease risk assessment', route: '/cardiac-risk', gradient: 'gradient-danger' },
+  { icon: Baby, title: 'Maternal Health', desc: 'Pregnancy & child tracking', route: '/maternal-health', gradient: 'gradient-success' },
+  { icon: Smile, title: 'Dental Health AI', desc: 'Teeth & gum scanning', route: '/dental-health', gradient: 'gradient-cool' },
+  { icon: ShieldCheck, title: 'Insurance Optimizer', desc: 'AI insurance comparison', route: '/insurance', gradient: 'gradient-health' },
+  { icon: Moon, title: 'Sleep Tracker', desc: 'AI sleep quality insights', route: '/sleep-health', gradient: 'gradient-cool' },
+  { icon: Bone, title: 'Orthopedic AI', desc: 'Bone & joint assessment', route: '/orthopedic', gradient: 'gradient-warm' },
+  { icon: PersonStanding, title: 'Fall Detection', desc: 'Senior emergency alerts', route: '/fall-detection', gradient: 'gradient-danger' },
+  { icon: Glasses, title: 'AR Surgery', desc: 'Augmented reality planning', route: '/ar-surgery', gradient: 'gradient-health' },
+  { icon: Droplets, title: 'Skincare AI', desc: 'Personalized skin routines', route: '/skincare', gradient: 'gradient-cool' },
+  { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient matching', route: '/blood-donation', gradient: 'gradient-danger' },
+  { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', gradient: 'gradient-success' },
+  { icon: Building2, title: 'Bed Availability', desc: 'Real-time hospital beds', route: '/bed-availability', gradient: 'gradient-warm' },
+  { icon: Dna, title: 'Epigenetics', desc: 'Gene expression tracking', route: '/epigenetics', gradient: 'gradient-health' },
+  { icon: Stethoscope, title: 'AI Second Opinion', desc: 'Multi-specialist consensus', route: '/second-opinion', gradient: 'gradient-cool' },
+  { icon: ThermometerSun, title: 'Fever Tracker', desc: 'Infection pattern detection', route: '/fever-tracker', gradient: 'gradient-warm' },
+  { icon: Star, title: 'Doctor Reviews', desc: 'Verified patient feedback', route: '/doctor-reviews', gradient: 'gradient-success' },
+  { icon: Wallet, title: 'Health Wallet', desc: 'Unified health payments', route: '/health-wallet', gradient: 'gradient-health' },
+  { icon: Microscope, title: 'Microbiome', desc: 'Gut health AI analysis', route: '/microbiome', gradient: 'gradient-cool' },
+  { icon: Ear, title: 'Hearing Health', desc: 'Early hearing loss detection', route: '/hearing-health', gradient: 'gradient-warm' },
+  { icon: Wind, title: 'Respiratory AI', desc: 'Lung health monitoring', route: '/respiratory', gradient: 'gradient-danger' },
+  { icon: TestTube, title: 'Pharmacogenomics', desc: 'Genetic drug response', route: '/pharmacogenomics', gradient: 'gradient-health' },
+  { icon: UsersRound, title: 'Peer Support', desc: 'Health support groups', route: '/peer-support', gradient: 'gradient-success' },
 ];
 
 const Dashboard = () => {
@@ -258,7 +289,8 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      {/* Additional Features */}
+
+      {/* Additional Features - All 40 */}
       <Card className="card-hover">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -266,15 +298,15 @@ const Dashboard = () => {
               <div className="stat-icon-purple h-8 w-8">
                 <Rocket className="h-4 w-4" />
               </div>
-              <CardTitle className="text-base">Additional Features</CardTitle>
+              <CardTitle className="text-base">All Features ({additionalFeatures.length})</CardTitle>
             </div>
             <Button variant="link" size="sm" className="text-xs text-primary gap-1" onClick={() => navigate('/coming-soon')}>
-              View Roadmap <ExternalLink className="h-3 w-3" />
+              View All <ExternalLink className="h-3 w-3" />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {additionalFeatures.map((feature) => (
               <button
                 key={feature.route}
