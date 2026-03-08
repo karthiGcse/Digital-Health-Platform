@@ -260,8 +260,8 @@ const ComingSoon = () => {
                     </div>
 
                     <div className="space-y-0.5">
-                      <p className="text-xs font-bold leading-tight group-hover:text-primary transition-colors duration-300">{feature.title}</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">{feature.desc}</p>
+                      <p className="text-xs font-bold leading-tight text-white group-hover:text-cyan-300 transition-colors duration-300">{feature.title}</p>
+                      <p className="text-[10px] text-white/40 leading-tight">{feature.desc}</p>
                     </div>
 
                     {/* Arrow indicator */}
