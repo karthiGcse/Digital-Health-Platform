@@ -37,6 +37,7 @@ import HospitalQueue from "@/pages/HospitalQueue";
 import AutoRefill from "@/pages/AutoRefill";
 import GlobalTelemedicine from "@/pages/GlobalTelemedicine";
 import PharmacyInventory from "@/pages/PharmacyInventory";
+import PlaceholderPage from "@/pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
@@ -81,6 +82,34 @@ const App = () => (
               <Route path="/hospital-queue" element={<HospitalQueue />} />
               <Route path="/auto-refill" element={<AutoRefill />} />
               <Route path="/global-telemedicine" element={<GlobalTelemedicine />} />
+              <Route path="/radiology" element={<PlaceholderPage title="AI Radiology Assistant" description="Advanced AI analysis of CT scans, MRIs, and ultrasounds with 3D visualization." />} />
+              <Route path="/vaccination" element={<PlaceholderPage title="Smart Vaccination Scheduler" description="Automated vaccination scheduling for all age groups with booster reminders." />} />
+              <Route path="/nutrition" element={<PlaceholderPage title="AI Nutrition & Diet Planner" description="Personalized meal plans based on your health conditions and goals." />} />
+              <Route path="/physiotherapy" element={<PlaceholderPage title="Physiotherapy & Rehab Coach" description="AI-guided exercise programs for injury recovery with video demos." />} />
+              <Route path="/clinical-trials" element={<PlaceholderPage title="Clinical Trial Matcher" description="Match with relevant clinical trials worldwide with eligibility screening." />} />
+              <Route path="/pathology" element={<PlaceholderPage title="AI Pathology Report Analyzer" description="Automated analysis and plain-language summaries of lab reports." />} />
+              <Route path="/cardiac-risk" element={<PlaceholderPage title="Cardiac Risk Predictor" description="AI-powered heart disease risk assessment with 10-year scoring." />} />
+              <Route path="/maternal-health" element={<PlaceholderPage title="Maternal & Child Health Tracker" description="Pregnancy monitoring, baby milestone tracking, and pediatric care." />} />
+              <Route path="/dental-health" element={<PlaceholderPage title="Dental Health AI Scanner" description="Scan teeth and gums for early detection of dental issues." />} />
+              <Route path="/insurance" element={<PlaceholderPage title="Health Insurance Optimizer" description="AI-powered insurance plan comparison and claim assistance." />} />
+              <Route path="/sleep-health" element={<PlaceholderPage title="Sleep Health Tracker" description="Monitor and improve your sleep quality with AI insights." />} />
+              <Route path="/orthopedic" element={<PlaceholderPage title="Orthopedic AI Assistant" description="AI-powered bone and joint health assessment with posture analysis." />} />
+              <Route path="/fall-detection" element={<PlaceholderPage title="Elderly Fall Detection" description="Smart fall detection and emergency alerts for seniors." />} />
+              <Route path="/ar-surgery" element={<PlaceholderPage title="AR Surgery Visualization" description="Augmented reality surgical planning with 3D organ mapping." />} />
+              <Route path="/skincare" element={<PlaceholderPage title="Skin Care AI Advisor" description="Personalized skincare routines based on AI skin analysis." />} />
+              <Route path="/blood-donation" element={<PlaceholderPage title="Blood Donation Network" description="Connect blood donors with nearby recipients in real-time." />} />
+              <Route path="/yoga" element={<PlaceholderPage title="Yoga & Meditation Guide" description="AI-guided yoga sessions and meditation programs with pose correction." />} />
+              <Route path="/bed-availability" element={<PlaceholderPage title="Hospital Bed Availability" description="Real-time hospital bed tracking across your city with ICU alerts." />} />
+              <Route path="/epigenetics" element={<PlaceholderPage title="Epigenetics Tracker" description="Track how lifestyle changes affect your gene expression." />} />
+              <Route path="/second-opinion" element={<PlaceholderPage title="AI Second Opinion" description="Get AI-powered second opinions on diagnoses from global specialists." />} />
+              <Route path="/fever-tracker" element={<PlaceholderPage title="Fever & Infection Tracker" description="Smart thermometer integration with infection pattern detection." />} />
+              <Route path="/doctor-reviews" element={<PlaceholderPage title="Doctor Rating & Reviews" description="Rate and review doctors with verified patient feedback." />} />
+              <Route path="/health-wallet" element={<PlaceholderPage title="Health Wallet & Payments" description="Unified health payments, insurance claims, and expense tracking." />} />
+              <Route path="/microbiome" element={<PlaceholderPage title="Microbiome Analysis" description="Analyze gut health and microbiome composition with AI insights." />} />
+              <Route path="/hearing-health" element={<PlaceholderPage title="Hearing Health Monitor" description="Track hearing health and detect early hearing loss." />} />
+              <Route path="/respiratory" element={<PlaceholderPage title="Respiratory Health AI" description="AI-powered lung health monitoring using breath analysis." />} />
+              <Route path="/pharmacogenomics" element={<PlaceholderPage title="Pharmacogenomics" description="Predict drug responses based on your genetic profile." />} />
+              <Route path="/peer-support" element={<PlaceholderPage title="Peer Health Support Groups" description="Connect with others managing similar health conditions." />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
