@@ -62,7 +62,7 @@ const App = () => (
               <Route path="/analytics" element={<HealthAnalytics />} />
               <Route path="/reports" element={<AIReports />} />
               <Route path="/emergency" element={<Emergency />} />
-              <Route path="/inventory" element={<AIConsultation />} />
+              <Route path="/inventory" element={<PharmacyInventory />} />
               <Route path="/image-diagnosis" element={<ImageDiagnosis />} />
               <Route path="/mental-health" element={<MentalHealth />} />
               <Route path="/family-health" element={<FamilyHealthHub />} />
