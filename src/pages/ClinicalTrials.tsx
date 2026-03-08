@@ -230,6 +230,43 @@ const allTrials: Trial[] = [
   },
 ];
 
+// Helper functions
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+const isOpenNow = (hours: { day: string; open: string; close: string }[]): { isOpen: boolean; nextChange: string } => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const now = new Date();
+  const currentDay = days[now.getDay()];
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  const todayHours = hours.find(h => h.day === currentDay);
+  if (!todayHours || todayHours.open === 'Closed') {
+    return { isOpen: false, nextChange: 'Opens tomorrow' };
+  }
+  
+  const [openH, openM] = todayHours.open.split(':').map(Number);
+  const [closeH, closeM] = todayHours.close.split(':').map(Number);
+  const openTime = openH * 60 + openM;
+  const closeTime = closeH * 60 + closeM;
+  
+  if (currentTime >= openTime && currentTime < closeTime) {
+    return { isOpen: true, nextChange: `Closes at ${todayHours.close}` };
+  } else if (currentTime < openTime) {
+    return { isOpen: false, nextChange: `Opens at ${todayHours.open}` };
+  } else {
+    return { isOpen: false, nextChange: 'Opens tomorrow' };
+  }
+};
+
 const ClinicalTrials = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [phaseFilter, setPhaseFilter] = useState('all');
@@ -239,11 +276,72 @@ const ClinicalTrials = () => {
   const [savedTrials, setSavedTrials] = useState<string[]>([]);
   const [appliedTrials, setAppliedTrials] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('browse');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [trialsWithDistance, setTrialsWithDistance] = useState<Trial[]>(allTrials);
 
-  const conditions = useMemo(() => [...new Set(allTrials.map(t => t.condition))], []);
+  // Get user's real-time location
+  const getUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+    
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        
+        // Calculate distances for all trials
+        const updatedTrials = allTrials.map(trial => {
+          if (trial.lat === 0 && trial.lng === 0) {
+            return { ...trial, distance: 'Remote' };
+          }
+          const dist = calculateDistance(latitude, longitude, trial.lat, trial.lng);
+          return { ...trial, distance: dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km` };
+        });
+        
+        setTrialsWithDistance(updatedTrials);
+        setLocationLoading(false);
+        toast.success('Location updated! Distances calculated based on your position.');
+      },
+      (error) => {
+        setLocationLoading(false);
+        toast.error('Unable to get your location. Using default distances.');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  useEffect(() => {
+    getUserLocation();
+  }, [getUserLocation]);
+
+  const openInMaps = (trial: Trial) => {
+    if (trial.lat === 0 && trial.lng === 0) {
+      toast.info('This is a remote trial with no physical location');
+      return;
+    }
+    const url = `https://www.google.com/maps/search/?api=1&query=${trial.lat},${trial.lng}`;
+    window.open(url, '_blank');
+  };
+
+  const getDirections = (trial: Trial) => {
+    if (trial.lat === 0 && trial.lng === 0) {
+      toast.info('This is a remote trial with no physical location');
+      return;
+    }
+    const url = userLocation 
+      ? `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${trial.lat},${trial.lng}`
+      : `https://www.google.com/maps/dir/?api=1&destination=${trial.lat},${trial.lng}`;
+    window.open(url, '_blank');
+  };
+
+  const conditions = useMemo(() => [...new Set(trialsWithDistance.map(t => t.condition))], [trialsWithDistance]);
 
   const filteredTrials = useMemo(() => {
-    return allTrials.filter(trial => {
+    return trialsWithDistance.filter(trial => {
       const matchesSearch = trial.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            trial.condition.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            trial.sponsor.toLowerCase().includes(searchQuery.toLowerCase());
@@ -252,9 +350,9 @@ const ClinicalTrials = () => {
       const matchesCondition = conditionFilter === 'all' || trial.condition === conditionFilter;
       return matchesSearch && matchesPhase && matchesStatus && matchesCondition;
     }).sort((a, b) => b.match - a.match);
-  }, [searchQuery, phaseFilter, statusFilter, conditionFilter]);
+  }, [searchQuery, phaseFilter, statusFilter, conditionFilter, trialsWithDistance]);
 
-  const savedTrialsList = useMemo(() => allTrials.filter(t => savedTrials.includes(t.id)), [savedTrials]);
+  const savedTrialsList = useMemo(() => trialsWithDistance.filter(t => savedTrials.includes(t.id)), [savedTrials, trialsWithDistance]);
 
   const toggleSaveTrial = (trialId: string) => {
     setSavedTrials(prev => {
@@ -280,8 +378,8 @@ const ClinicalTrials = () => {
     setSelectedTrial(null);
   };
 
-  const recruitingCount = allTrials.filter(t => t.status === 'Recruiting').length;
-  const bestMatch = Math.max(...allTrials.map(t => t.match));
+  const recruitingCount = trialsWithDistance.filter(t => t.status === 'Recruiting').length;
+  const bestMatch = Math.max(...trialsWithDistance.map(t => t.match));
 
   return (
     <div className="space-y-6">
