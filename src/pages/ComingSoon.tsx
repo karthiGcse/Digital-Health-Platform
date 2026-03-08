@@ -61,7 +61,7 @@ const categories = [
     emoji: '🧘',
     features: [
       { icon: Apple, title: 'Nutrition Planner', desc: 'AI meal plans', route: '/nutrition', from: '#10B981', to: '#34D399' },
-      { icon: Dumbbell, title: 'Physio & Rehab', desc: 'Exercise recovery', route: '/physiotherapy', from: '#6366F1', to: '#8B5CF6' },
+      
       { icon: Move3D, title: 'Yoga & Meditation', desc: 'AI-guided sessions', route: '/yoga', from: '#14B8A6', to: '#10B981' },
       { icon: Syringe, title: 'Vaccination', desc: 'Smart vaccine scheduler', route: '/vaccination', from: '#F59E0B', to: '#F97316' },
       { icon: CircleDot, title: 'Blood Donation', desc: 'Donor-recipient match', route: '/blood-donation', from: '#EF4444', to: '#EC4899' },
