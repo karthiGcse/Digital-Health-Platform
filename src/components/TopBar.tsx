@@ -42,10 +42,7 @@ const TopBar = ({ title }: TopBarProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-4 w-4 text-muted-foreground" />
-          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full gradient-danger text-white text-[10px] flex items-center justify-center font-bold shadow-sm">3</span>
-        </Button>
+        <NotificationDropdown />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
