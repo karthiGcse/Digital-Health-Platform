@@ -164,6 +164,19 @@ const VoiceAssistant = () => {
         <Badge variant="secondary" className="self-start gap-1.5 px-3 py-1.5">
           <Globe className="h-3 w-3" /> {languages.find(l => l.code === language)?.name}
         </Badge>
+        <div className="flex items-center gap-2 ml-auto">
+          {isSpeaking && (
+            <Button variant="outline" size="sm" onClick={stopSpeaking} className="gap-1.5 text-xs">
+              <VolumeX className="h-3.5 w-3.5" /> Stop
+            </Button>
+          )}
+          <div className="flex items-center gap-2">
+            <Switch id="auto-read" checked={autoRead} onCheckedChange={setAutoRead} />
+            <Label htmlFor="auto-read" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+              <Volume2 className="h-3.5 w-3.5" /> Auto-read
+            </Label>
+          </div>
+        </div>
       </div>
 
       {/* Quick Phrases */}
