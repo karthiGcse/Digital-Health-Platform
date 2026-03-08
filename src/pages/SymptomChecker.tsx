@@ -12,16 +12,21 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const symptomCategories: Record<string, string[]> = {
-  'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness'],
-  'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness'],
-  'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion'],
-  'Cardiac': ['Chest Pain', 'Palpitations', 'Rapid Heartbeat', 'Swollen Legs', 'High Blood Pressure'],
-  'Digestive': ['Nausea', 'Vomiting', 'Diarrhea', 'Constipation', 'Abdominal Pain', 'Bloating', 'Heartburn', 'Blood in Stool'],
-  'Musculoskeletal': ['Joint Pain', 'Back Pain', 'Muscle Ache', 'Stiffness', 'Swelling', 'Cramps'],
-  'Skin': ['Rash', 'Itching', 'Hives', 'Bruising', 'Dry Skin', 'Skin Discoloration', 'Wound Not Healing'],
-  'Mental Health': ['Anxiety', 'Depression', 'Insomnia', 'Mood Swings', 'Panic Attacks', 'Stress'],
-  'Urinary': ['Painful Urination', 'Frequent Urination', 'Blood in Urine', 'Incontinence'],
-  'ENT': ['Ear Pain', 'Hearing Loss', 'Tinnitus', 'Nasal Congestion', 'Difficulty Swallowing'],
+  'General': ['Fever', 'Fatigue', 'Chills', 'Weight Loss', 'Night Sweats', 'Loss of Appetite', 'Weakness', 'Dehydration', 'Body Ache', 'Swollen Lymph Nodes'],
+  'Head & Neuro': ['Headache', 'Dizziness', 'Blurred Vision', 'Confusion', 'Memory Loss', 'Seizures', 'Numbness', 'Tingling', 'Tremors', 'Fainting', 'Migraine', 'Light Sensitivity'],
+  'Respiratory': ['Cough', 'Shortness of Breath', 'Wheezing', 'Sore Throat', 'Runny Nose', 'Sneezing', 'Chest Congestion', 'Coughing Blood', 'Difficulty Breathing', 'Hoarseness'],
+  'Cardiac': ['Chest Pain', 'Palpitations', 'Rapid Heartbeat', 'Swollen Legs', 'High Blood Pressure', 'Low Blood Pressure', 'Irregular Heartbeat', 'Cold Extremities', 'Chest Tightness'],
+  'Digestive': ['Nausea', 'Vomiting', 'Diarrhea', 'Constipation', 'Abdominal Pain', 'Bloating', 'Heartburn', 'Blood in Stool', 'Loss of Appetite', 'Acid Reflux', 'Difficulty Swallowing Food', 'Stomach Cramps'],
+  'Musculoskeletal': ['Joint Pain', 'Back Pain', 'Muscle Ache', 'Stiffness', 'Swelling', 'Cramps', 'Neck Pain', 'Shoulder Pain', 'Knee Pain', 'Hip Pain', 'Muscle Weakness', 'Bone Pain'],
+  'Skin': ['Rash', 'Itching', 'Hives', 'Bruising', 'Dry Skin', 'Skin Discoloration', 'Wound Not Healing', 'Acne', 'Blisters', 'Hair Loss', 'Nail Changes', 'Excessive Sweating'],
+  'Mental Health': ['Anxiety', 'Depression', 'Insomnia', 'Mood Swings', 'Panic Attacks', 'Stress', 'Brain Fog', 'Irritability', 'Lack of Motivation', 'Suicidal Thoughts', 'Hallucinations'],
+  'Urinary': ['Painful Urination', 'Frequent Urination', 'Blood in Urine', 'Incontinence', 'Dark Urine', 'Cloudy Urine', 'Kidney Pain', 'Urinary Retention'],
+  'ENT': ['Ear Pain', 'Hearing Loss', 'Tinnitus', 'Nasal Congestion', 'Difficulty Swallowing', 'Nosebleed', 'Jaw Pain', 'Loss of Smell', 'Loss of Taste', 'Sinus Pressure'],
+  'Eyes': ['Eye Pain', 'Red Eyes', 'Watery Eyes', 'Dry Eyes', 'Double Vision', 'Eye Floaters', 'Swollen Eyelids', 'Sensitivity to Light'],
+  'Hormonal': ['Excessive Thirst', 'Unexplained Weight Gain', 'Hot Flashes', 'Irregular Periods', 'Excessive Hunger', 'Cold Intolerance', 'Heat Intolerance', 'Mood Changes'],
+  'Allergies': ['Sneezing Fits', 'Watery Eyes', 'Hives', 'Swollen Face', 'Throat Swelling', 'Anaphylaxis', 'Food Intolerance', 'Drug Reaction'],
+  'Pediatric': ['Crying Excessively', 'Refusal to Eat', 'Diaper Rash', 'Teething Pain', 'Developmental Delay', 'Growth Concerns', 'Bed Wetting'],
+  'Dental': ['Toothache', 'Bleeding Gums', 'Bad Breath', 'Jaw Stiffness', 'Tooth Sensitivity', 'Mouth Ulcers', 'Swollen Gums'],
 };
 
 interface AnalysisResult {
