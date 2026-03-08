@@ -81,10 +81,20 @@ const Nutrition = () => {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['nutrition_plans'] });
       toast.success('Nutrition plan added!');
       setDialogOpen(false);
+      // Send notification
+      if (user) {
+        await supabase.from('notifications').insert({
+          user_id: user.id,
+          title: '🥗 Nutrition Plan Added',
+          message: `Your meal "${form.meal_name}" (${form.calories} kcal) has been added to today's plan.`,
+          type: 'success',
+          link: '/nutrition',
+        });
+      }
       resetForm();
     },
     onError: (e: Error) => toast.error(e.message),
