@@ -32,6 +32,14 @@ const features = [
   { id: '20', icon: '👶', title: 'Maternal & Child Health Tracker', tag: 'Family', eta: 'Q2 2027', progress: 15, desc: 'Pregnancy monitoring and baby milestone tracking.', benefits: ['Week-by-week pregnancy guide', 'Growth chart tracking', 'Pediatric symptom checker'], launched: false },
   { id: '21', icon: '🦷', title: 'Dental Health AI Scanner', tag: 'AI Vision', eta: 'Q3 2027', progress: 10, desc: 'Scan teeth and gums for early detection of dental issues.', benefits: ['Cavity risk detection', 'Gum disease screening', 'Dental appointment booking'], launched: false },
   { id: '22', icon: '🛡️', title: 'Health Insurance Optimizer', tag: 'Finance', eta: 'Q3 2027', progress: 8, desc: 'AI-powered insurance plan comparison and claim assistance.', benefits: ['Plan comparison tool', 'Claim auto-filing', 'Coverage gap analysis'], launched: false },
+  { id: '23', icon: '😴', title: 'Sleep Health Tracker', tag: 'Wellness', eta: 'Q4 2027', progress: 5, desc: 'Monitor and improve your sleep quality with AI insights.', benefits: ['Sleep cycle analysis', 'Smart alarm recommendations', 'Environment optimization tips'], launched: false },
+  { id: '24', icon: '🦴', title: 'Orthopedic AI Assistant', tag: 'AI', eta: 'Q4 2027', progress: 5, desc: 'AI-powered bone and joint health assessment.', benefits: ['Posture analysis', 'Fracture risk prediction', 'Rehab exercise plans'], launched: false },
+  { id: '25', icon: '👴', title: 'Elderly Fall Detection', tag: 'IoT', eta: 'Q1 2028', progress: 3, desc: 'Smart fall detection and emergency alerts for seniors.', benefits: ['Real-time fall alerts', 'Auto emergency call', 'Activity pattern monitoring'], launched: false },
+  { id: '26', icon: '🥼', title: 'AR Surgery Visualization', tag: 'AR', eta: 'Q1 2028', progress: 3, desc: 'Augmented reality surgical planning and visualization.', benefits: ['3D organ mapping', 'Pre-surgery simulation', 'Training for surgeons'], launched: false },
+  { id: '27', icon: '🧴', title: 'Skin Care AI Advisor', tag: 'AI Vision', eta: 'Q2 2028', progress: 2, desc: 'Personalized skincare routines based on AI skin analysis.', benefits: ['Skin type detection', 'Product recommendations', 'UV damage assessment'], launched: false },
+  { id: '28', icon: '🩸', title: 'Blood Donation Network', tag: 'Service', eta: 'Q2 2028', progress: 2, desc: 'Connect blood donors with nearby recipients in real-time.', benefits: ['Donor-recipient matching', 'Blood bank inventory', 'Donation reminders'], launched: false },
+  { id: '29', icon: '🧘', title: 'Yoga & Meditation Guide', tag: 'Fitness', eta: 'Q3 2028', progress: 1, desc: 'AI-guided yoga sessions and meditation programs.', benefits: ['Pose correction via camera', 'Guided breathing exercises', 'Stress level tracking'], launched: false },
+  { id: '30', icon: '🏥', title: 'Hospital Bed Availability', tag: 'Efficiency', eta: 'Q3 2028', progress: 1, desc: 'Real-time hospital bed tracking across your city.', benefits: ['Live bed count dashboard', 'ICU availability alerts', 'Ambulance routing'], launched: false },
 ];
 
 const tagColors: Record<string, string> = {
@@ -42,7 +50,7 @@ const tagColors: Record<string, string> = {
   Family: 'bg-orange-500/10 text-orange-600', Efficiency: 'bg-teal-500/10 text-teal-600',
   Pharmacy: 'bg-emerald-500/10 text-emerald-600', Global: 'bg-sky-500/10 text-sky-600',
   Fitness: 'bg-lime-500/10 text-lime-600', Research: 'bg-violet-500/10 text-violet-600',
-  Finance: 'bg-yellow-500/10 text-yellow-600',
+  Finance: 'bg-yellow-500/10 text-yellow-600', AR: 'bg-rose-500/10 text-rose-600',
 };
 
 const ComingSoon = () => {
