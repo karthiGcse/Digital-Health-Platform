@@ -52,7 +52,7 @@ const SymptomChecker = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-
+  const [selectedCategory, setSelectedCategory] = useState('General');
   const addSymptom = (s: string) => {
     setSymptoms(prev => prev ? `${prev}, ${s}` : s);
   };
