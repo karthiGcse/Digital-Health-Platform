@@ -31,7 +31,8 @@ const roleColors: Record<AppRole, string> = {
 };
 
 interface NavItem {
-  title: string;
+  titleKey: string;
+  fallback: string;
   url: string;
   icon: any;
 }
