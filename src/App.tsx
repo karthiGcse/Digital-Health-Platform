@@ -111,6 +111,12 @@ const App = () => (
               <Route path="/health-wallet" element={<HealthWallet />} />
               <Route path="/hearing-health" element={<HearingHealth />} />
               <Route path="/notification-settings" element={<NotificationSettings />} />
+              <Route path="/patient-registration" element={<PatientRegistration />} />
+              <Route path="/doctor-queue" element={<DoctorQueue />} />
+              <Route path="/bed-management" element={<BedManagementPage />} />
+              <Route path="/smart-pharmacy" element={<SmartPharmacy />} />
+              <Route path="/ai-assistant" element={<AIAssistant />} />
+              <Route path="/patient-notifications" element={<PatientNotifications />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />
