@@ -49,6 +49,12 @@ import Epigenetics from "@/pages/Epigenetics";
 import HealthWallet from "@/pages/HealthWallet";
 import HearingHealth from "@/pages/HearingHealth";
 import NotificationSettings from "@/pages/NotificationSettings";
+import PatientRegistration from "@/pages/PatientRegistration";
+import DoctorQueue from "@/pages/DoctorQueue";
+import BedManagementPage from "@/pages/BedManagement";
+import SmartPharmacy from "@/pages/SmartPharmacy";
+import AIAssistant from "@/pages/AIAssistant";
+import PatientNotifications from "@/pages/PatientNotifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
