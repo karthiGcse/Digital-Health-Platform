@@ -54,17 +54,17 @@ const additionalFeatures = [
 
 const Dashboard = () => {
   const { profile } = useAuth();
-  const isDoctorRole = profile?.role === 'doctor';
-
-  // If doctor, render DoctorDashboard
-  if (isDoctorRole) {
-    const DoctorDashboard = require('./DoctorDashboard').default;
-    return <DoctorDashboard />;
-  }
   const { t } = useLanguage();
   const navigate = useNavigate();
   const riskScore = 32;
   const [activeTab, setActiveTab] = useState<'week' | 'month'>('week');
+  const isDoctorRole = profile?.role === 'doctor';
+
+  if (isDoctorRole) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const DoctorDashboard = require('./DoctorDashboard').default;
+    return <DoctorDashboard />;
+  }
 
   const recentActivity = [
     { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, gradient: 'from-emerald-500 to-teal-500', status: 'completed' },
