@@ -43,6 +43,12 @@ const routeToTranslationKey: Record<string, string> = {
   '/health-wallet': 'nav.healthWallet',
   '/hearing-health': 'nav.hearingHealth',
   '/notification-settings': 'Notification Settings',
+  '/patient-registration': 'Patient Registration',
+  '/doctor-queue': 'Doctor Queue & Prescriptions',
+  '/bed-management': 'Bed Management',
+  '/smart-pharmacy': 'Smart Pharmacy',
+  '/ai-assistant': 'AI Doctor Assistant',
+  '/patient-notifications': 'Patient Notifications',
 };
 
 const AppLayout = () => {
