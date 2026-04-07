@@ -215,7 +215,15 @@ const Login = () => {
     );
   }
 
-  // Doctor Login View
+  const roleConfig = {
+    doctor: { label: 'Doctor Login', icon: Stethoscope, gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/25' },
+    patient: { label: 'Patient Login', icon: User, gradient: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/25' },
+    pharmacist: { label: 'Pharmacy Login', icon: Pill, gradient: 'from-purple-500 to-violet-500', shadow: 'shadow-purple-500/25' },
+  };
+  const currentRole = roleConfig[selectedRole];
+  const isDoctor = selectedRole === 'doctor';
+
+  // Role Login View
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 p-4">
       <div className="w-full max-w-lg animate-fade-in">
@@ -230,23 +238,29 @@ const Login = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Stethoscope className="h-6 w-6 text-white" />
+            <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${currentRole.gradient} flex items-center justify-center shadow-lg ${currentRole.shadow}`}>
+              <currentRole.icon className="h-6 w-6 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Doctor Login</h1>
+          <h1 className="text-2xl font-bold text-foreground">{currentRole.label}</h1>
           <p className="text-muted-foreground">Choose your authentication method</p>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-slate-900/80">
           <Tabs defaultValue="email" className="w-full">
             <CardHeader className="pb-2">
-              <TabsList className="grid grid-cols-4 w-full">
-                <TabsTrigger value="email" className="text-xs gap-1"><Mail className="h-3.5 w-3.5" /><span className="hidden sm:inline">Email</span></TabsTrigger>
-                <TabsTrigger value="face" className="text-xs gap-1"><ScanFace className="h-3.5 w-3.5" /><span className="hidden sm:inline">Face ID</span></TabsTrigger>
-                <TabsTrigger value="finger" className="text-xs gap-1"><Fingerprint className="h-3.5 w-3.5" /><span className="hidden sm:inline">Fingerprint</span></TabsTrigger>
-                <TabsTrigger value="docid" className="text-xs gap-1"><IdCard className="h-3.5 w-3.5" /><span className="hidden sm:inline">Doctor ID</span></TabsTrigger>
-              </TabsList>
+              {isDoctor ? (
+                <TabsList className="grid grid-cols-4 w-full">
+                  <TabsTrigger value="email" className="text-xs gap-1"><Mail className="h-3.5 w-3.5" /><span className="hidden sm:inline">Email</span></TabsTrigger>
+                  <TabsTrigger value="face" className="text-xs gap-1"><ScanFace className="h-3.5 w-3.5" /><span className="hidden sm:inline">Face ID</span></TabsTrigger>
+                  <TabsTrigger value="finger" className="text-xs gap-1"><Fingerprint className="h-3.5 w-3.5" /><span className="hidden sm:inline">Fingerprint</span></TabsTrigger>
+                  <TabsTrigger value="docid" className="text-xs gap-1"><IdCard className="h-3.5 w-3.5" /><span className="hidden sm:inline">Doctor ID</span></TabsTrigger>
+                </TabsList>
+              ) : (
+                <TabsList className="grid grid-cols-1 w-full">
+                  <TabsTrigger value="email" className="text-xs gap-1"><Mail className="h-3.5 w-3.5" /><span>Email / Password</span></TabsTrigger>
+                </TabsList>
+              )}
             </CardHeader>
 
             {/* TAB 1: Email/Password */}
