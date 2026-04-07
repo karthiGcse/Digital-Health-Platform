@@ -21,6 +21,7 @@ type SelectedRole = 'doctor' | 'patient' | 'pharmacist';
 
 const Login = () => {
   const [view, setView] = useState<LoginView>('role-select');
+  const [selectedRole, setSelectedRole] = useState<SelectedRole>('doctor');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
