@@ -178,61 +178,33 @@ const Login = () => {
 
           {/* Role Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Patient - Coming Soon */}
-            <Card className="relative overflow-hidden border-2 border-dashed border-muted opacity-60 cursor-not-allowed">
-              <div className="absolute top-3 right-3">
-                <span className="text-xs font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Coming Soon</span>
-              </div>
-              <CardContent className="pt-10 pb-8 flex flex-col items-center gap-4">
-                <div className="h-20 w-20 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
-                  <User className="h-10 w-10 text-emerald-400" />
+            {[
+              { role: 'patient' as SelectedRole, label: 'Patient Login', desc: 'Access your health records', icon: User, color: 'emerald', gradient: 'from-emerald-600 to-teal-600' },
+              { role: 'doctor' as SelectedRole, label: 'Doctor Login', desc: 'Full access to hospital system', icon: Stethoscope, color: 'blue', gradient: 'from-blue-600 to-cyan-600' },
+              { role: 'pharmacist' as SelectedRole, label: 'Pharmacy Login', desc: 'Manage prescriptions & stock', icon: Pill, color: 'purple', gradient: 'from-purple-600 to-violet-600' },
+            ].map((card) => (
+              <Card
+                key={card.role}
+                className={`relative overflow-hidden border-2 border-${card.color}-400 bg-gradient-to-b from-${card.color}-50/50 to-white dark:from-${card.color}-950/30 dark:to-slate-900 cursor-pointer hover:shadow-xl hover:shadow-${card.color}-500/15 transition-all duration-300 hover:-translate-y-1 group`}
+                onClick={() => { setSelectedRole(card.role); setView('role-login'); }}
+              >
+                <div className="absolute top-3 right-3">
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full bg-${card.color}-100 text-${card.color}-700 dark:bg-${card.color}-900 dark:text-${card.color}-300`}>Active</span>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-muted-foreground">Patient Login</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Access your health records</p>
-                </div>
-                <Button disabled className="w-full mt-2" variant="outline">Coming Soon</Button>
-              </CardContent>
-            </Card>
-
-            {/* Doctor - Active */}
-            <Card
-              className="relative overflow-hidden border-2 border-blue-400 bg-gradient-to-b from-blue-50/50 to-white dark:from-blue-950/30 dark:to-slate-900 cursor-pointer hover:shadow-xl hover:shadow-blue-500/15 transition-all duration-300 hover:-translate-y-1 group"
-              onClick={() => setView('doctor-login')}
-            >
-              <div className="absolute top-3 right-3">
-                <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">Active</span>
-              </div>
-              <CardContent className="pt-10 pb-8 flex flex-col items-center gap-4">
-                <div className="h-20 w-20 rounded-2xl bg-blue-100 dark:bg-blue-950 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Stethoscope className="h-10 w-10 text-blue-600" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-foreground">Doctor Login</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Full access to hospital system</p>
-                </div>
-                <Button className="w-full mt-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-md">
-                  Click to Login
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Pharmacy - Coming Soon */}
-            <Card className="relative overflow-hidden border-2 border-dashed border-muted opacity-60 cursor-not-allowed">
-              <div className="absolute top-3 right-3">
-                <span className="text-xs font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Coming Soon</span>
-              </div>
-              <CardContent className="pt-10 pb-8 flex flex-col items-center gap-4">
-                <div className="h-20 w-20 rounded-2xl bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
-                  <Pill className="h-10 w-10 text-purple-400" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-muted-foreground">Pharmacy Login</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Manage prescriptions & stock</p>
-                </div>
-                <Button disabled className="w-full mt-2" variant="outline">Coming Soon</Button>
-              </CardContent>
-            </Card>
+                <CardContent className="pt-10 pb-8 flex flex-col items-center gap-4">
+                  <div className={`h-20 w-20 rounded-2xl bg-${card.color}-100 dark:bg-${card.color}-950 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <card.icon className={`h-10 w-10 text-${card.color}-600`} />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-foreground">{card.label}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{card.desc}</p>
+                  </div>
+                  <Button className={`w-full mt-2 bg-gradient-to-r ${card.gradient} hover:opacity-90 text-white shadow-md`}>
+                    Click to Login
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
