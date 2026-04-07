@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type LoginView = 'role-select' | 'doctor-login';
+type LoginView = 'role-select' | 'role-login';
+type SelectedRole = 'doctor' | 'patient' | 'pharmacist';
 
 const Login = () => {
   const [view, setView] = useState<LoginView>('role-select');
