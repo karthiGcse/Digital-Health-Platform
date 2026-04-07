@@ -117,28 +117,35 @@ const DoctorDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentPatients.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer" onClick={() => navigate('/doctor-queue')}>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-                        {p.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.id} • Age {p.age} • {p.symptoms}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{p.time}</span>
-                      <Badge variant={p.status === 'Completed' ? 'default' : p.status === 'In Progress' ? 'secondary' : 'outline'}
-                        className={p.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20' :
-                          p.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600 border-blue-500/20' :
-                          'bg-amber-500/15 text-amber-600 border-amber-500/20'}>
-                        {p.status}
-                      </Badge>
-                    </div>
+                {patients.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-muted-foreground">No patients registered yet.</p>
+                    <Button size="sm" variant="link" onClick={() => navigate('/patient-registration')}>Register first patient →</Button>
                   </div>
-                ))}
+                ) : (
+                  patients.slice(0, 5).map((p) => (
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer" onClick={() => navigate('/doctor-queue')}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+                          {p.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{p.name}</p>
+                          <p className="text-xs text-muted-foreground">{p.id} • Age {p.age} • {p.symptoms}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{p.registeredAt}</span>
+                        <Badge variant={p.status === 'Completed' ? 'default' : p.status === 'In Progress' ? 'secondary' : 'outline'}
+                          className={p.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20' :
+                            p.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600 border-blue-500/20' :
+                            'bg-amber-500/15 text-amber-600 border-amber-500/20'}>
+                          {p.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
