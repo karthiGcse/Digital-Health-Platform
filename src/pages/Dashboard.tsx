@@ -17,6 +17,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import DoctorDashboard from './DoctorDashboard';
+import PharmacistDashboard from './PharmacistDashboard';
 
 const adherenceData = [
   { day: 'Mon', adherence: 85, target: 90 }, { day: 'Tue', adherence: 90, target: 90 }, { day: 'Wed', adherence: 78, target: 90 },
@@ -59,11 +60,15 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const riskScore = 32;
   const [activeTab, setActiveTab] = useState<'week' | 'month'>('week');
-  const isDoctorRole = profile?.role === 'doctor';
-
-  if (isDoctorRole) {
+  if (profile?.role === 'doctor') {
     return <DoctorDashboard />;
   }
+
+  if (profile?.role === 'pharmacist') {
+    return <PharmacistDashboard />;
+  }
+
+  // Patient dashboard (default) continues below
 
   const recentActivity = [
     { icon: Pill, text: t('activity.tookMedicine'), time: `2 ${t('time.hoursAgo')}`, gradient: 'from-emerald-500 to-teal-500', status: 'completed' },
