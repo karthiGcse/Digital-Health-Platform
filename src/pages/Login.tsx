@@ -55,7 +55,8 @@ const Login = () => {
     setIsLoading(true);
     try {
       await signIn(email, password);
-      toast({ title: 'Welcome back, Doctor! 🩺', description: 'Login successful.' });
+      const roleEmoji = selectedRole === 'doctor' ? '🩺' : selectedRole === 'pharmacist' ? '💊' : '👤';
+      toast({ title: `Welcome back! ${roleEmoji}`, description: 'Login successful.' });
       runPostLogin();
     } catch (err: any) {
       toast({ title: 'Login failed', description: err.message, variant: 'destructive' });
