@@ -17,6 +17,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import DoctorDashboard from './DoctorDashboard';
+import PharmacistDashboard from './PharmacistDashboard';
 
 const adherenceData = [
   { day: 'Mon', adherence: 85, target: 90 }, { day: 'Tue', adherence: 90, target: 90 }, { day: 'Wed', adherence: 78, target: 90 },
