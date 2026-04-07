@@ -7,16 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Bell, Send, Search, CheckCircle2, Clock, MessageSquare, Users } from 'lucide-react';
-
-interface Notification {
-  id: string;
-  patient: string;
-  message: string;
-  type: 'token' | 'doctor' | 'pharmacy' | 'reminder' | 'followup';
-  time: string;
-  status: 'Sent' | 'Delivered' | 'Read';
-}
+import { Bell, Send, Search, CheckCircle2, Clock, Users, Stethoscope, Pill, BedDouble } from 'lucide-react';
+import { useHospital } from '@/contexts/HospitalContext';
+import { useNavigate } from 'react-router-dom';
 
 const templates = [
   { id: 'token', label: 'Token Ready', template: 'Your token #{n} is ready. Estimated wait: {time} mins' },
@@ -24,27 +17,20 @@ const templates = [
   { id: 'pharmacy', label: 'Medicine Ready', template: 'Your medicine is ready at Counter {n}' },
   { id: 'reminder', label: 'Med Reminder', template: 'Reminder: Take {med} {dose} — {time}' },
   { id: 'followup', label: 'Follow-up', template: 'Follow-up with Dr. {name} tomorrow at {time}' },
+  { id: 'bed', label: 'Bed Assigned', template: 'Bed {n} ({ward}) has been assigned to you.' },
 ];
 
-const mockNotifications: Notification[] = [
-  { id: '1', patient: 'Rahul Sharma', message: 'Your token #1 is ready. Estimated wait: 10 mins', type: 'token', time: '10:30 AM', status: 'Read' },
-  { id: '2', patient: 'Priya Patel', message: 'Dr. Arun is ready to see you — Room 3', type: 'doctor', time: '10:45 AM', status: 'Delivered' },
-  { id: '3', patient: 'Amit Kumar', message: 'Your medicine is ready at Counter 2', type: 'pharmacy', time: '11:00 AM', status: 'Sent' },
-  { id: '4', patient: 'Sneha Gupta', message: 'Reminder: Take Azithromycin 500mg — 9:00 PM', type: 'reminder', time: '08:00 PM', status: 'Delivered' },
-  { id: '5', patient: 'Vikram Singh', message: 'Follow-up with Dr. Meena tomorrow at 10:00 AM', type: 'followup', time: '06:00 PM', status: 'Sent' },
-  { id: '6', patient: 'Meera Joshi', message: 'Your token #6 is ready. Estimated wait: 25 mins', type: 'token', time: '11:15 AM', status: 'Read' },
-];
-
-const patients = ['Rahul Sharma', 'Priya Patel', 'Amit Kumar', 'Sneha Gupta', 'Vikram Singh', 'Meera Joshi', 'Ravi Tiwari', 'Anjali Das'];
-
-const typeIcons: Record<string, string> = { token: '🎫', doctor: '👨‍⚕️', pharmacy: '💊', reminder: '⏰', followup: '📅' };
+const typeIcons: Record<string, string> = { token: '🎫', doctor: '👨‍⚕️', pharmacy: '💊', reminder: '⏰', followup: '📅', bed: '🛏️' };
 
 const PatientNotifications = () => {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { notifications, patients, addNotification } = useHospital();
+  const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const patientNames = patients.map(p => p.name);
 
   const handleSend = () => {
     if (!selectedPatient || (!selectedTemplate && !customMessage)) {
@@ -52,15 +38,13 @@ const PatientNotifications = () => {
       return;
     }
     const msg = customMessage || templates.find(t => t.id === selectedTemplate)?.template || '';
-    const newNotif: Notification = {
-      id: Date.now().toString(),
+    addNotification({
       patient: selectedPatient,
       message: msg,
-      type: (selectedTemplate as Notification['type']) || 'reminder',
+      type: (selectedTemplate as any) || 'reminder',
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       status: 'Sent',
-    };
-    setNotifications(prev => [newNotif, ...prev]);
+    });
     setCustomMessage('');
     setSelectedTemplate('');
     toast({ title: 'Notification Sent ✓', description: `Sent to ${selectedPatient}` });
@@ -73,21 +57,65 @@ const PatientNotifications = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
-          <Bell className="h-5 w-5 text-white" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
+            <Bell className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Patient Notifications</h1>
+            <p className="text-sm text-muted-foreground">Send and track patient notifications — auto-linked from all modules</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Patient Notifications</h1>
-          <p className="text-sm text-muted-foreground">Send and track patient notifications</p>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => navigate('/doctor-queue')}>
+            <Stethoscope className="h-4 w-4 mr-1" /> Doctor Queue
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/smart-pharmacy')}>
+            <Pill className="h-4 w-4 mr-1" /> Pharmacy
+          </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="send">
+      <Tabs defaultValue="history">
         <TabsList>
-          <TabsTrigger value="send">📤 Send</TabsTrigger>
-          <TabsTrigger value="history">📋 History ({notifications.length})</TabsTrigger>
+          <TabsTrigger value="history">📋 All Notifications ({notifications.length})</TabsTrigger>
+          <TabsTrigger value="send">📤 Send Manual</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="history">
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search notifications..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+              </div>
+              {filtered.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No notifications yet. They will appear automatically as patients are registered, prescriptions sent, beds assigned, etc.</p>
+              ) : (
+                filtered.map(n => (
+                  <div key={n.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">{typeIcons[n.type] || '📌'}</span>
+                      <div>
+                        <p className="text-sm font-semibold">{n.patient}</p>
+                        <p className="text-xs text-muted-foreground">{n.message}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge className={
+                        n.status === 'Read' ? 'bg-emerald-500/15 text-emerald-600' :
+                        n.status === 'Delivered' ? 'bg-blue-500/15 text-blue-600' :
+                        'bg-muted text-muted-foreground'
+                      }>{n.status}</Badge>
+                      <p className="text-[10px] text-muted-foreground mt-1">{n.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="send">
           <div className="grid lg:grid-cols-2 gap-6">
@@ -99,7 +127,11 @@ const PatientNotifications = () => {
                   <Select value={selectedPatient} onValueChange={setSelectedPatient}>
                     <SelectTrigger><SelectValue placeholder="Select patient..." /></SelectTrigger>
                     <SelectContent>
-                      {patients.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      {patientNames.length > 0 ? (
+                        patientNames.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)
+                      ) : (
+                        <SelectItem value="_none" disabled>No patients registered</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -134,49 +166,9 @@ const PatientNotifications = () => {
                 ) : (
                   <p className="text-center text-muted-foreground py-12">Select patient and message to preview</p>
                 )}
-                <div className="mt-4">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">Templates</p>
-                  <div className="space-y-2">
-                    {templates.map(t => (
-                      <div key={t.id} className="p-2 rounded-lg bg-muted/30 text-xs">
-                        <span className="font-medium">{t.label}:</span> {t.template}
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <Card>
-            <CardContent className="p-4 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search notifications..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-              </div>
-              {filtered.map(n => (
-                <div key={n.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{typeIcons[n.type]}</span>
-                    <div>
-                      <p className="text-sm font-semibold">{n.patient}</p>
-                      <p className="text-xs text-muted-foreground">{n.message}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Badge className={
-                      n.status === 'Read' ? 'bg-emerald-500/15 text-emerald-600' :
-                      n.status === 'Delivered' ? 'bg-blue-500/15 text-blue-600' :
-                      'bg-muted text-muted-foreground'
-                    }>{n.status}</Badge>
-                    <p className="text-[10px] text-muted-foreground mt-1">{n.time}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

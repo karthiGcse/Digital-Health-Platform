@@ -5,17 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Pill, Search, Package, AlertTriangle, CheckCircle2, Clock, TrendingUp, Bell } from 'lucide-react';
+import { Pill, Search, Package, AlertTriangle, CheckCircle2, Clock, TrendingUp, Bell, Users, Stethoscope } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-
-interface Prescription {
-  id: string;
-  patient: string;
-  medicines: string[];
-  time: string;
-  status: 'New' | 'In Progress' | 'Ready' | 'Dispensed';
-}
+import { useHospital } from '@/contexts/HospitalContext';
+import { useNavigate } from 'react-router-dom';
 
 interface StockItem {
   name: string;
@@ -24,14 +18,6 @@ interface StockItem {
   expiry: string;
   price: number;
 }
-
-const mockPrescriptions: Prescription[] = [
-  { id: 'RX-001', patient: 'Rahul Sharma', medicines: ['Metformin 500mg', 'Amlodipine 5mg'], time: '10:30 AM', status: 'New' },
-  { id: 'RX-002', patient: 'Priya Patel', medicines: ['Paracetamol 500mg', 'Cetirizine 10mg'], time: '10:45 AM', status: 'New' },
-  { id: 'RX-003', patient: 'Amit Kumar', medicines: ['Ibuprofen 400mg'], time: '11:00 AM', status: 'In Progress' },
-  { id: 'RX-004', patient: 'Sneha Gupta', medicines: ['Azithromycin 500mg', 'Pantoprazole 40mg'], time: '09:15 AM', status: 'Ready' },
-  { id: 'RX-005', patient: 'Vikram Singh', medicines: ['Salbutamol Inhaler', 'Montelukast 10mg', 'Dolo 650mg'], time: '11:15 AM', status: 'New' },
-];
 
 const mockStock: StockItem[] = [
   { name: 'Paracetamol 500mg', stock: 450, maxStock: 500, expiry: '2026-06', price: 5 },
@@ -59,13 +45,17 @@ const topMedicines = [
 ];
 
 const SmartPharmacy = () => {
-  const [prescriptions, setPrescriptions] = useState(mockPrescriptions);
+  const { prescriptions, updatePrescriptionStatus, patients } = useHospital();
+  const navigate = useNavigate();
   const [stock, setStock] = useState(mockStock);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const updatePrescriptionStatus = (id: string, status: Prescription['status']) => {
-    setPrescriptions(prev => prev.map(p => p.id === id ? { ...p, status } : p));
-    toast({ title: `${status === 'Ready' ? '✅ Ready for pickup' : status === 'In Progress' ? '🔄 Preparing...' : '💊 Dispensed'}`, description: `Prescription ${id} updated.` });
+  const handleUpdateStatus = (id: string, status: 'In Progress' | 'Ready' | 'Dispensed') => {
+    updatePrescriptionStatus(id, status);
+    toast({
+      title: `${status === 'Ready' ? '✅ Ready for pickup' : status === 'In Progress' ? '🔄 Preparing...' : '💊 Dispensed'}`,
+      description: `Prescription ${id} updated. Patient notified.`,
+    });
   };
 
   const getStockLevel = (item: StockItem) => {
@@ -87,65 +77,107 @@ const SmartPharmacy = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
-          <Pill className="h-5 w-5 text-white" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+            <Pill className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Smart Pharmacy</h1>
+            <p className="text-sm text-muted-foreground">Prescriptions from doctors, stock & analytics</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Smart Pharmacy</h1>
-          <p className="text-sm text-muted-foreground">Prescriptions, stock & analytics</p>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => navigate('/doctor-queue')}>
+            <Stethoscope className="h-4 w-4 mr-1" /> Doctor Queue
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/patient-notifications')}>
+            <Bell className="h-4 w-4 mr-1" /> Notifications
+          </Button>
         </div>
       </div>
 
       <Tabs defaultValue="inbox">
         <TabsList>
           <TabsTrigger value="inbox">📥 Inbox ({prescriptions.filter(p => p.status === 'New').length})</TabsTrigger>
+          <TabsTrigger value="all">📋 All Rx ({prescriptions.length})</TabsTrigger>
           <TabsTrigger value="stock">📦 Stock</TabsTrigger>
           <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="inbox">
           <div className="space-y-3">
-            {prescriptions.map(rx => (
-              <Card key={rx.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                        Rx
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-bold">{rx.id}</p>
-                          <Badge className={
-                            rx.status === 'New' ? 'bg-blue-500/15 text-blue-600' :
-                            rx.status === 'In Progress' ? 'bg-amber-500/15 text-amber-600' :
-                            rx.status === 'Ready' ? 'bg-emerald-500/15 text-emerald-600' :
-                            'bg-muted text-muted-foreground'
-                          }>{rx.status}</Badge>
-                        </div>
-                        <p className="text-sm text-foreground">{rx.patient}</p>
-                        <p className="text-xs text-muted-foreground">{rx.medicines.join(', ')}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{rx.time}</span>
-                      {rx.status === 'New' && (
-                        <Button size="sm" onClick={() => updatePrescriptionStatus(rx.id, 'In Progress')}>Start Preparing</Button>
-                      )}
-                      {rx.status === 'In Progress' && (
-                        <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700" onClick={() => updatePrescriptionStatus(rx.id, 'Ready')}>
-                          <CheckCircle2 className="h-4 w-4 mr-1" /> Mark Ready
-                        </Button>
-                      )}
-                      {rx.status === 'Ready' && (
-                        <Button size="sm" variant="outline" onClick={() => updatePrescriptionStatus(rx.id, 'Dispensed')}>Dispensed</Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
+            {prescriptions.filter(rx => rx.status !== 'Dispensed').length === 0 ? (
+              <Card className="p-12 text-center">
+                <Pill className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+                <p className="text-muted-foreground">No prescriptions yet. They will appear here when doctors send them.</p>
               </Card>
-            ))}
+            ) : (
+              prescriptions.filter(rx => rx.status !== 'Dispensed').map(rx => (
+                <Card key={rx.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                          Rx
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold">{rx.id}</p>
+                            <Badge className={
+                              rx.status === 'New' ? 'bg-blue-500/15 text-blue-600' :
+                              rx.status === 'In Progress' ? 'bg-amber-500/15 text-amber-600' :
+                              rx.status === 'Ready' ? 'bg-emerald-500/15 text-emerald-600' :
+                              'bg-muted text-muted-foreground'
+                            }>{rx.status}</Badge>
+                          </div>
+                          <p className="text-sm text-foreground">{rx.patientName} ({rx.patientId})</p>
+                          <p className="text-xs text-muted-foreground">Dx: {rx.diagnosis}</p>
+                          <p className="text-xs text-muted-foreground">{rx.medicines.map(m => m.name).join(', ')}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{rx.time}</span>
+                        {rx.status === 'New' && (
+                          <Button size="sm" onClick={() => handleUpdateStatus(rx.id, 'In Progress')}>Start Preparing</Button>
+                        )}
+                        {rx.status === 'In Progress' && (
+                          <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700" onClick={() => handleUpdateStatus(rx.id, 'Ready')}>
+                            <CheckCircle2 className="h-4 w-4 mr-1" /> Mark Ready
+                          </Button>
+                        )}
+                        {rx.status === 'Ready' && (
+                          <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(rx.id, 'Dispensed')}>Dispensed</Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="all">
+          <div className="space-y-3">
+            {prescriptions.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No prescriptions yet.</p>
+            ) : (
+              prescriptions.map(rx => (
+                <div key={rx.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
+                  <div>
+                    <p className="text-sm font-semibold">{rx.id} — {rx.patientName}</p>
+                    <p className="text-xs text-muted-foreground">{rx.medicines.map(m => m.name).join(', ')}</p>
+                  </div>
+                  <Badge className={
+                    rx.status === 'Dispensed' ? 'bg-muted text-muted-foreground' :
+                    rx.status === 'Ready' ? 'bg-emerald-500/15 text-emerald-600' :
+                    rx.status === 'In Progress' ? 'bg-amber-500/15 text-amber-600' :
+                    'bg-blue-500/15 text-blue-600'
+                  }>{rx.status}</Badge>
+                </div>
+              ))
+            )}
           </div>
         </TabsContent>
 
@@ -156,12 +188,10 @@ const SmartPharmacy = () => {
                 <AlertTriangle className="h-4 w-4" /> {lowStockItems.length} items critically low: {lowStockItems.map(i => i.name).join(', ')}
               </div>
             )}
-
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search medicines..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-
             <div className="grid gap-2">
               {filteredStock.map(item => {
                 const level = getStockLevel(item);
@@ -213,8 +243,8 @@ const SmartPharmacy = () => {
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <p className="text-3xl font-bold text-foreground">{stock.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Medicines</p>
+                  <p className="text-3xl font-bold text-foreground">{prescriptions.length}</p>
+                  <p className="text-sm text-muted-foreground">Total Prescriptions</p>
                 </CardContent>
               </Card>
               <Card>

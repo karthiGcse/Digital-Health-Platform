@@ -7,41 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Users, FileText, Plus, Trash2, Download, Send, Clock,
-  AlertCircle, CheckCircle2, Stethoscope, Pill, Eye
+  CheckCircle2, Stethoscope, Pill, Eye, BedDouble, Bell, Brain
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import jsPDF from 'jspdf';
-
-interface Medicine {
-  name: string;
-  dosage: string;
-  timing: string;
-  duration: string;
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  symptoms: string;
-  history: string;
-  chronic: string[];
-  token: number;
-  status: 'Waiting' | 'In Progress' | 'Completed';
-}
-
-const mockPatients: Patient[] = [
-  { id: 'PT-2025-0001', name: 'Rahul Sharma', age: 45, gender: 'Male', symptoms: 'Chest pain, fatigue, shortness of breath', history: 'Previous MI 2023', chronic: ['Diabetes', 'BP'], token: 1, status: 'In Progress' },
-  { id: 'PT-2025-0002', name: 'Priya Patel', age: 32, gender: 'Female', symptoms: 'Severe headache, fever 102°F', history: 'Migraine history', chronic: [], token: 2, status: 'Waiting' },
-  { id: 'PT-2025-0003', name: 'Amit Kumar', age: 58, gender: 'Male', symptoms: 'Joint pain, morning stiffness', history: 'Rheumatoid Arthritis', chronic: ['Heart'], token: 3, status: 'Waiting' },
-  { id: 'PT-2025-0004', name: 'Sneha Gupta', age: 27, gender: 'Female', symptoms: 'Skin rash, itching', history: 'Allergies to dust', chronic: [], token: 4, status: 'Completed' },
-  { id: 'PT-2025-0005', name: 'Vikram Singh', age: 63, gender: 'Male', symptoms: 'Breathing difficulty, wheezing', history: 'COPD diagnosed 2020', chronic: ['Diabetes', 'BP', 'Heart'], token: 5, status: 'Waiting' },
-  { id: 'PT-2025-0006', name: 'Meera Joshi', age: 41, gender: 'Female', symptoms: 'Abdominal pain, nausea', history: 'Gallstones', chronic: [], token: 6, status: 'Waiting' },
-];
+import { useHospital, PrescriptionMedicine } from '@/contexts/HospitalContext';
+import { useNavigate } from 'react-router-dom';
 
 const medicineOptions = [
   'Paracetamol 500mg', 'Amoxicillin 250mg', 'Metformin 500mg', 'Amlodipine 5mg',
@@ -51,12 +25,15 @@ const medicineOptions = [
 ];
 
 const DoctorQueue = () => {
-  const [patients, setPatients] = useState(mockPatients);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(mockPatients[0]);
+  const { patients, updatePatientStatus, addPrescription, getAvailableBeds, assignBed } = useHospital();
+  const navigate = useNavigate();
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [diagnosis, setDiagnosis] = useState('');
-  const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [newMed, setNewMed] = useState<Medicine>({ name: '', dosage: '', timing: 'After Food - Morning', duration: '5 days' });
+  const [medicines, setMedicines] = useState<PrescriptionMedicine[]>([]);
+  const [newMed, setNewMed] = useState<PrescriptionMedicine>({ name: '', dosage: '', timing: 'After Food - Morning', duration: '5 days' });
   const [showPreview, setShowPreview] = useState(false);
+
+  const selectedPatient = patients.find(p => p.id === selectedPatientId) || null;
 
   const addMedicine = () => {
     if (!newMed.name) return;
@@ -68,18 +45,40 @@ const DoctorQueue = () => {
     setMedicines(prev => prev.filter((_, i) => i !== idx));
   };
 
+  const handleStartConsultation = (patientId: string) => {
+    updatePatientStatus(patientId, 'In Progress');
+    setSelectedPatientId(patientId);
+  };
+
   const handleSendToPharmacy = () => {
     if (!medicines.length || !diagnosis) {
       toast({ title: 'Incomplete', description: 'Add diagnosis and at least one medicine.', variant: 'destructive' });
       return;
     }
     if (selectedPatient) {
-      setPatients(prev => prev.map(p => p.id === selectedPatient.id ? { ...p, status: 'Completed' } : p));
+      addPrescription({
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.name,
+        diagnosis,
+        medicines,
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      });
+      updatePatientStatus(selectedPatient.id, 'Completed');
     }
     toast({ title: 'Prescription Sent ✓', description: 'Sent to pharmacy and patient notified.' });
     setMedicines([]);
     setDiagnosis('');
     setShowPreview(false);
+  };
+
+  const handleAdmitPatient = (ward: string) => {
+    if (!selectedPatient) return;
+    const bed = assignBed(selectedPatient.id, selectedPatient.name, ward);
+    if (bed) {
+      toast({ title: 'Bed Assigned ✓', description: `${selectedPatient.name} → Bed ${bed.number} (${ward})` });
+    } else {
+      toast({ title: 'No beds available', description: `No free beds in ${ward}`, variant: 'destructive' });
+    }
   };
 
   const downloadPDF = () => {
@@ -98,17 +97,31 @@ const DoctorQueue = () => {
     doc.save(`prescription-${selectedPatient.id}.pdf`);
   };
 
-  const chronicColors: Record<string, string> = { 'Diabetes': 'bg-red-500/15 text-red-600', 'BP': 'bg-blue-500/15 text-blue-600', 'Heart': 'bg-emerald-500/15 text-emerald-600' };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
-          <Stethoscope className="h-5 w-5 text-white" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+            <Stethoscope className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Doctor Queue & Prescription</h1>
+            <p className="text-sm text-muted-foreground">Manage patients and write prescriptions</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Doctor Queue & Prescription</h1>
-          <p className="text-sm text-muted-foreground">Manage patients and write prescriptions</p>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => navigate('/patient-registration')}>
+            <Users className="h-4 w-4 mr-1" /> Register
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/bed-management')}>
+            <BedDouble className="h-4 w-4 mr-1" /> Beds
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/ai-assistant')}>
+            <Brain className="h-4 w-4 mr-1" /> AI Assist
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/smart-pharmacy')}>
+            <Pill className="h-4 w-4 mr-1" /> Pharmacy
+          </Button>
         </div>
       </div>
 
@@ -123,30 +136,45 @@ const DoctorQueue = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 max-h-[70vh] overflow-y-auto">
-              {patients.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedPatient(p)}
-                  className={`p-3 rounded-xl cursor-pointer transition-all ${selectedPatient?.id === p.id ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-muted/30 hover:bg-muted/60'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
-                        #{p.token}
+              {patients.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                  <p className="text-sm text-muted-foreground">No patients in queue</p>
+                  <Button size="sm" variant="link" onClick={() => navigate('/patient-registration')}>Register a patient →</Button>
+                </div>
+              ) : (
+                patients.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => setSelectedPatientId(p.id)}
+                    className={`p-3 rounded-xl cursor-pointer transition-all ${selectedPatientId === p.id ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-muted/30 hover:bg-muted/60'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+                          #{p.token}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">{p.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{p.id} • {p.age}y • {p.gender}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold">{p.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{p.id} • {p.age}y • {p.gender}</p>
+                      <div className="flex items-center gap-2">
+                        {p.status === 'Waiting' && (
+                          <Button size="sm" variant="outline" className="h-7 text-[10px]" onClick={(e) => { e.stopPropagation(); handleStartConsultation(p.id); }}>
+                            Start
+                          </Button>
+                        )}
+                        <Badge className={
+                          p.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600 text-[10px]' :
+                          p.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600 text-[10px]' :
+                          'bg-amber-500/15 text-amber-600 text-[10px]'
+                        }>{p.status}</Badge>
                       </div>
                     </div>
-                    <Badge className={
-                      p.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600 text-[10px]' :
-                      p.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600 text-[10px]' :
-                      'bg-amber-500/15 text-amber-600 text-[10px]'
-                    }>{p.status}</Badge>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
@@ -155,7 +183,6 @@ const DoctorQueue = () => {
         <div className="lg:col-span-8 space-y-4">
           {selectedPatient ? (
             <>
-              {/* Patient Profile */}
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
@@ -166,16 +193,13 @@ const DoctorQueue = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-bold">{selectedPatient.name}</h3>
                         <Badge variant="outline" className="text-xs">{selectedPatient.id}</Badge>
+                        <Badge className={
+                          selectedPatient.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600' :
+                          selectedPatient.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600' :
+                          'bg-amber-500/15 text-amber-600'
+                        }>{selectedPatient.status}</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">Age {selectedPatient.age} • {selectedPatient.gender}</p>
-                      <div className="flex gap-2 mt-2">
-                        {selectedPatient.chronic.map(c => (
-                          <Badge key={c} className={`text-[10px] ${chronicColors[c] || 'bg-muted'}`}>
-                            {c === 'Diabetes' ? '🔴' : c === 'BP' ? '🔵' : '💚'} {c}
-                          </Badge>
-                        ))}
-                        {!selectedPatient.chronic.length && <span className="text-xs text-muted-foreground">No chronic conditions</span>}
-                      </div>
+                      <p className="text-sm text-muted-foreground">Age {selectedPatient.age} • {selectedPatient.gender} • Phone: {selectedPatient.phone}</p>
                       <div className="mt-3 p-2 rounded-lg bg-muted/50">
                         <p className="text-xs font-medium text-muted-foreground">Symptoms</p>
                         <p className="text-sm">{selectedPatient.symptoms}</p>
@@ -186,6 +210,15 @@ const DoctorQueue = () => {
                           <p className="text-sm">{selectedPatient.history}</p>
                         </div>
                       )}
+                      {/* Admit to Bed */}
+                      <div className="mt-3 flex gap-2 flex-wrap">
+                        <span className="text-xs text-muted-foreground self-center">Admit to:</span>
+                        {['ICU', 'Emergency', 'General Ward', 'Surgery'].map(w => (
+                          <Button key={w} size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleAdmitPatient(w)}>
+                            <BedDouble className="h-3 w-3 mr-1" /> {w} ({getAvailableBeds(w).length})
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -204,7 +237,6 @@ const DoctorQueue = () => {
                     <Textarea placeholder="Enter diagnosis..." value={diagnosis} onChange={e => setDiagnosis(e.target.value)} className="min-h-[60px]" />
                   </div>
 
-                  {/* Add Medicine */}
                   <div className="p-3 rounded-xl bg-muted/30 border border-dashed space-y-3">
                     <p className="text-sm font-semibold flex items-center gap-2"><Pill className="h-4 w-4" /> Add Medicine</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -249,7 +281,6 @@ const DoctorQueue = () => {
                     </Button>
                   </div>
 
-                  {/* Medicines List */}
                   {medicines.length > 0 && (
                     <div className="space-y-2">
                       <p className="text-sm font-semibold">Prescribed Medicines ({medicines.length})</p>
@@ -270,7 +301,7 @@ const DoctorQueue = () => {
                     </div>
                   )}
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button variant="outline" onClick={() => setShowPreview(true)} disabled={!medicines.length}>
                       <Eye className="h-4 w-4 mr-2" /> Preview
                     </Button>
@@ -280,11 +311,13 @@ const DoctorQueue = () => {
                     <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white" onClick={handleSendToPharmacy} disabled={!medicines.length}>
                       <Send className="h-4 w-4 mr-2" /> Save & Send to Pharmacy
                     </Button>
+                    <Button variant="outline" onClick={() => navigate('/patient-notifications')}>
+                      <Bell className="h-4 w-4 mr-2" /> Notify Patient
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Prescription Preview Dialog */}
               <Dialog open={showPreview} onOpenChange={setShowPreview}>
                 <DialogContent className="max-w-lg">
                   <DialogHeader>
@@ -312,9 +345,6 @@ const DoctorQueue = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="text-center pt-2 border-t">
-                      <Badge className="bg-emerald-500/15 text-emerald-600">Sent to Pharmacy</Badge>
-                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -322,7 +352,12 @@ const DoctorQueue = () => {
           ) : (
             <Card className="p-12 text-center">
               <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-muted-foreground">Select a patient from the queue</p>
+              <p className="text-muted-foreground">
+                {patients.length === 0 ? 'No patients registered yet' : 'Select a patient from the queue'}
+              </p>
+              {patients.length === 0 && (
+                <Button size="sm" variant="link" onClick={() => navigate('/patient-registration')}>Register a patient →</Button>
+              )}
             </Card>
           )}
         </div>

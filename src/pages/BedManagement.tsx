@@ -6,24 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { BedDouble, AlertTriangle, CheckCircle2, Clock, Users, TrendingUp, Sparkles } from 'lucide-react';
+import { BedDouble, AlertTriangle, CheckCircle2, Clock, Users, TrendingUp, Stethoscope, Pill } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useHospital, Bed, BedStatus } from '@/contexts/HospitalContext';
+import { useNavigate } from 'react-router-dom';
 
-type BedStatus = 'available' | 'occupied' | 'cleaning' | 'reserved';
-
-interface Bed {
-  id: string;
-  number: string;
-  ward: string;
-  status: BedStatus;
-  patient?: string;
-  doctor?: string;
-  admissionDate?: string;
-  expectedDischarge?: string;
-}
-
-const wards = ['ICU', 'Emergency', 'General Ward', 'Surgery'];
 const statusColors: Record<BedStatus, string> = {
   available: 'bg-emerald-500',
   occupied: 'bg-red-500',
@@ -35,34 +23,6 @@ const statusLabels: Record<BedStatus, string> = {
   occupied: '🔴 Occupied',
   cleaning: '🟡 Cleaning',
   reserved: '🔵 Reserved',
-};
-
-const generateBeds = (): Bed[] => {
-  const beds: Bed[] = [];
-  const patients = ['Rahul S.', 'Priya P.', 'Amit K.', 'Sneha G.', 'Vikram S.', 'Meera J.', 'Ravi T.', 'Anjali D.', 'Suresh M.', 'Kavita R.'];
-  const doctors = ['Dr. Arun', 'Dr. Meena', 'Dr. Rajan', 'Dr. Sunita', 'Dr. Pradeep'];
-  let idx = 0;
-  wards.forEach(ward => {
-    const count = ward === 'ICU' ? 6 : ward === 'Emergency' ? 5 : ward === 'Surgery' ? 4 : 8;
-    for (let i = 1; i <= count; i++) {
-      const statuses: BedStatus[] = ['available', 'occupied', 'occupied', 'cleaning', 'reserved', 'available', 'occupied'];
-      const status = statuses[idx % statuses.length];
-      beds.push({
-        id: `${ward}-${i}`,
-        number: `${ward.charAt(0)}${i.toString().padStart(2, '0')}`,
-        ward,
-        status,
-        ...(status === 'occupied' ? {
-          patient: patients[idx % patients.length],
-          doctor: doctors[idx % doctors.length],
-          admissionDate: '2025-04-03',
-          expectedDischarge: '2025-04-08',
-        } : {}),
-      });
-      idx++;
-    }
-  });
-  return beds;
 };
 
 const occupancyTrend = Array.from({ length: 24 }, (_, i) => ({
@@ -80,11 +40,13 @@ const weekdayData = [
   { day: 'Sun', weekday: 0, weekend: 60 },
 ];
 
-const BedManagement = () => {
-  const [beds, setBeds] = useState(generateBeds);
+const BedManagementPage = () => {
+  const { beds, updateBedStatus } = useHospital();
+  const navigate = useNavigate();
   const [selectedBed, setSelectedBed] = useState<Bed | null>(null);
   const [selectedWard, setSelectedWard] = useState('All');
 
+  const wards = ['ICU', 'Emergency', 'General Ward', 'Surgery'];
   const total = beds.length;
   const available = beds.filter(b => b.status === 'available').length;
   const occupied = beds.filter(b => b.status === 'occupied').length;
@@ -94,21 +56,31 @@ const BedManagement = () => {
 
   const filteredBeds = selectedWard === 'All' ? beds : beds.filter(b => b.ward === selectedWard);
 
-  const updateBedStatus = (bedId: string, newStatus: BedStatus) => {
-    setBeds(prev => prev.map(b => b.id === bedId ? { ...b, status: newStatus, patient: newStatus === 'available' ? undefined : b.patient } : b));
+  const handleUpdateBedStatus = (bedId: string, newStatus: BedStatus) => {
+    updateBedStatus(bedId, newStatus);
     setSelectedBed(null);
     toast({ title: 'Bed Updated', description: `Bed status changed to ${newStatus}` });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-          <BedDouble className="h-5 w-5 text-white" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+            <BedDouble className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Bed Management</h1>
+            <p className="text-sm text-muted-foreground">Real-time bed status across all wards</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Bed Management</h1>
-          <p className="text-sm text-muted-foreground">Real-time bed status across all wards</p>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => navigate('/patient-registration')}>
+            <Users className="h-4 w-4 mr-1" /> Register
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => navigate('/doctor-queue')}>
+            <Stethoscope className="h-4 w-4 mr-1" /> Doctor Queue
+          </Button>
         </div>
       </div>
 
@@ -136,7 +108,6 @@ const BedManagement = () => {
         </Card>
       </div>
 
-      {/* Alerts */}
       {(occupancyRate > 80 || icuOccupancy > 80) && (
         <div className="space-y-2">
           {occupancyRate > 80 && (
@@ -186,7 +157,6 @@ const BedManagement = () => {
             ))}
           </div>
 
-          {/* Bed Detail Panel */}
           {selectedBed && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="mt-4">
@@ -201,15 +171,15 @@ const BedManagement = () => {
                   {selectedBed.patient && (
                     <div className="space-y-1 mb-3 text-sm">
                       <p>Patient: <strong>{selectedBed.patient}</strong></p>
-                      <p>Doctor: {selectedBed.doctor}</p>
-                      <p>Admitted: {selectedBed.admissionDate}</p>
-                      <p>Expected Discharge: {selectedBed.expectedDischarge}</p>
+                      {selectedBed.doctor && <p>Doctor: {selectedBed.doctor}</p>}
+                      {selectedBed.admissionDate && <p>Admitted: {selectedBed.admissionDate}</p>}
+                      {selectedBed.expectedDischarge && <p>Expected Discharge: {selectedBed.expectedDischarge}</p>}
                     </div>
                   )}
                   <div className="flex gap-2 flex-wrap">
-                    <Button size="sm" variant="outline" onClick={() => updateBedStatus(selectedBed.id, 'cleaning')}>🧹 Mark for Cleaning</Button>
-                    <Button size="sm" variant="outline" onClick={() => updateBedStatus(selectedBed.id, 'reserved')}>🔵 Reserve</Button>
-                    <Button size="sm" variant="outline" onClick={() => updateBedStatus(selectedBed.id, 'available')}>✅ Discharge</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleUpdateBedStatus(selectedBed.id, 'cleaning')}>🧹 Mark for Cleaning</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleUpdateBedStatus(selectedBed.id, 'reserved')}>🔵 Reserve</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleUpdateBedStatus(selectedBed.id, 'available')}>✅ Discharge</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -261,7 +231,7 @@ const BedManagement = () => {
                       <p className="text-sm font-semibold">Bed {bed.number}</p>
                       <p className="text-xs text-muted-foreground">{bed.ward}</p>
                     </div>
-                    <Button size="sm" onClick={() => updateBedStatus(bed.id, 'available')}>
+                    <Button size="sm" onClick={() => handleUpdateBedStatus(bed.id, 'available')}>
                       <CheckCircle2 className="h-4 w-4 mr-1" /> Mark Clean
                     </Button>
                   </div>
@@ -275,4 +245,4 @@ const BedManagement = () => {
   );
 };
 
-export default BedManagement;
+export default BedManagementPage;
