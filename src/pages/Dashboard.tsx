@@ -62,8 +62,6 @@ const Dashboard = () => {
   const isDoctorRole = profile?.role === 'doctor';
 
   if (isDoctorRole) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const DoctorDashboard = require('./DoctorDashboard').default;
     return <DoctorDashboard />;
   }
 
