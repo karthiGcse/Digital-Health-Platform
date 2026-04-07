@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import DoctorDashboard from './DoctorDashboard';
 
 const adherenceData = [
   { day: 'Mon', adherence: 85, target: 90 }, { day: 'Tue', adherence: 90, target: 90 }, { day: 'Wed', adherence: 78, target: 90 },
