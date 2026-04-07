@@ -12,30 +12,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
-const mockStats = {
-  todayPatients: 24,
-  activeBeds: 18,
-  pendingPrescriptions: 7,
-  avgWaitTime: '12 min',
-};
-
-const recentPatients = [
-  { id: 'PT-2025-0001', name: 'Rahul Sharma', age: 45, status: 'In Progress', symptoms: 'Chest pain, fatigue', time: '10:30 AM' },
-  { id: 'PT-2025-0002', name: 'Priya Patel', age: 32, status: 'Waiting', symptoms: 'Headache, fever', time: '10:45 AM' },
-  { id: 'PT-2025-0003', name: 'Amit Kumar', age: 58, status: 'Waiting', symptoms: 'Joint pain', time: '11:00 AM' },
-  { id: 'PT-2025-0004', name: 'Sneha Gupta', age: 27, status: 'Completed', symptoms: 'Skin rash', time: '09:15 AM' },
-  { id: 'PT-2025-0005', name: 'Vikram Singh', age: 63, status: 'Waiting', symptoms: 'Breathing difficulty', time: '11:15 AM' },
-];
-
-const recentNotifications = [
-  { text: 'New patient registered: Vikram Singh', time: '2 min ago', type: 'info' },
-  { text: 'Lab results ready for Rahul Sharma', time: '15 min ago', type: 'success' },
-  { text: 'ICU bed occupancy at 85%', time: '30 min ago', type: 'warning' },
-  { text: 'Prescription sent to pharmacy for Sneha Gupta', time: '1 hr ago', type: 'info' },
-];
-
 const DoctorDashboard = () => {
   const { profile } = useAuth();
+  const { patients, prescriptions, notifications: hospitalNotifs, beds } = useHospital();
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -44,12 +23,24 @@ const DoctorDashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const todayPatients = patients.length;
+  const activeBeds = beds.filter(b => b.status === 'occupied').length;
+  const pendingPrescriptions = prescriptions.filter(p => p.status === 'New' || p.status === 'In Progress').length;
+  const waitingCount = patients.filter(p => p.status === 'Waiting').length;
+  const avgWaitTime = `${waitingCount * 8} min`;
+
   const statCards = [
-    { label: "Today's Patients", value: mockStats.todayPatients, icon: Users, gradient: 'from-blue-500 to-cyan-500', trend: '+3 from yesterday' },
-    { label: 'Active Beds', value: mockStats.activeBeds, icon: BedDouble, gradient: 'from-emerald-500 to-teal-500', trend: '72% occupancy' },
-    { label: 'Pending Rx', value: mockStats.pendingPrescriptions, icon: FileText, gradient: 'from-violet-500 to-purple-500', trend: '3 urgent' },
-    { label: 'Avg Wait Time', value: mockStats.avgWaitTime, icon: Clock, gradient: 'from-amber-500 to-orange-500', trend: '-2 min vs avg' },
+    { label: "Today's Patients", value: todayPatients, icon: Users, gradient: 'from-blue-500 to-cyan-500', trend: `${waitingCount} waiting` },
+    { label: 'Active Beds', value: activeBeds, icon: BedDouble, gradient: 'from-emerald-500 to-teal-500', trend: `${Math.round((activeBeds / beds.length) * 100)}% occupancy` },
+    { label: 'Pending Rx', value: pendingPrescriptions, icon: FileText, gradient: 'from-violet-500 to-purple-500', trend: `${prescriptions.filter(p => p.status === 'New').length} new` },
+    { label: 'Avg Wait Time', value: avgWaitTime, icon: Clock, gradient: 'from-amber-500 to-orange-500', trend: `${waitingCount} in queue` },
   ];
+
+  const recentNotifications = hospitalNotifs.slice(0, 4).map(n => ({
+    text: `${n.patient}: ${n.message}`,
+    time: n.time,
+    type: n.type === 'pharmacy' ? 'success' : n.type === 'bed' ? 'warning' : 'info',
+  }));
 
   return (
     <div className="space-y-6">
