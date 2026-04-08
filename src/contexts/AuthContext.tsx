@@ -22,6 +22,8 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, name: string, role: AppRole) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithOtp: (email: string) => Promise<void>;
+  verifyOtp: (email: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
