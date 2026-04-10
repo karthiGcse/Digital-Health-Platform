@@ -1,46 +1,54 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { useHospital } from '@/contexts/HospitalContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Users, BedDouble, FileText, Clock, Activity, Bell,
-  Calendar, Stethoscope, ArrowRight, TrendingUp, AlertCircle,
-  CheckCircle2, Loader2, Pill
+  Users, FileText, Clock, Activity, Bell,
+  Stethoscope, ArrowRight, TrendingUp, Pill, RefreshCw,
+  Hash, AlertCircle, CheckCircle2, Package
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useHospitalDB, HospitalTokenDB } from '@/hooks/useHospitalDB';
 
 const DoctorDashboard = () => {
   const { profile } = useAuth();
-  const { patients, prescriptions, notifications: hospitalNotifs, beds } = useHospital();
   const navigate = useNavigate();
+  const { getTodayTokens, getOrdersByType } = useHospitalDB();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [tokens, setTokens] = useState<HospitalTokenDB[]>([]);
+  const [pharmacyCount, setPharmacyCount] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const todayPatients = patients.length;
-  const activeBeds = beds.filter(b => b.status === 'occupied').length;
-  const pendingPrescriptions = prescriptions.filter(p => p.status === 'New' || p.status === 'In Progress').length;
-  const waitingCount = patients.filter(p => p.status === 'Waiting').length;
-  const avgWaitTime = `${waitingCount * 8} min`;
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      const todayTokens = await getTodayTokens();
+      setTokens(todayTokens);
+      const pharmacyOrders = await getOrdersByType('pharmacy');
+      setPharmacyCount(pharmacyOrders.length);
+    } catch (e) { console.error(e); }
+  };
+
+  const waitingCount = tokens.filter(t => ['registered', 'waiting'].includes(t.status)).length;
+  const inProgress = tokens.filter(t => t.status === 'with_doctor').length;
+  const completed = tokens.filter(t => t.status === 'completed').length;
+  const emergencyCount = tokens.filter(t => t.is_emergency && t.status !== 'completed').length;
 
   const statCards = [
-    { label: "Today's Patients", value: todayPatients, icon: Users, gradient: 'from-blue-500 to-cyan-500', trend: `${waitingCount} waiting` },
-    { label: 'Active Beds', value: activeBeds, icon: BedDouble, gradient: 'from-emerald-500 to-teal-500', trend: `${Math.round((activeBeds / beds.length) * 100)}% occupancy` },
-    { label: 'Pending Rx', value: pendingPrescriptions, icon: FileText, gradient: 'from-violet-500 to-purple-500', trend: `${prescriptions.filter(p => p.status === 'New').length} new` },
-    { label: 'Avg Wait Time', value: avgWaitTime, icon: Clock, gradient: 'from-amber-500 to-orange-500', trend: `${waitingCount} in queue` },
+    { label: "Today's Patients", value: tokens.length, icon: Users, gradient: 'from-blue-500 to-cyan-500', trend: `${waitingCount} waiting` },
+    { label: 'With Doctor', value: inProgress, icon: Stethoscope, gradient: 'from-violet-500 to-purple-500', trend: `${completed} completed` },
+    { label: 'Pharmacy Queue', value: pharmacyCount, icon: Pill, gradient: 'from-emerald-500 to-teal-500', trend: 'pending orders' },
+    { label: 'Emergency', value: emergencyCount, icon: AlertCircle, gradient: 'from-red-500 to-rose-500', trend: 'active emergencies' },
   ];
-
-  const recentNotifications = hospitalNotifs.slice(0, 4).map(n => ({
-    text: `${n.patient}: ${n.message}`,
-    time: n.time,
-    type: n.type === 'pharmacy' ? 'success' : n.type === 'bed' ? 'warning' : 'info',
-  }));
 
   return (
     <div className="space-y-6">
@@ -81,7 +89,7 @@ const DoctorDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Stat Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
@@ -103,46 +111,62 @@ const DoctorDashboard = () => {
         ))}
       </div>
 
+      {/* Quick Actions & Queue Preview */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Patient Queue */}
         <div className="lg:col-span-2">
           <Card className="border-border/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-500" /> Today's Patient Queue
+                <Users className="h-5 w-5 text-blue-500" /> Patient Queue
               </CardTitle>
-              <Button size="sm" variant="outline" onClick={() => navigate('/doctor-queue')}>
-                View All <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={loadDashboardData}>
+                  <RefreshCw className="h-3 w-3" />
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => navigate('/doctor-queue')}>
+                  View All <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {patients.length === 0 ? (
+                {tokens.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-sm text-muted-foreground">No patients registered yet.</p>
+                    <p className="text-sm text-muted-foreground">No patients today.</p>
                     <Button size="sm" variant="link" onClick={() => navigate('/patient-registration')}>Register first patient →</Button>
                   </div>
                 ) : (
-                  patients.slice(0, 5).map((p) => (
-                    <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer" onClick={() => navigate('/doctor-queue')}>
+                  [...tokens]
+                    .sort((a, b) => {
+                      if (a.is_emergency && !b.is_emergency) return -1;
+                      if (!a.is_emergency && b.is_emergency) return 1;
+                      return a.token_number - b.token_number;
+                    })
+                    .slice(0, 8)
+                    .map((t) => (
+                    <div key={t.id} className={`flex items-center justify-between p-3 rounded-xl transition-colors cursor-pointer
+                      ${t.is_emergency ? 'bg-red-500/5 border border-red-500/20' : 'bg-muted/50 hover:bg-muted/80'}`}
+                      onClick={() => navigate('/doctor-queue')}
+                    >
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-                          {p.name.charAt(0)}
+                        <div className={`h-9 w-9 rounded-full flex items-center justify-center text-white font-bold text-sm
+                          ${t.is_emergency ? 'bg-gradient-to-br from-red-500 to-rose-500' : 'bg-gradient-to-br from-blue-500 to-cyan-500'}`}>
+                          #{t.token_number}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-foreground">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">{p.id} • Age {p.age} • {p.symptoms}</p>
+                          <p className="text-sm font-semibold text-foreground flex items-center gap-1">
+                            Token #{t.token_number}
+                            {t.is_emergency && <span className="text-[10px] text-red-500">🚨</span>}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">{t.symptoms || 'No symptoms'}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">{p.registeredAt}</span>
-                        <Badge variant={p.status === 'Completed' ? 'default' : p.status === 'In Progress' ? 'secondary' : 'outline'}
-                          className={p.status === 'Completed' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20' :
-                            p.status === 'In Progress' ? 'bg-blue-500/15 text-blue-600 border-blue-500/20' :
-                            'bg-amber-500/15 text-amber-600 border-amber-500/20'}>
-                          {p.status}
-                        </Badge>
-                      </div>
+                      <Badge className={`text-[10px] ${
+                        t.status === 'completed' ? 'bg-emerald-500/15 text-emerald-600' :
+                        t.status === 'with_doctor' ? 'bg-blue-500/15 text-blue-600' :
+                        t.status === 'at_pharmacy' ? 'bg-violet-500/15 text-violet-600' :
+                        'bg-amber-500/15 text-amber-600'
+                      }`}>{t.status.replace(/_/g, ' ')}</Badge>
                     </div>
                   ))
                 )}
@@ -151,29 +175,7 @@ const DoctorDashboard = () => {
           </Card>
         </div>
 
-        {/* Notifications + Quick Actions */}
         <div className="space-y-4">
-          <Card className="border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Bell className="h-5 w-5 text-amber-500" /> Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recentNotifications.map((n, i) => (
-                  <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className={`h-2 w-2 rounded-full mt-1.5 shrink-0 ${n.type === 'warning' ? 'bg-amber-500' : n.type === 'success' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
-                    <div>
-                      <p className="text-xs text-foreground">{n.text}</p>
-                      <p className="text-[10px] text-muted-foreground">{n.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
           <Card className="border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Quick Actions</CardTitle>
@@ -181,9 +183,11 @@ const DoctorDashboard = () => {
             <CardContent className="grid grid-cols-2 gap-2">
               {[
                 { label: 'Register', icon: Users, route: '/patient-registration', color: 'from-blue-500 to-cyan-500' },
-                { label: 'Beds', icon: BedDouble, route: '/bed-management', color: 'from-emerald-500 to-teal-500' },
-                { label: 'Pharmacy', icon: Pill, route: '/smart-pharmacy', color: 'from-violet-500 to-purple-500' },
-                { label: 'AI Assist', icon: Activity, route: '/ai-assistant', color: 'from-amber-500 to-orange-500' },
+                { label: 'Queue', icon: Stethoscope, route: '/doctor-queue', color: 'from-violet-500 to-purple-500' },
+                { label: 'Pharmacy', icon: Pill, route: '/smart-pharmacy', color: 'from-emerald-500 to-teal-500' },
+                { label: 'Scan Centre', icon: Activity, route: '/scan-centre', color: 'from-amber-500 to-orange-500' },
+                { label: 'Lab Centre', icon: Package, route: '/lab-centre', color: 'from-cyan-500 to-blue-500' },
+                { label: 'Notifications', icon: Bell, route: '/patient-notifications', color: 'from-pink-500 to-rose-500' },
               ].map((a) => (
                 <Button key={a.label} variant="outline" className="h-16 flex-col gap-1 hover:shadow-md transition-all" onClick={() => navigate(a.route)}>
                   <div className={`h-7 w-7 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center`}>
