@@ -89,6 +89,462 @@ export type Database = {
         }
         Relationships: []
       }
+      hospital_bills: {
+        Row: {
+          amount_paid: number | null
+          created_at: string | null
+          discount: number | null
+          gst_amount: number | null
+          id: string
+          insurance_claim_id: string | null
+          insurance_covered: number | null
+          insurance_status: string | null
+          items: Json | null
+          patient_id: string
+          payment_method: string | null
+          payment_status: string | null
+          subtotal: number | null
+          token_id: string | null
+          total_amount: number | null
+          visit_id: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          created_at?: string | null
+          discount?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurance_claim_id?: string | null
+          insurance_covered?: number | null
+          insurance_status?: string | null
+          items?: Json | null
+          patient_id: string
+          payment_method?: string | null
+          payment_status?: string | null
+          subtotal?: number | null
+          token_id?: string | null
+          total_amount?: number | null
+          visit_id?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          created_at?: string | null
+          discount?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurance_claim_id?: string | null
+          insurance_covered?: number | null
+          insurance_status?: string | null
+          items?: Json | null
+          patient_id?: string
+          payment_method?: string | null
+          payment_status?: string | null
+          subtotal?: number | null
+          token_id?: string | null
+          total_amount?: number | null
+          visit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_bills_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_bills_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_bills_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_departments: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          floor: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          floor?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          floor?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      hospital_doctors: {
+        Row: {
+          availability_status: string | null
+          created_at: string | null
+          department_id: string | null
+          email: string | null
+          experience_years: number | null
+          id: string
+          is_verified: boolean | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          qualification: string | null
+          rating_avg: number | null
+          rating_count: number | null
+          room_number: string | null
+          schedule: Json | null
+          speciality: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          availability_status?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          email?: string | null
+          experience_years?: number | null
+          id?: string
+          is_verified?: boolean | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          qualification?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          room_number?: string | null
+          schedule?: Json | null
+          speciality?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          availability_status?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          email?: string | null
+          experience_years?: number | null
+          id?: string
+          is_verified?: boolean | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          qualification?: string | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          room_number?: string | null
+          schedule?: Json | null
+          speciality?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_doctors_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_loyalty: {
+        Row: {
+          badge_name: string | null
+          created_at: string | null
+          description: string | null
+          event_type: string
+          id: string
+          patient_id: string
+          points: number | null
+        }
+        Insert: {
+          badge_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_type: string
+          id?: string
+          patient_id: string
+          points?: number | null
+        }
+        Update: {
+          badge_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_type?: string
+          id?: string
+          patient_id?: string
+          points?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_loyalty_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_notifications_log: {
+        Row: {
+          channel: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          patient_id: string | null
+          sent_at: string | null
+          stage: string
+          token_id: string | null
+        }
+        Insert: {
+          channel?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          patient_id?: string | null
+          sent_at?: string | null
+          stage: string
+          token_id?: string | null
+        }
+        Update: {
+          channel?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          patient_id?: string | null
+          sent_at?: string | null
+          stage?: string
+          token_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_notifications_log_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_notifications_log_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_orders: {
+        Row: {
+          centre_name: string | null
+          completed_at: string | null
+          created_at: string | null
+          floor_location: string | null
+          id: string
+          injection_details: string | null
+          lab_tests: Json | null
+          medicines: Json | null
+          order_details: string | null
+          order_type: string
+          patient_id: string
+          queue_position: number | null
+          referring_doctor_id: string | null
+          result_data: Json | null
+          result_notes: string | null
+          result_uploaded_at: string | null
+          scan_type: string | null
+          seen_at: string | null
+          started_at: string | null
+          status: string | null
+          token_id: string
+          updated_at: string | null
+          visit_id: string
+        }
+        Insert: {
+          centre_name?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          floor_location?: string | null
+          id?: string
+          injection_details?: string | null
+          lab_tests?: Json | null
+          medicines?: Json | null
+          order_details?: string | null
+          order_type: string
+          patient_id: string
+          queue_position?: number | null
+          referring_doctor_id?: string | null
+          result_data?: Json | null
+          result_notes?: string | null
+          result_uploaded_at?: string | null
+          scan_type?: string | null
+          seen_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          token_id: string
+          updated_at?: string | null
+          visit_id: string
+        }
+        Update: {
+          centre_name?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          floor_location?: string | null
+          id?: string
+          injection_details?: string | null
+          lab_tests?: Json | null
+          medicines?: Json | null
+          order_details?: string | null
+          order_type?: string
+          patient_id?: string
+          queue_position?: number | null
+          referring_doctor_id?: string | null
+          result_data?: Json | null
+          result_notes?: string | null
+          result_uploaded_at?: string | null
+          scan_type?: string | null
+          seen_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          token_id?: string
+          updated_at?: string | null
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_orders_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_orders_referring_doctor_id_fkey"
+            columns: ["referring_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_orders_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_orders_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_patients: {
+        Row: {
+          aadhaar: string | null
+          allergies: string | null
+          blood_group: string | null
+          chronic_diseases: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          email: string | null
+          family_head_id: string | null
+          gender: string | null
+          health_id: string
+          id: string
+          is_family_head: boolean | null
+          language_preference: string | null
+          last_visit_date: string | null
+          last_visit_summary: string | null
+          loyalty_points: number | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          total_visits: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aadhaar?: string | null
+          allergies?: string | null
+          blood_group?: string | null
+          chronic_diseases?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          family_head_id?: string | null
+          gender?: string | null
+          health_id: string
+          id?: string
+          is_family_head?: boolean | null
+          language_preference?: string | null
+          last_visit_date?: string | null
+          last_visit_summary?: string | null
+          loyalty_points?: number | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          total_visits?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aadhaar?: string | null
+          allergies?: string | null
+          blood_group?: string | null
+          chronic_diseases?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          family_head_id?: string | null
+          gender?: string | null
+          health_id?: string
+          id?: string
+          is_family_head?: boolean | null
+          language_preference?: string | null
+          last_visit_date?: string | null
+          last_visit_summary?: string | null
+          loyalty_points?: number | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          total_visits?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_patients_family_head_id_fkey"
+            columns: ["family_head_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hospital_queue_bookings: {
         Row: {
           appointment_date: string
@@ -130,6 +586,240 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      hospital_slots: {
+        Row: {
+          booked_by: string | null
+          created_at: string | null
+          department_id: string | null
+          doctor_id: string | null
+          id: string
+          is_booked: boolean | null
+          slot_date: string
+          slot_time: string
+        }
+        Insert: {
+          booked_by?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          doctor_id?: string | null
+          id?: string
+          is_booked?: boolean | null
+          slot_date: string
+          slot_time: string
+        }
+        Update: {
+          booked_by?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          doctor_id?: string | null
+          id?: string
+          is_booked?: boolean | null
+          slot_date?: string
+          slot_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_slots_booked_by_fkey"
+            columns: ["booked_by"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_slots_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_slots_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_tokens: {
+        Row: {
+          ai_suggested_department: string | null
+          created_at: string | null
+          department_id: string | null
+          doctor_id: string | null
+          entry_type: string | null
+          estimated_wait_minutes: number | null
+          follow_up_from: string | null
+          id: string
+          is_emergency: boolean | null
+          is_follow_up: boolean | null
+          patient_id: string
+          qr_code: string | null
+          queue_position: number | null
+          severity: string | null
+          status: string | null
+          symptoms: string | null
+          token_date: string | null
+          token_number: number
+          updated_at: string | null
+        }
+        Insert: {
+          ai_suggested_department?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          doctor_id?: string | null
+          entry_type?: string | null
+          estimated_wait_minutes?: number | null
+          follow_up_from?: string | null
+          id?: string
+          is_emergency?: boolean | null
+          is_follow_up?: boolean | null
+          patient_id: string
+          qr_code?: string | null
+          queue_position?: number | null
+          severity?: string | null
+          status?: string | null
+          symptoms?: string | null
+          token_date?: string | null
+          token_number: number
+          updated_at?: string | null
+        }
+        Update: {
+          ai_suggested_department?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          doctor_id?: string | null
+          entry_type?: string | null
+          estimated_wait_minutes?: number | null
+          follow_up_from?: string | null
+          id?: string
+          is_emergency?: boolean | null
+          is_follow_up?: boolean | null
+          patient_id?: string
+          qr_code?: string | null
+          queue_position?: number | null
+          severity?: string | null
+          status?: string | null
+          symptoms?: string | null
+          token_date?: string | null
+          token_number?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_tokens_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_tokens_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_tokens_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_visits: {
+        Row: {
+          ai_suggestions: Json | null
+          completed_at: string | null
+          created_at: string | null
+          diagnosis: string | null
+          doctor_id: string | null
+          drug_warnings: Json | null
+          follow_up_date: string | null
+          follow_up_days: number | null
+          id: string
+          next_steps: Json | null
+          notes: string | null
+          patient_feedback: string | null
+          patient_id: string
+          patient_rating: number | null
+          prescription: Json | null
+          started_at: string | null
+          symptoms: string | null
+          token_id: string
+          updated_at: string | null
+          visit_stage: string | null
+        }
+        Insert: {
+          ai_suggestions?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          diagnosis?: string | null
+          doctor_id?: string | null
+          drug_warnings?: Json | null
+          follow_up_date?: string | null
+          follow_up_days?: number | null
+          id?: string
+          next_steps?: Json | null
+          notes?: string | null
+          patient_feedback?: string | null
+          patient_id: string
+          patient_rating?: number | null
+          prescription?: Json | null
+          started_at?: string | null
+          symptoms?: string | null
+          token_id: string
+          updated_at?: string | null
+          visit_stage?: string | null
+        }
+        Update: {
+          ai_suggestions?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          diagnosis?: string | null
+          doctor_id?: string | null
+          drug_warnings?: Json | null
+          follow_up_date?: string | null
+          follow_up_days?: number | null
+          id?: string
+          next_steps?: Json | null
+          notes?: string | null
+          patient_feedback?: string | null
+          patient_id?: string
+          patient_rating?: number | null
+          prescription?: Json | null
+          started_at?: string | null
+          symptoms?: string | null
+          token_id?: string
+          updated_at?: string | null
+          visit_stage?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_visits_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_visits_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_visits_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       image_diagnoses: {
         Row: {
