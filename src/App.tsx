@@ -56,6 +56,9 @@ import BedManagementPage from "@/pages/BedManagement";
 import SmartPharmacy from "@/pages/SmartPharmacy";
 import AIAssistant from "@/pages/AIAssistant";
 import PatientNotifications from "@/pages/PatientNotifications";
+import ScanCentre from "@/pages/ScanCentre";
+import LabCentre from "@/pages/LabCentre";
+import InjectionCentre from "@/pages/InjectionCentre";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({});
@@ -119,6 +122,9 @@ const App = () => (
               <Route path="/smart-pharmacy" element={<SmartPharmacy />} />
               <Route path="/ai-assistant" element={<AIAssistant />} />
               <Route path="/patient-notifications" element={<PatientNotifications />} />
+              <Route path="/scan-centre" element={<ScanCentre />} />
+              <Route path="/lab-centre" element={<LabCentre />} />
+              <Route path="/injection-centre" element={<InjectionCentre />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Route>
             <Route path="*" element={<NotFound />} />

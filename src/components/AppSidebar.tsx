@@ -96,6 +96,7 @@ const navByRole: Record<AppRole, NavItem[]> = {
     { titleKey: 'Smart Pharmacy', url: '/smart-pharmacy', icon: Package },
     { titleKey: 'Scan Centre', url: '/scan-centre', icon: Microscope },
     { titleKey: 'Lab Centre', url: '/lab-centre', icon: FlaskConical },
+    { titleKey: 'Injection Centre', url: '/injection-centre', icon: Syringe },
     { titleKey: 'Bed Management', url: '/bed-management', icon: Building2 },
     { titleKey: 'Patient Notifications', url: '/patient-notifications', icon: Bell },
     { titleKey: 'AI Assistant', url: '/ai-assistant', icon: Brain },
