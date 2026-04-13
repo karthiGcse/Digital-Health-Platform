@@ -5,43 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Progress } from '@/components/ui/progress';
 import {
   Heart, Lock, Stethoscope, Pill, User, Mail,
-  ScanFace, Fingerprint, IdCard, Camera, CheckCircle2, XCircle,
-  Loader2, ShieldCheck, ArrowLeft, KeyRound
+  Loader2, CheckCircle2, ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 type LoginView = 'role-select' | 'role-login';
 type SelectedRole = 'doctor' | 'patient' | 'pharmacist';
-type OtpStep = 'email' | 'otp';
 
 const Login = () => {
   const [view, setView] = useState<LoginView>('role-select');
   const [selectedRole, setSelectedRole] = useState<SelectedRole>('doctor');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [doctorId, setDoctorId] = useState('');
-  const [accessPin, setAccessPin] = useState('');
-
-  // OTP states
-  const [otpStep, setOtpStep] = useState<OtpStep>('email');
-  const [otpCode, setOtpCode] = useState('');
-
-  // Biometric states
-  const [faceStatus, setFaceStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
-  const [fingerStatus, setFingerStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
-  const [scanProgress, setScanProgress] = useState(0);
-
-  // Post-login loading
   const [postLoginStep, setPostLoginStep] = useState(0);
   const [showPostLogin, setShowPostLogin] = useState(false);
 
-  const { signInWithOtp, verifyOtp } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const runPostLogin = () => {
@@ -52,114 +35,21 @@ const Login = () => {
     setTimeout(() => navigate('/dashboard'), 2400);
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signInWithOtp(email);
-      setOtpStep('otp');
-      toast({ title: 'OTP Sent! 📧', description: `A 6-digit code has been sent to ${email}` });
-    } catch (err: any) {
-      toast({ title: 'Failed to send OTP', description: err.message, variant: 'destructive' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otpCode.length !== 6) {
-      toast({ title: 'Invalid OTP', description: 'Please enter the 6-digit code', variant: 'destructive' });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await verifyOtp(email, otpCode);
+      await signIn(email, password);
       const roleEmoji = selectedRole === 'doctor' ? '🩺' : selectedRole === 'pharmacist' ? '💊' : '👤';
-      toast({ title: `Welcome! ${roleEmoji}`, description: 'OTP verified successfully.' });
+      toast({ title: `Welcome! ${roleEmoji}`, description: 'Login successful.' });
       runPostLogin();
     } catch (err: any) {
-      toast({ title: 'OTP Verification Failed', description: err.message, variant: 'destructive' });
+      toast({ title: 'Login Failed', description: err.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleResendOtp = async () => {
-    setIsLoading(true);
-    try {
-      await signInWithOtp(email);
-      toast({ title: 'OTP Resent! 📧', description: `New code sent to ${email}` });
-    } catch (err: any) {
-      toast({ title: 'Failed to resend', description: err.message, variant: 'destructive' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleFaceScan = () => {
-    setFaceStatus('scanning');
-    setScanProgress(0);
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          const success = Math.random() > 0.3;
-          setFaceStatus(success ? 'success' : 'error');
-          if (success) {
-            toast({ title: 'Face Verified ✓', description: 'Redirecting to dashboard...' });
-            setTimeout(() => runPostLogin(), 1000);
-          } else {
-            toast({ title: 'Face not recognized', description: 'Please try again.', variant: 'destructive' });
-          }
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 80);
-  };
-
-  const handleFingerScan = () => {
-    setFingerStatus('scanning');
-    setScanProgress(0);
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          const success = Math.random() > 0.3;
-          setFingerStatus(success ? 'success' : 'error');
-          if (success) {
-            toast({ title: 'Fingerprint Verified ✓', description: 'Redirecting...' });
-            setTimeout(() => runPostLogin(), 1000);
-          } else {
-            toast({ title: 'Fingerprint not recognized', description: 'Try again.', variant: 'destructive' });
-          }
-          return 100;
-        }
-        return prev + 4;
-      });
-    }, 60);
-  };
-
-  const handleDoctorIdLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!/^DOC-\d{4}-\d{4}$/.test(doctorId)) {
-      toast({ title: 'Invalid Doctor ID', description: 'Format: DOC-YYYY-XXXX', variant: 'destructive' });
-      return;
-    }
-    if (accessPin.length < 4 || accessPin.length > 6) {
-      toast({ title: 'Invalid PIN', description: '4-6 digit PIN required.', variant: 'destructive' });
-      return;
-    }
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({ title: 'Doctor ID Verified ✓' });
-      runPostLogin();
-    }, 1500);
-  };
-
-  // Post-login overlay
   if (showPostLogin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950">
@@ -191,7 +81,6 @@ const Login = () => {
     );
   }
 
-  // Role selection view
   if (view === 'role-select') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 p-4">
@@ -214,15 +103,12 @@ const Login = () => {
             ].map((card) => (
               <Card
                 key={card.role}
-                className={`relative overflow-hidden border-2 border-${card.color}-400 bg-gradient-to-b from-${card.color}-50/50 to-white dark:from-${card.color}-950/30 dark:to-slate-900 cursor-pointer hover:shadow-xl hover:shadow-${card.color}-500/15 transition-all duration-300 hover:-translate-y-1 group`}
-                onClick={() => { setSelectedRole(card.role); setView('role-login'); setOtpStep('email'); setOtpCode(''); }}
+                className="relative overflow-hidden border-2 border-border cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                onClick={() => { setSelectedRole(card.role); setView('role-login'); }}
               >
-                <div className="absolute top-3 right-3">
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full bg-${card.color}-100 text-${card.color}-700 dark:bg-${card.color}-900 dark:text-${card.color}-300`}>Active</span>
-                </div>
                 <CardContent className="pt-10 pb-8 flex flex-col items-center gap-4">
-                  <div className={`h-20 w-20 rounded-2xl bg-${card.color}-100 dark:bg-${card.color}-950 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <card.icon className={`h-10 w-10 text-${card.color}-600`} />
+                  <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <card.icon className="h-10 w-10 text-primary" />
                   </div>
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-foreground">{card.label}</h3>
@@ -237,7 +123,8 @@ const Login = () => {
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Need help? Contact <span className="text-blue-600 font-medium">IT Support</span>
+            Don't have an account?{' '}
+            <Link to="/register" className="text-primary hover:underline font-medium">Sign up</Link>
           </p>
         </div>
       </div>
@@ -250,235 +137,56 @@ const Login = () => {
     pharmacist: { label: 'Pharmacy Login', icon: Pill, gradient: 'from-purple-500 to-violet-500', shadow: 'shadow-purple-500/25' },
   };
   const currentRole = roleConfig[selectedRole];
-  const isDoctor = selectedRole === 'doctor';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 p-4">
-      <div className="w-full max-w-lg animate-fade-in">
+      <div className="w-full max-w-md animate-fade-in">
         <button
-          onClick={() => { setView('role-select'); setOtpStep('email'); setOtpCode(''); }}
+          onClick={() => setView('role-select')}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Back to role selection
         </button>
 
         <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${currentRole.gradient} flex items-center justify-center shadow-lg ${currentRole.shadow}`}>
-              <currentRole.icon className="h-6 w-6 text-white" />
-            </div>
+          <div className={`h-12 w-12 mx-auto rounded-2xl bg-gradient-to-br ${currentRole.gradient} flex items-center justify-center shadow-lg ${currentRole.shadow} mb-3`}>
+            <currentRole.icon className="h-6 w-6 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">{currentRole.label}</h1>
-          <p className="text-muted-foreground">Choose your authentication method</p>
+          <p className="text-muted-foreground">Enter your email and password</p>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-xl dark:bg-slate-900/80">
-          <Tabs defaultValue="email" className="w-full">
-            <CardHeader className="pb-2">
-              {isDoctor ? (
-                <TabsList className="grid grid-cols-4 w-full">
-                  <TabsTrigger value="email" className="text-xs gap-1"><Mail className="h-3.5 w-3.5" /><span className="hidden sm:inline">Email OTP</span></TabsTrigger>
-                  <TabsTrigger value="face" className="text-xs gap-1"><ScanFace className="h-3.5 w-3.5" /><span className="hidden sm:inline">Face ID</span></TabsTrigger>
-                  <TabsTrigger value="finger" className="text-xs gap-1"><Fingerprint className="h-3.5 w-3.5" /><span className="hidden sm:inline">Fingerprint</span></TabsTrigger>
-                  <TabsTrigger value="docid" className="text-xs gap-1"><IdCard className="h-3.5 w-3.5" /><span className="hidden sm:inline">Doctor ID</span></TabsTrigger>
-                </TabsList>
-              ) : (
-                <TabsList className="grid grid-cols-1 w-full">
-                  <TabsTrigger value="email" className="text-xs gap-1"><Mail className="h-3.5 w-3.5" /><span>Email OTP Login</span></TabsTrigger>
-                </TabsList>
-              )}
-            </CardHeader>
-
-            {/* TAB 1: Email OTP */}
-            <TabsContent value="email">
-              {otpStep === 'email' ? (
-                <form onSubmit={handleSendOtp}>
-                  <CardContent className="space-y-4">
-                    <div className="text-center mb-2">
-                      <div className="h-16 w-16 mx-auto rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center mb-3">
-                        <Mail className="h-8 w-8 text-blue-600" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Enter your email to receive a one-time password</p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="email" type="email" placeholder="you@example.com"
-                          className="pl-10" value={email} onChange={e => setEmail(e.target.value)} required
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex-col gap-3">
-                    <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white" disabled={isLoading}>
-                      {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Sending OTP...</> : <><KeyRound className="h-4 w-4 mr-2" />Send OTP</>}
-                    </Button>
-                  </CardFooter>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyOtp}>
-                  <CardContent className="space-y-5">
-                    <div className="text-center mb-2">
-                      <div className="h-16 w-16 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center mb-3">
-                        <KeyRound className="h-8 w-8 text-emerald-600" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground">Enter the 6-digit OTP</p>
-                      <p className="text-xs text-muted-foreground mt-1">Sent to <strong>{email}</strong></p>
-                    </div>
-                    <div className="flex justify-center">
-                      <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode}>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </div>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={handleResendOtp}
-                        disabled={isLoading}
-                        className="text-sm text-blue-600 hover:underline disabled:opacity-50"
-                      >
-                        Didn't receive it? Resend OTP
-                      </button>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex-col gap-3">
-                    <Button type="submit" className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white" disabled={isLoading || otpCode.length !== 6}>
-                      {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Verifying...</> : <><ShieldCheck className="h-4 w-4 mr-2" />Verify & Login</>}
-                    </Button>
-                    <button
-                      type="button"
-                      onClick={() => { setOtpStep('email'); setOtpCode(''); }}
-                      className="text-sm text-muted-foreground hover:text-foreground"
-                    >
-                      ← Change email
-                    </button>
-                  </CardFooter>
-                </form>
-              )}
-            </TabsContent>
-
-            {/* TAB 2: Face ID */}
-            <TabsContent value="face">
-              <CardContent className="flex flex-col items-center gap-5 py-6">
-                <div className={cn(
-                  'h-40 w-40 rounded-full border-4 flex items-center justify-center transition-all duration-500 relative overflow-hidden',
-                  faceStatus === 'idle' && 'border-dashed border-muted-foreground/30 bg-muted/30',
-                  faceStatus === 'scanning' && 'border-blue-500 bg-blue-50 dark:bg-blue-950',
-                  faceStatus === 'success' && 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950',
-                  faceStatus === 'error' && 'border-red-500 bg-red-50 dark:bg-red-950'
-                )}>
-                  {faceStatus === 'scanning' && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-blue-400/20 to-transparent animate-pulse" />
-                  )}
-                  {faceStatus === 'idle' && <Camera className="h-14 w-14 text-muted-foreground/50" />}
-                  {faceStatus === 'scanning' && <ScanFace className="h-14 w-14 text-blue-500 animate-pulse" />}
-                  {faceStatus === 'success' && <CheckCircle2 className="h-14 w-14 text-emerald-500" />}
-                  {faceStatus === 'error' && <XCircle className="h-14 w-14 text-red-500" />}
+          <form onSubmit={handleLogin}>
+            <CardContent className="space-y-4 pt-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input id="email" type="email" placeholder="you@example.com" className="pl-10" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
-                <p className="text-sm text-muted-foreground text-center">
-                  {faceStatus === 'idle' && 'Position your face in front of the camera'}
-                  {faceStatus === 'scanning' && 'Scanning face...'}
-                  {faceStatus === 'success' && 'Face Verified ✓'}
-                  {faceStatus === 'error' && 'Face not recognized. Try again.'}
-                </p>
-                {faceStatus === 'scanning' && <Progress value={scanProgress} className="w-full max-w-xs" />}
-                <Button
-                  onClick={() => { setFaceStatus('idle'); handleFaceScan(); }}
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
-                  disabled={faceStatus === 'scanning'}
-                >
-                  <ScanFace className="h-4 w-4 mr-2" />
-                  {faceStatus === 'error' ? 'Retry Face Scan' : 'Verify with Face ID'}
-                </Button>
-              </CardContent>
-            </TabsContent>
-
-            {/* TAB 3: Fingerprint */}
-            <TabsContent value="finger">
-              <CardContent className="flex flex-col items-center gap-5 py-6">
-                <div className={cn(
-                  'h-32 w-32 rounded-2xl border-4 flex items-center justify-center transition-all duration-500',
-                  fingerStatus === 'idle' && 'border-dashed border-muted-foreground/30 bg-muted/30',
-                  fingerStatus === 'scanning' && 'border-blue-500 bg-blue-50 dark:bg-blue-950 animate-pulse',
-                  fingerStatus === 'success' && 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950',
-                  fingerStatus === 'error' && 'border-red-500 bg-red-50 dark:bg-red-950'
-                )}>
-                  {fingerStatus === 'idle' && <Fingerprint className="h-16 w-16 text-muted-foreground/40" />}
-                  {fingerStatus === 'scanning' && <Fingerprint className="h-16 w-16 text-blue-500 animate-bounce" />}
-                  {fingerStatus === 'success' && <CheckCircle2 className="h-16 w-16 text-emerald-500" />}
-                  {fingerStatus === 'error' && <XCircle className="h-16 w-16 text-red-500" />}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input id="password" type="password" placeholder="••••••••" className="pl-10" value={password} onChange={e => setPassword(e.target.value)} required />
                 </div>
-                <p className="text-sm text-muted-foreground text-center">
-                  {fingerStatus === 'idle' && 'Place your finger on the scanner to verify'}
-                  {fingerStatus === 'scanning' && 'Scanning fingerprint...'}
-                  {fingerStatus === 'success' && 'Fingerprint Verified ✓'}
-                  {fingerStatus === 'error' && 'Fingerprint not recognized. Try again.'}
-                </p>
-                {fingerStatus === 'scanning' && <Progress value={scanProgress} className="w-full max-w-xs" />}
-                <Button
-                  onClick={() => { setFingerStatus('idle'); handleFingerScan(); }}
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
-                  disabled={fingerStatus === 'scanning'}
-                >
-                  <Fingerprint className="h-4 w-4 mr-2" />
-                  {fingerStatus === 'error' ? 'Retry Scan' : 'Scan Fingerprint'}
-                </Button>
-              </CardContent>
-            </TabsContent>
-
-            {/* TAB 4: Doctor ID */}
-            <TabsContent value="docid">
-              <form onSubmit={handleDoctorIdLogin}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="docid">Doctor ID</Label>
-                    <div className="relative">
-                      <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="docid" placeholder="DOC-2025-XXXX"
-                        className="pl-10" value={doctorId} onChange={e => setDoctorId(e.target.value)} required
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Format: DOC-YYYY-XXXX</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="pin">Access PIN</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="pin" type="password" placeholder="••••" maxLength={6}
-                        className="pl-10" value={accessPin} onChange={e => setAccessPin(e.target.value.replace(/\D/g, ''))} required
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">4-6 digit PIN</p>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white" disabled={isLoading}>
-                    {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Verifying...</> : <><ShieldCheck className="h-4 w-4 mr-2" />Login with ID</>}
-                  </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          <div className="px-6 pb-6 pt-2 border-t border-border/50 space-y-2 text-center">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account? <Link to="/register" className="text-blue-600 hover:underline font-medium">Register</Link>
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Need help? <span className="text-blue-600 cursor-pointer hover:underline">Contact IT Support</span>
-            </p>
-          </div>
+              </div>
+              <div className="text-right">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
+              </div>
+            </CardContent>
+            <CardFooter className="flex-col gap-3">
+              <Button type="submit" className={`w-full bg-gradient-to-r ${currentRole.gradient} hover:opacity-90 text-white`} disabled={isLoading}>
+                {isLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Signing in...</> : 'Sign In'}
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <Link to="/register" className="text-primary hover:underline font-medium">Sign up</Link>
+              </p>
+            </CardFooter>
+          </form>
         </Card>
       </div>
     </div>
