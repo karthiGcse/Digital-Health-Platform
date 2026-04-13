@@ -1426,7 +1426,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_patient_id: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "patient" | "pharmacist" | "doctor" | "admin"
