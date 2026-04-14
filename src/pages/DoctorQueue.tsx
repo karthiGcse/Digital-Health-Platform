@@ -310,11 +310,13 @@ const DoctorQueue = () => {
   const waitingTokens = tokens.filter(t => ['registered', 'waiting'].includes(t.status));
   const activeTokens = tokens.filter(t => ['with_doctor', 'at_scan', 'at_lab', 'at_injection', 'at_pharmacy'].includes(t.status));
 
-  // Check for same-symptom repeats
-  const sameSymptomCount = pastVisits.filter(v =>
-    selectedToken?.symptoms && v.symptoms &&
-    v.symptoms.toLowerCase().includes(selectedToken.symptoms.toLowerCase().split(' ')[0])
-  ).length;
+  // Safely compute same symptom count
+  const sameSymptomCount = selectedToken?.symptoms
+    ? pastVisits.filter(v =>
+        v.symptoms &&
+        v.symptoms.toLowerCase().includes((selectedToken.symptoms || '').toLowerCase().split(' ')[0])
+      ).length
+    : 0;
 
   return (
     <div className="space-y-6">
