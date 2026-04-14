@@ -443,7 +443,7 @@ const DoctorQueue = () => {
                   <div className="flex items-start gap-4">
                     <div className={`h-16 w-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shrink-0
                       ${selectedToken.is_emergency ? 'bg-gradient-to-br from-red-500 to-rose-500' : 'bg-gradient-to-br from-blue-500 to-cyan-500'}`}>
-                      {selectedPatient.name.charAt(0)}
+                      {selectedPatient.name?.charAt(0) || '?'}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
