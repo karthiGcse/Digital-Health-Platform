@@ -99,29 +99,42 @@ const DoctorQueue = () => {
     try {
       await updateTokenStatus(token.id, 'with_doctor');
 
+      // Update local token status immediately so UI reflects the change
+      setTokens(prev => prev.map(t => t.id === token.id ? { ...t, status: 'with_doctor' } : t));
+
       const visit = await createVisit({
         token_id: token.id,
         patient_id: token.patient_id,
-        symptoms: token.symptoms,
+        symptoms: token.symptoms || '',
       });
       setCurrentVisit(visit);
       setSelectedTokenId(token.id);
 
       // Load past visits
-      const past = await getPatientVisits(token.patient_id);
-      setPastVisits(past.filter(v => v.id !== visit.id));
+      try {
+        const past = await getPatientVisits(token.patient_id);
+        setPastVisits(past.filter(v => v.id !== visit.id));
+      } catch (e) {
+        console.error('Failed to load past visits:', e);
+        setPastVisits([]);
+      }
 
-      await addNotificationLog({
-        token_id: token.id,
-        patient_id: token.patient_id,
-        stage: 'with_doctor',
-        message: 'Doctor is ready to see you now. Please proceed.',
-      });
+      try {
+        await addNotificationLog({
+          token_id: token.id,
+          patient_id: token.patient_id,
+          stage: 'with_doctor',
+          message: 'Doctor is ready to see you now. Please proceed.',
+        });
+      } catch (e) {
+        console.error('Notification log failed:', e);
+      }
 
       toast({ title: '🩺 Consultation Started', description: `Patient token #${token.token_number}` });
       loadData();
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      console.error('Start consultation error:', e);
+      toast({ title: 'Error starting consultation', description: e.message || 'Something went wrong', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
