@@ -472,12 +472,12 @@ const DoctorQueue = () => {
                       {/* Symptoms */}
                       <div className="mt-2 p-2 rounded-lg bg-muted/50">
                         <p className="text-xs font-medium text-muted-foreground">Current Symptoms</p>
-                        <p className="text-sm">{selectedToken.symptoms}</p>
+                        <p className="text-sm">{selectedToken.symptoms || 'No symptoms recorded'}</p>
                         <Badge className={`mt-1 text-[10px] ${
                           selectedToken.severity === 'critical' ? 'bg-red-500/15 text-red-600' :
                           selectedToken.severity === 'moderate' ? 'bg-amber-500/15 text-amber-600' :
                           'bg-emerald-500/15 text-emerald-600'
-                        }`}>{selectedToken.severity}</Badge>
+                        }`}>{selectedToken.severity || 'mild'}</Badge>
                       </div>
 
                       {/* Same Symptom Red Alert */}
