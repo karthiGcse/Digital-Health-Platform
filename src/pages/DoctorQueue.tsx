@@ -456,9 +456,9 @@ const DoctorQueue = () => {
                         {selectedToken.is_emergency && <Badge className="bg-red-500 text-white text-xs">🚨 EMERGENCY</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {selectedPatient.gender} • {selectedPatient.blood_group && `🩸 ${selectedPatient.blood_group}`}
-                        • 📞 {selectedPatient.phone}
-                        • Visits: {selectedPatient.total_visits}
+                        {selectedPatient.gender || 'N/A'} • {selectedPatient.blood_group ? `🩸 ${selectedPatient.blood_group}` : ''}
+                        • 📞 {selectedPatient.phone || 'N/A'}
+                        • Visits: {selectedPatient.total_visits ?? 0}
                       </p>
 
                       {/* Allergies & Chronic Diseases Alert */}
