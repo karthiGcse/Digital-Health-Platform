@@ -99,29 +99,42 @@ const DoctorQueue = () => {
     try {
       await updateTokenStatus(token.id, 'with_doctor');
 
+      // Update local token status immediately so UI reflects the change
+      setTokens(prev => prev.map(t => t.id === token.id ? { ...t, status: 'with_doctor' } : t));
+
       const visit = await createVisit({
         token_id: token.id,
         patient_id: token.patient_id,
-        symptoms: token.symptoms,
+        symptoms: token.symptoms || '',
       });
       setCurrentVisit(visit);
       setSelectedTokenId(token.id);
 
       // Load past visits
-      const past = await getPatientVisits(token.patient_id);
-      setPastVisits(past.filter(v => v.id !== visit.id));
+      try {
+        const past = await getPatientVisits(token.patient_id);
+        setPastVisits(past.filter(v => v.id !== visit.id));
+      } catch (e) {
+        console.error('Failed to load past visits:', e);
+        setPastVisits([]);
+      }
 
-      await addNotificationLog({
-        token_id: token.id,
-        patient_id: token.patient_id,
-        stage: 'with_doctor',
-        message: 'Doctor is ready to see you now. Please proceed.',
-      });
+      try {
+        await addNotificationLog({
+          token_id: token.id,
+          patient_id: token.patient_id,
+          stage: 'with_doctor',
+          message: 'Doctor is ready to see you now. Please proceed.',
+        });
+      } catch (e) {
+        console.error('Notification log failed:', e);
+      }
 
       toast({ title: '🩺 Consultation Started', description: `Patient token #${token.token_number}` });
       loadData();
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      console.error('Start consultation error:', e);
+      toast({ title: 'Error starting consultation', description: e.message || 'Something went wrong', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -297,11 +310,13 @@ const DoctorQueue = () => {
   const waitingTokens = tokens.filter(t => ['registered', 'waiting'].includes(t.status));
   const activeTokens = tokens.filter(t => ['with_doctor', 'at_scan', 'at_lab', 'at_injection', 'at_pharmacy'].includes(t.status));
 
-  // Check for same-symptom repeats
-  const sameSymptomCount = pastVisits.filter(v =>
-    selectedToken?.symptoms && v.symptoms &&
-    v.symptoms.toLowerCase().includes(selectedToken.symptoms.toLowerCase().split(' ')[0])
-  ).length;
+  // Safely compute same symptom count
+  const sameSymptomCount = selectedToken?.symptoms
+    ? pastVisits.filter(v =>
+        v.symptoms &&
+        v.symptoms.toLowerCase().includes((selectedToken.symptoms || '').toLowerCase().split(' ')[0])
+      ).length
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -428,7 +443,7 @@ const DoctorQueue = () => {
                   <div className="flex items-start gap-4">
                     <div className={`h-16 w-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shrink-0
                       ${selectedToken.is_emergency ? 'bg-gradient-to-br from-red-500 to-rose-500' : 'bg-gradient-to-br from-blue-500 to-cyan-500'}`}>
-                      {selectedPatient.name.charAt(0)}
+                      {selectedPatient.name?.charAt(0) || '?'}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -441,9 +456,9 @@ const DoctorQueue = () => {
                         {selectedToken.is_emergency && <Badge className="bg-red-500 text-white text-xs">🚨 EMERGENCY</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {selectedPatient.gender} • {selectedPatient.blood_group && `🩸 ${selectedPatient.blood_group}`}
-                        • 📞 {selectedPatient.phone}
-                        • Visits: {selectedPatient.total_visits}
+                        {selectedPatient.gender || 'N/A'} • {selectedPatient.blood_group ? `🩸 ${selectedPatient.blood_group}` : ''}
+                        • 📞 {selectedPatient.phone || 'N/A'}
+                        • Visits: {selectedPatient.total_visits ?? 0}
                       </p>
 
                       {/* Allergies & Chronic Diseases Alert */}
@@ -457,12 +472,12 @@ const DoctorQueue = () => {
                       {/* Symptoms */}
                       <div className="mt-2 p-2 rounded-lg bg-muted/50">
                         <p className="text-xs font-medium text-muted-foreground">Current Symptoms</p>
-                        <p className="text-sm">{selectedToken.symptoms}</p>
+                        <p className="text-sm">{selectedToken.symptoms || 'No symptoms recorded'}</p>
                         <Badge className={`mt-1 text-[10px] ${
                           selectedToken.severity === 'critical' ? 'bg-red-500/15 text-red-600' :
                           selectedToken.severity === 'moderate' ? 'bg-amber-500/15 text-amber-600' :
                           'bg-emerald-500/15 text-emerald-600'
-                        }`}>{selectedToken.severity}</Badge>
+                        }`}>{selectedToken.severity || 'mild'}</Badge>
                       </div>
 
                       {/* Same Symptom Red Alert */}
