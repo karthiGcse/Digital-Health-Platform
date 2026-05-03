@@ -1,31 +1,4 @@
 project_id = "evmyknljivgdfyxfzdov"
 
-[functions.claude-symptom-analysis]
-verify_jwt = false
-
-[functions.claude-medicine-summary]
-verify_jwt = false
-
-[functions.claude-drug-interactions]
-verify_jwt = false
-
-[functions.prescription-ocr]
-verify_jwt = false
-
 [functions.nearby-services]
-verify_jwt = false
-
-[functions.ai-consultation]
-verify_jwt = false
-
-[functions.ai-health-report]
-verify_jwt = false
-
-[functions.ai-image-diagnosis]
-verify_jwt = false
-
-[functions.mental-health-chat]
-verify_jwt = false
-
-[functions.voice-assistant]
 verify_jwt = false
