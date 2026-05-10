@@ -58,8 +58,11 @@ const ImageDiagnosis = () => {
             .upload(fileName, byteArray, { contentType: 'image/jpeg' });
 
           if (!uploadError) {
-            const { data: urlData } = supabase.storage.from('diagnosis-images').getPublicUrl(fileName);
-            imageUrl = urlData.publicUrl;
+            // Bucket is private; store the storage path and generate signed URLs on demand
+            const { data: signed } = await supabase.storage
+              .from('diagnosis-images')
+              .createSignedUrl(fileName, 60 * 60 * 24 * 7);
+            imageUrl = signed?.signedUrl || fileName;
           }
         } catch { /* image storage optional */ }
 
