@@ -612,10 +612,10 @@ const DoctorQueue = () => {
                     {/* Follow-up */}
                     <div className="flex items-center gap-3">
                       <Label className="text-xs whitespace-nowrap">Follow-up in:</Label>
-                      <Select value={followUpDays} onValueChange={setFollowUpDays}>
+                      <Select value={followUpDays || 'none'} onValueChange={(v) => setFollowUpDays(v === 'none' ? '' : v)}>
                         <SelectTrigger className="w-32 h-8 text-xs"><SelectValue placeholder="No follow-up" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No follow-up</SelectItem>
+                          <SelectItem value="none">No follow-up</SelectItem>
                           {['3', '5', '7', '10', '14', '30'].map(d => (
                             <SelectItem key={d} value={d}>{d} days</SelectItem>
                           ))}
