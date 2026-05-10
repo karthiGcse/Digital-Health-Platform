@@ -11,6 +11,16 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useHospitalDB, HospitalTokenDB } from '@/hooks/useHospitalDB';
+import { supabase } from '@/integrations/supabase/client';
+
+interface RecentVisit {
+  id: string;
+  patient_id: string;
+  diagnosis: string;
+  prescription: any[];
+  completed_at: string | null;
+  created_at: string;
+}
 
 const DoctorDashboard = () => {
   const { profile } = useAuth();
@@ -19,6 +29,8 @@ const DoctorDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tokens, setTokens] = useState<HospitalTokenDB[]>([]);
   const [pharmacyCount, setPharmacyCount] = useState(0);
+  const [recentVisits, setRecentVisits] = useState<RecentVisit[]>([]);
+  const [patientNames, setPatientNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -27,6 +39,13 @@ const DoctorDashboard = () => {
 
   useEffect(() => {
     loadDashboardData();
+    const channel = supabase
+      .channel('doctor-dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hospital_tokens' }, () => loadDashboardData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hospital_orders' }, () => loadDashboardData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hospital_visits' }, () => loadDashboardData())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const loadDashboardData = async () => {
@@ -35,6 +54,25 @@ const DoctorDashboard = () => {
       setTokens(todayTokens);
       const pharmacyOrders = await getOrdersByType('pharmacy');
       setPharmacyCount(pharmacyOrders.length);
+
+      const today = new Date().toISOString().split('T')[0];
+      const { data: visits } = await supabase
+        .from('hospital_visits')
+        .select('id, patient_id, diagnosis, prescription, completed_at, created_at')
+        .gte('created_at', today)
+        .order('created_at', { ascending: false })
+        .limit(6);
+      if (visits) setRecentVisits(visits as RecentVisit[]);
+
+      const ids = [...new Set([...todayTokens.map(t => t.patient_id), ...(visits || []).map((v: any) => v.patient_id)])];
+      if (ids.length) {
+        const { data: pats } = await supabase.from('hospital_patients').select('id, name').in('id', ids);
+        if (pats) {
+          const map: Record<string, string> = {};
+          pats.forEach((p: any) => { map[p.id] = p.name; });
+          setPatientNames(map);
+        }
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -42,6 +80,8 @@ const DoctorDashboard = () => {
   const inProgress = tokens.filter(t => t.status === 'with_doctor').length;
   const completed = tokens.filter(t => t.status === 'completed').length;
   const emergencyCount = tokens.filter(t => t.is_emergency && t.status !== 'completed').length;
+  const activeConsult = tokens.find(t => t.status === 'with_doctor');
+  const prescriptionsToday = recentVisits.filter(v => Array.isArray(v.prescription) && v.prescription.length > 0);
 
   const statCards = [
     { label: "Today's Patients", value: tokens.length, icon: Users, gradient: 'from-blue-500 to-cyan-500', trend: `${waitingCount} waiting` },
@@ -88,6 +128,29 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Active Consultation Banner */}
+      {activeConsult && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-500/5 to-cyan-500/5">
+            <CardContent className="p-4 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold animate-pulse">
+                  #{activeConsult.token_number}
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-blue-600 font-semibold">Active Consultation</p>
+                  <p className="text-sm font-bold">{patientNames[activeConsult.patient_id] || 'Patient'}</p>
+                  <p className="text-xs text-muted-foreground truncate max-w-[400px]">{activeConsult.symptoms || 'No symptoms recorded'}</p>
+                </div>
+              </div>
+              <Button size="sm" className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white" onClick={() => navigate('/doctor-queue')}>
+                Continue Consultation <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -200,6 +263,38 @@ const DoctorDashboard = () => {
           </Card>
         </div>
       </div>
+
+      {/* Recent Prescriptions Today */}
+      <Card className="border-border/50">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <FileText className="h-5 w-5 text-violet-500" /> Prescriptions Issued Today
+          </CardTitle>
+          <Badge variant="outline" className="text-xs">{prescriptionsToday.length} total</Badge>
+        </CardHeader>
+        <CardContent>
+          {prescriptionsToday.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No prescriptions issued yet today.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {prescriptionsToday.map(v => (
+                <div key={v.id} className="p-3 rounded-xl bg-muted/40 border border-border/40">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-semibold truncate">{patientNames[v.patient_id] || 'Patient'}</p>
+                    <Badge className="bg-violet-500/15 text-violet-600 text-[10px] border-0">
+                      {(v.prescription as any[]).length} med
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">{v.diagnosis || 'No diagnosis recorded'}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {new Date(v.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
