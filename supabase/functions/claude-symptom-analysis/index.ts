@@ -71,17 +71,26 @@ Analyze these symptoms and provide a comprehensive assessment.`;
                       required: ["name", "probability", "description"],
                     },
                   },
-                  recommended_actions: {
-                    type: "array",
-                    items: { type: "string" },
-                  },
-                  emergency_flag: { type: "boolean" },
-                  follow_up_questions: {
-                    type: "array",
-                    items: { type: "string" },
-                  },
-                },
-                required: ["risk_score", "severity", "detected_symptoms", "possible_conditions", "recommended_actions", "emergency_flag"],
+                   recommended_actions: {
+                     type: "array",
+                     items: { type: "string" },
+                   },
+                   emergency_flag: { type: "boolean" },
+                   follow_up_questions: {
+                     type: "array",
+                     items: { type: "string" },
+                   },
+                   suggested_department: {
+                     type: "string",
+                     enum: [
+                       "General Medicine", "Cardiology", "Pediatrics", "Gynecology",
+                       "Orthopedics", "Dentistry", "Ophthalmology", "Psychiatry",
+                       "Emergency", "Radiology", "Laboratory", "Injection Centre", "Pharmacy"
+                     ],
+                     description: "Best-fit hospital department for this case based on symptoms"
+                   },
+                 },
+                 required: ["risk_score", "severity", "detected_symptoms", "possible_conditions", "recommended_actions", "emergency_flag", "suggested_department"],
               },
             },
           },
