@@ -9,43 +9,84 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useHospitalDB, HospitalOrderDB, HospitalPatientDB } from '@/hooks/useHospitalDB';
 
-const mockStats = {
-  pendingPrescriptions: 12,
-  readyForPickup: 5,
-  lowStockAlerts: 3,
-  todayDispensed: 34,
-};
-
-const pendingRx = [
-  { id: 'RX-2025-0001', patient: 'Rahul Sharma', medicines: 3, status: 'New', time: '10:30 AM', doctor: 'Dr. Mehta' },
-  { id: 'RX-2025-0002', patient: 'Priya Patel', medicines: 2, status: 'Preparing', time: '10:45 AM', doctor: 'Dr. Singh' },
-  { id: 'RX-2025-0003', patient: 'Amit Kumar', medicines: 1, status: 'New', time: '11:00 AM', doctor: 'Dr. Gupta' },
-  { id: 'RX-2025-0004', patient: 'Sneha Gupta', medicines: 4, status: 'Ready', time: '09:15 AM', doctor: 'Dr. Mehta' },
-  { id: 'RX-2025-0005', patient: 'Vikram Singh', medicines: 2, status: 'Preparing', time: '11:15 AM', doctor: 'Dr. Patel' },
-];
-
-const lowStockItems = [
-  { name: 'Paracetamol 500mg', stock: 12, threshold: 50 },
-  { name: 'Amoxicillin 250mg', stock: 8, threshold: 30 },
-  { name: 'Omeprazole 20mg', stock: 5, threshold: 25 },
-];
+interface LowStockItem { name: string; stock: number; threshold: number; }
 
 const PharmacistDashboard = () => {
   const { profile } = useAuth();
   const navigate = useNavigate();
+  const { getOrdersByType } = useHospitalDB();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [orders, setOrders] = useState<HospitalOrderDB[]>([]);
+  const [todayOrders, setTodayOrders] = useState<HospitalOrderDB[]>([]);
+  const [patients, setPatients] = useState<Record<string, HospitalPatientDB>>({});
+  const [lowStock, setLowStock] = useState<LowStockItem[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    loadData();
+    const channel = supabase
+      .channel('pharmacist-dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hospital_orders' }, () => loadData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pharmacy_inventory' }, () => loadInventory())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const active = await getOrdersByType('pharmacy');
+      setOrders(active);
+
+      const today = new Date().toISOString().split('T')[0];
+      const { data: all } = await supabase
+        .from('hospital_orders')
+        .select('*')
+        .eq('order_type', 'pharmacy')
+        .gte('created_at', today)
+        .order('created_at', { ascending: false });
+      if (all) setTodayOrders(all as HospitalOrderDB[]);
+
+      const ids = [...new Set(active.map(o => o.patient_id))];
+      if (ids.length > 0) {
+        const { data: pats } = await supabase.from('hospital_patients').select('*').in('id', ids);
+        if (pats) {
+          const map: Record<string, HospitalPatientDB> = {};
+          pats.forEach((p: any) => { map[p.id] = p; });
+          setPatients(map);
+        }
+      }
+      await loadInventory();
+    } catch (e) { console.error(e); }
+  };
+
+  const loadInventory = async () => {
+    const { data } = await supabase
+      .from('pharmacy_inventory')
+      .select('medicine_name, stock_quantity')
+      .lte('stock_quantity', 20)
+      .order('stock_quantity')
+      .limit(5);
+    if (data) {
+      setLowStock(data.map((i: any) => ({ name: i.medicine_name, stock: i.stock_quantity, threshold: 20 })));
+    }
+  };
+
+  const pending = orders.filter(o => o.status === 'pending').length;
+  const ready = orders.filter(o => o.status === 'in_progress' || o.status === 'seen').length;
+  const dispensed = todayOrders.filter(o => o.status === 'completed').length;
+
   const statCards = [
-    { label: 'Pending Rx', value: mockStats.pendingPrescriptions, icon: FileText, gradient: 'from-blue-500 to-cyan-500', trend: '4 urgent' },
-    { label: 'Ready for Pickup', value: mockStats.readyForPickup, icon: CheckCircle2, gradient: 'from-emerald-500 to-teal-500', trend: '2 waiting >30min' },
-    { label: 'Low Stock Alerts', value: mockStats.lowStockAlerts, icon: AlertTriangle, gradient: 'from-amber-500 to-orange-500', trend: 'Action needed' },
-    { label: 'Today Dispensed', value: mockStats.todayDispensed, icon: Package, gradient: 'from-violet-500 to-purple-500', trend: '+8 vs yesterday' },
+    { label: 'Pending Rx', value: pending, icon: FileText, gradient: 'from-blue-500 to-cyan-500', trend: pending > 0 ? 'Awaiting prep' : 'All clear' },
+    { label: 'Ready for Pickup', value: ready, icon: CheckCircle2, gradient: 'from-emerald-500 to-teal-500', trend: 'In progress' },
+    { label: 'Low Stock Alerts', value: lowStock.length, icon: AlertTriangle, gradient: 'from-amber-500 to-orange-500', trend: lowStock.length ? 'Action needed' : 'Stocked up' },
+    { label: 'Today Dispensed', value: dispensed, icon: Package, gradient: 'from-violet-500 to-purple-500', trend: 'Completed today' },
   ];
 
   return (
@@ -123,28 +164,37 @@ const PharmacistDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {pendingRx.map((rx) => (
-                  <div key={rx.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer" onClick={() => navigate('/smart-pharmacy')}>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
-                        {rx.patient.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{rx.patient}</p>
-                        <p className="text-xs text-muted-foreground">{rx.id} • {rx.medicines} medicines • {rx.doctor}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{rx.time}</span>
-                      <Badge variant={rx.status === 'Ready' ? 'default' : rx.status === 'Preparing' ? 'secondary' : 'outline'}
-                        className={rx.status === 'Ready' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20' :
-                          rx.status === 'Preparing' ? 'bg-blue-500/15 text-blue-600 border-blue-500/20' :
-                          'bg-amber-500/15 text-amber-600 border-amber-500/20'}>
-                        {rx.status}
-                      </Badge>
-                    </div>
+                {orders.length === 0 ? (
+                  <div className="text-center py-8 text-sm text-muted-foreground">
+                    No pending prescriptions. New orders from doctors will appear here automatically.
                   </div>
-                ))}
+                ) : (
+                  orders.slice(0, 8).map((o) => {
+                    const p = patients[o.patient_id];
+                    const meds = Array.isArray(o.medicines) ? o.medicines.length : 0;
+                    const time = new Date(o.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    const statusLabel = o.status === 'pending' ? 'New' : o.status === 'seen' ? 'Acknowledged' : 'Preparing';
+                    return (
+                      <div key={o.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer" onClick={() => navigate('/smart-pharmacy')}>
+                        <div className="flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
+                            {(p?.name || 'P').charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{p?.name || 'Patient'}</p>
+                            <p className="text-xs text-muted-foreground">{p?.health_id || '—'} • {meds} medicine{meds === 1 ? '' : 's'}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{time}</span>
+                          <Badge className={statusLabel === 'New' ? 'bg-amber-500/15 text-amber-600 border-amber-500/20' : 'bg-blue-500/15 text-blue-600 border-blue-500/20'}>
+                            {statusLabel}
+                          </Badge>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>
@@ -160,7 +210,9 @@ const PharmacistDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {lowStockItems.map((item, i) => (
+                {lowStock.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-3">All medicines well-stocked.</p>
+                ) : lowStock.map((item, i) => (
                   <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="h-2 w-2 rounded-full mt-1.5 shrink-0 bg-red-500" />
                     <div>
