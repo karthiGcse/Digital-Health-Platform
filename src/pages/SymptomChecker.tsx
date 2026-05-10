@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock, Baby, User, Heart } from 'lucide-react';
+import { AlertTriangle, Activity, Loader2, Phone, Trash2, Clock, Baby, User, Heart, Stethoscope, Hash, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useHospitalDB } from '@/hooks/useHospitalDB';
 
 type PatientType = 'child' | 'adult' | 'pregnant';
 
@@ -102,6 +104,7 @@ interface AnalysisResult {
   recommended_actions: string[];
   emergency_flag: boolean;
   follow_up_questions?: string[];
+  suggested_department?: string;
 }
 
 interface HistoryItem {
@@ -113,7 +116,11 @@ interface HistoryItem {
 }
 
 const SymptomChecker = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const { getDepartments, getDoctors, registerPatient, createToken, addNotificationLog } = useHospitalDB();
+  const [bookingToken, setBookingToken] = useState(false);
+  const [bookedToken, setBookedToken] = useState<{ number: number; department: string; doctor?: string } | null>(null);
   const [patientType, setPatientType] = useState<PatientType>('adult');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
@@ -154,6 +161,7 @@ const SymptomChecker = () => {
     }
     setLoading(true);
     setResult(null);
+    setBookedToken(null);
     try {
       const { data, error } = await supabase.functions.invoke('claude-symptom-analysis', {
         body: { symptoms, age: parseInt(age), gender, duration, patientType },
@@ -178,6 +186,80 @@ const SymptomChecker = () => {
       toast.error(e.message || 'Analysis failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const bookDoctor = async () => {
+    if (!result || !user) {
+      toast.error('Please sign in to book a doctor');
+      return;
+    }
+    setBookingToken(true);
+    try {
+      // 1. Find or create the patient record for this user
+      const { data: existing } = await supabase
+        .from('hospital_patients')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const patient = existing
+        ? existing
+        : await registerPatient({
+            name: profile?.name || user.email?.split('@')[0] || 'Patient',
+            phone: profile?.phone || '',
+            email: user.email || '',
+            gender: gender || '',
+          });
+
+      // 2. Look up the suggested department
+      const departments = await getDepartments();
+      const targetName = result.suggested_department || 'General Medicine';
+      const dept = departments.find(d => d.name.toLowerCase() === targetName.toLowerCase())
+        || departments.find(d => d.name === 'General Medicine')
+        || departments[0];
+      if (!dept) throw new Error('No departments available');
+
+      // 3. Pick an available doctor in that department
+      const doctors = await getDoctors();
+      const deptDoctors = doctors.filter(d => d.department_id === dept.id);
+      const available = deptDoctors.find(d => d.availability_status === 'available') || deptDoctors[0];
+
+      // 4. Create the token
+      const sevMap: Record<string, string> = { mild: 'mild', moderate: 'moderate', severe: 'severe', critical: 'severe' };
+      const token = await createToken({
+        patient_id: patient.id,
+        department_id: dept.id,
+        doctor_id: available?.id,
+        entry_type: 'online',
+        is_emergency: result.emergency_flag,
+        severity: sevMap[result.severity] || 'mild',
+        symptoms,
+        ai_suggested_department: targetName,
+      });
+
+      // 5. Notify
+      await addNotificationLog({
+        token_id: token.id,
+        patient_id: patient.id,
+        stage: 'token_issued',
+        message: `Token #${token.token_number} issued for ${dept.name}${available ? ` with Dr. ${available.name}` : ''}.`,
+      });
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: '🎫 Doctor Appointment Booked',
+        message: `Token #${token.token_number} for ${dept.name}${available ? ` with Dr. ${available.name}` : ''}. Please arrive on time.`,
+        type: 'success',
+        link: '/hospital-queue',
+      });
+
+      setBookedToken({ number: token.token_number, department: dept.name, doctor: available?.name });
+      toast.success(`Token #${token.token_number} assigned to ${dept.name}!`);
+    } catch (e: any) {
+      console.error('Book doctor error:', e);
+      toast.error(e.message || 'Could not book appointment');
+    } finally {
+      setBookingToken(false);
     }
   };
 
@@ -411,6 +493,48 @@ const SymptomChecker = () => {
                         <Phone className="h-4 w-4 mr-2" /> Consult a Doctor Now
                       </Button>
                     )}
+                  </CardContent>
+                </Card>
+
+                {/* Symptom-to-Doctor: Auto-book token */}
+                <Card className="rounded-card shadow-md mt-4 border-primary/30 bg-gradient-to-br from-primary/5 to-blue-500/5">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Stethoscope className="h-4 w-4 text-primary" />
+                      AI-Routed Doctor Appointment
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {result.suggested_department && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Building2 className="h-4 w-4 text-primary" />
+                        <span className="text-muted-foreground">Best fit:</span>
+                        <Badge className="bg-primary/15 text-primary border-0">{result.suggested_department}</Badge>
+                      </div>
+                    )}
+                    {bookedToken ? (
+                      <div className="rounded-lg bg-success/10 border border-success/30 p-4 text-center space-y-1">
+                        <Hash className="h-6 w-6 mx-auto text-success" />
+                        <p className="text-2xl font-bold text-success">Token #{bookedToken.number}</p>
+                        <p className="text-sm">{bookedToken.department}{bookedToken.doctor ? ` — Dr. ${bookedToken.doctor}` : ''}</p>
+                        <Button variant="link" size="sm" onClick={() => navigate('/hospital-queue')}>
+                          View in Queue →
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={bookDoctor}
+                        disabled={bookingToken || !user}
+                        className="w-full bg-gradient-to-r from-primary to-blue-600 text-white hover:opacity-90"
+                      >
+                        {bookingToken ? (
+                          <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Booking…</>
+                        ) : (
+                          <><Stethoscope className="h-4 w-4 mr-2" /> Book Doctor & Get Token</>
+                        )}
+                      </Button>
+                    )}
+                    {!user && <p className="text-xs text-muted-foreground text-center">Sign in to book an appointment.</p>}
                   </CardContent>
                 </Card>
               </motion.div>
